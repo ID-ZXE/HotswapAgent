@@ -32,24 +32,6 @@
 
     <build>
         <plugins>
-            <!--TODO - run manually from IDE. If run from maven, unable to access JAR content-->
-            <!--<plugin>-->
-            <!--<groupId>org.codehaus.mojo</groupId>-->
-            <!--<artifactId>exec-maven-plugin</artifactId>-->
-            <!--<version>1.2.1</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>package</phase>-->
-            <!--<goals>-->
-            <!--<goal>java</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-            <!--<mainClass>org.hotswap.agent.distribution.PluginDocs</mainClass>-->
-            <!--</configuration>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
-
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>

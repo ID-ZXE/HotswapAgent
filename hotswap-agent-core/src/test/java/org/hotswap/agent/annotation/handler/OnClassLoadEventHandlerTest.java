@@ -55,7 +55,8 @@ public class OnClassLoadEventHandlerTest {
 
             allowing(pluginManager).getPluginRegistry(); will(returnValue(pluginRegistry));
 
-            allowing(pluginRegistry).getAppClassLoader(with(any(Object.class))); will(returnValue(appClassLoader));
+            allowing(pluginRegistry).getAppClassLoader(with(any(Object.class)));
+            will(returnValue(appClassLoader));
 
             oneOf(hotswapTransformer).registerTransformer(with(appClassLoader),
                     with("org.hotswap.example.type"), with(any(HaClassFileTransformer.class)));
@@ -65,8 +66,10 @@ public class OnClassLoadEventHandlerTest {
 
         SimplePlugin simplePlugin = new SimplePlugin();
         Method method = SimplePlugin.class.getMethod("transform");
-        PluginAnnotation<OnClassLoadEvent> pluginAnnotation = new PluginAnnotation<OnClassLoadEvent>(SimplePlugin.class,
+        PluginAnnotation<OnClassLoadEvent> pluginAnnotation = new PluginAnnotation<>(SimplePlugin.class,
                 simplePlugin, method.getAnnotation(OnClassLoadEvent.class), method);
+//        onClassLoadedHandler.initMethod(pluginAnnotation);
+//        Class.forName("org.hotswap.example.type.Demo");
         assertTrue("Init successful",
                 onClassLoadedHandler.initMethod(pluginAnnotation));
 

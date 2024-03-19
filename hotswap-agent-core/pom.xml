@@ -12,6 +12,11 @@
 
     <artifactId>hotswap-agent-core</artifactId>
 
+    <properties>
+        <commons-io.version>2.7</commons-io.version>
+        <commons-lang3.version>3.3.1</commons-lang3.version>
+    </properties>
+
     <profiles>
         <profile>
             <id>default-tools</id>
@@ -106,7 +111,6 @@
         </resources>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -122,10 +126,53 @@
                     </archive>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <id>shade-when-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>commons-io</pattern>
+                                    <shadedPattern>org.hotswap.agent.commons.io</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>arthas-memorycompiler</pattern>
+                                    <shadedPattern>org.hotswap.agent.compiler</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.taobao.arthas:arthas-memorycompiler</include>
+                                    <include>commons-io:commons-io</include>
+                                </includes>
+                            </artifactSet>
+                            <shadeSourcesContent>true</shadeSourcesContent>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.taobao.arthas</groupId>
+            <artifactId>arthas-memorycompiler</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

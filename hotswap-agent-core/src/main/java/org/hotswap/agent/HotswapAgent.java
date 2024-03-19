@@ -18,11 +18,17 @@
  */
 package org.hotswap.agent;
 
+import org.hotswap.agent.constants.HotswapConstants;
+import org.hotswap.agent.handle.EmbedHttpServer;
+import org.hotswap.agent.handle.LocalCompileHandler;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.util.Version;
+import org.hotswap.agent.watch.Watcher;
+import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.lang.instrument.Instrumentation;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,7 +51,7 @@ public class HotswapAgent {
      * <p/>
      * Plugin might be disabled in hotswap-agent.properties for application classloaders as well.
      */
-      private static Set<String> disabledPlugins = new HashSet<>();
+    private static Set<String> disabledPlugins = new HashSet<>();
 
     /**
      * Default value for autoHotswap property.
@@ -57,23 +63,28 @@ public class HotswapAgent {
      */
     private static String propertiesFilePath;
 
+    private static ClassLoader compileClassLoader;
+
     public static void agentmain(String args, Instrumentation inst) {
         premain(args, inst);
     }
 
     public static void premain(String args, Instrumentation inst) {
-
         LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
         parseArgs(args);
         fixJboss7Modules();
         PluginManager.getInstance().init(inst);
+
+        // 远程编译器初始化
+        LocalCompileHandler.init((AbstractNIO2Watcher) PluginManager.getInstance().getWatcher(),
+                HotswapConstants.EXT_CLASS_PATH, inst);
+        EmbedHttpServer.start();
         LOGGER.debug("Hotswap agent initialized.");
 
     }
 
     public static void parseArgs(String args) {
-        if (args == null)
-            return;
+        if (args == null) return;
 
         for (String arg : args.split(",")) {
             String[] val = arg.split("=");
@@ -123,18 +134,6 @@ public class HotswapAgent {
         return autoHotswap;
     }
 
-    /**
-     * JBoss 7 use OSGI classloading and hence agent core classes are not available from application classloader
-     * (this is not the case with standard classloaders with parent delgation).
-     *
-     * Wee need to simulate command line attribute -Djboss.modules.system.pkgs=org.hotswap.agent to allow any
-     * classloader to access agent libraries (OSGI default export). This method does it on behalf of the user.
-     *
-     * It is not possible to add whole org.hotswap.agent package, because it includes all subpackages and
-     * examples will fail (org.hotswap.agent.example will become system package).
-     *
-     * See similar problem description https://issues.jboss.org/browse/WFLY-895.
-     */
     private static void fixJboss7Modules() {
         String JBOSS_SYSTEM_MODULES_KEY = "jboss.modules.system.pkgs";
 
@@ -145,12 +144,11 @@ public class HotswapAgent {
 
     public static final String HOTSWAP_AGENT_EXPORT_PACKAGES = //
             "org.hotswap.agent.annotation,"//
-            + "org.hotswap.agent.command," //
-            + "org.hotswap.agent.config," //
-            + "org.hotswap.agent.logging,"
-            + "org.hotswap.agent.plugin," //
-            + "org.hotswap.agent.util," //
-            + "org.hotswap.agent.watch," //
-            + "org.hotswap.agent.versions," //
-            + "org.hotswap.agent.javassist";
+                    + "org.hotswap.agent.command," //
+                    + "org.hotswap.agent.config," //
+                    + "org.hotswap.agent.logging," + "org.hotswap.agent.plugin," //
+                    + "org.hotswap.agent.util," //
+                    + "org.hotswap.agent.watch," //
+                    + "org.hotswap.agent.versions," //
+                    + "org.hotswap.agent.javassist";
 }

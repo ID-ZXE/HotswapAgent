@@ -40,7 +40,7 @@ public class SimplePlugin {
 
     @OnClassLoadEvent(classNameRegexp = "org.hotswap.example.type")
     public void transform() {
-
+        System.out.println("--> Transforming class");
     }
 
     // used by PluginManagerInvokerTest to dynamically call this method.
