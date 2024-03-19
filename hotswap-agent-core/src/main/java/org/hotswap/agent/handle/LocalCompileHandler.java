@@ -2,7 +2,6 @@ package org.hotswap.agent.handle;
 
 import com.taobao.arthas.compiler.DynamicCompiler;
 import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.HotswapAgent;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
@@ -57,8 +56,8 @@ public class LocalCompileHandler {
             String classDestinationPath = Paths.get(extraClasspath, entry.getKey().replace('.', '/').concat(".class")).toString();
             Path destinationPath = Paths.get(classDestinationPath);
             if (!Files.exists(destinationPath.getParent())) {
-                Files.createDirectories(destinationPath.getParent());
-                watcher.addDirectory(Paths.get(extraClasspath));
+                Path directories = Files.createDirectories(destinationPath.getParent());
+                watcher.addDirectory(directories);
             }
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
         }
