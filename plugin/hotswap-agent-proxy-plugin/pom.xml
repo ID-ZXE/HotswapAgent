@@ -12,9 +12,9 @@
 
     <artifactId>hotswap-agent-proxy-plugin</artifactId>
 
-        <properties>
-                <org.springframework.version>5.3.30</org.springframework.version>
-        </properties>
+    <properties>
+        <org.springframework.version>5.3.30</org.springframework.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -25,13 +25,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-                        <version>${org.springframework.version}</version>
+            <version>${org.springframework.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-                        <version>${org.springframework.version}</version>
+            <version>${org.springframework.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -55,7 +55,7 @@
         <profile>
             <id>default-tools</id>
             <activation>
-                    <jdk>(,1.9)</jdk>
+                <jdk>(,1.9)</jdk>
             </activation>
             <dependencies>
                 <dependency>
