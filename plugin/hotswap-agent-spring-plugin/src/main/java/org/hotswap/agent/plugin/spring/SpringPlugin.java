@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the HotswapAgent authors.
+ * Copyright 2013-2024 the HotswapAgent authors.
  *
  * This file is part of HotswapAgent.
  *
@@ -168,8 +168,9 @@ public class SpringPlugin {
     }
 
     private void registerBasePackage(final String basePackage) {
-        // v.d.: Force load/Initialize ClassPathBeanRefreshCommand classe in JVM. This is hack, in whatever reason sometimes new ClassPathBeanRefreshCommand()
-        //       stays locked inside agent's transform() call. It looks like some bug in JVMTI or JVMTI-debugger() locks handling.
+        // Force load/initialize the ClassPathBeanRefreshCommand class into the JVM to work around an issue where instances
+        // of this class sometimes remain locked during the agent's transform() call. This behavior suggests a potential
+        // bug in JVMTI or its handling of debugger locks.
         hotswapTransformer.registerTransformer(appClassLoader, getClassNameRegExp(basePackage),
                 new SpringBeanClassFileTransformer(appClassLoader, scheduler, basePackage));
     }

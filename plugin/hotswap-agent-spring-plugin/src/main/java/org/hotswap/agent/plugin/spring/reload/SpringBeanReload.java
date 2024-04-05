@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the HotswapAgent authors.
+ * Copyright 2013-2024 the HotswapAgent authors.
  *
  * This file is part of HotswapAgent.
  *
@@ -476,7 +476,7 @@ public class SpringBeanReload {
             }
             newScanBeanDefinitions.clear();
         }
-        newBeanNames.addAll(newBeanNames);
+        this.newBeanNames.addAll(newBeanNames);
     }
 
     private void preInstantiateSingleton() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the HotswapAgent authors.
+ * Copyright 2013-2024 the HotswapAgent authors.
  *
  * This file is part of HotswapAgent.
  *
@@ -30,11 +30,9 @@ import java.util.List;
 import org.hotswap.agent.logging.AgentLogger;
 
 /**
- *
  * Loadable detachable Spring bean holder
  *
  * @author Erki Ehtla
- *
  */
 public class DetachableBeanHolder implements Serializable {
 
