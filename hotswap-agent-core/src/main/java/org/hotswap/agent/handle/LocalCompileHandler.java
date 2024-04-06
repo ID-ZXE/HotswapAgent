@@ -76,7 +76,7 @@ public class LocalCompileHandler {
         if (dynamicCompiler == null) {
             synchronized (LocalCompileHandler.class) {
                 if (dynamicCompiler == null) {
-                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+                     PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
                     dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
                 }
             }

@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>hotswap-agent-parent</artifactId>
+    <groupId>org.hotswapagent</groupId>
+    <version>1.4.2-SNAPSHOT</version>
+    <relativePath>../hotswap-agent-parent/pom.xml</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>hotswap-agent-core</artifactId>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.md</include>
+        </includes>
+      </resource>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Agent-Class>org.hotswap.agent.HotswapAgent</Agent-Class>
+              <Premain-Class>org.hotswap.agent.HotswapAgent</Premain-Class>
+              <Can-Redefine-Classes>true</Can-Redefine-Classes>
+              <Can-Retransform-Classes>true</Can-Retransform-Classes>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <id>shade-when-package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>commons-io</pattern>
+                  <shadedPattern>org.hotswap.agent.commons.io</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>arthas-memorycompiler</pattern>
+                  <shadedPattern>org.hotswap.agent.compiler</shadedPattern>
+                </relocation>
+              </relocations>
+              <artifactSet>
+                <includes>
+                  <include>com.taobao.arthas:arthas-memorycompiler</include>
+                  <include>commons-io:commons-io</include>
+                </includes>
+              </artifactSet>
+              <shadeSourcesContent>true</shadeSourcesContent>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>default-tools</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+          <version>${java.version}</version>
+          <scope>system</scope>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>mac-tools</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+          <version>11.0.15</version>
+          <scope>system</scope>
+          <systemPath>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/../lib/tools.jar</systemPath>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>surefire-java11</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.15</version>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-XX:+AllowEnhancedClassRedefinition
+                              -XX:HotswapAgent=external
+                              -Xlog:redefine+class*=info
+                              -Dblank
+                              --add-opens java.base/java.lang=ALL-UNNAMED
+                              --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+                              --add-opens java.base/java.io=ALL-UNNAMED
+                              --add-opens java.desktop/java.beans=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans.introspect=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans.util=ALL-UNNAMED
+                              --add-opens java.base/sun.security.action=ALL-UNNAMED
+                              --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+                  <useSystemClassLoader>true</useSystemClassLoader>
+                  <useManifestOnlyJar>false</useManifestOnlyJar>
+                  <jvm>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/bin/java</jvm>
+                </configuration>
+              </execution>
+            </executions>
+            <configuration>
+              <argLine>-XX:+AllowEnhancedClassRedefinition
+                              -XX:HotswapAgent=external
+                              -Xlog:redefine+class*=info
+                              -Dblank
+                              --add-opens java.base/java.lang=ALL-UNNAMED
+                              --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+                              --add-opens java.base/java.io=ALL-UNNAMED
+                              --add-opens java.desktop/java.beans=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans.introspect=ALL-UNNAMED
+                              --add-opens java.desktop/com.sun.beans.util=ALL-UNNAMED
+                              --add-opens java.base/sun.security.action=ALL-UNNAMED
+                              --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+              <useSystemClassLoader>true</useSystemClassLoader>
+              <useManifestOnlyJar>false</useManifestOnlyJar>
+              <jvm>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/bin/java</jvm>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-XX:HotswapAgent=external -Dblank -Xlog:redefine+class*=info</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hamcrest-core</artifactId>
+          <groupId>org.hamcrest</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>2.6.0</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jmock</artifactId>
+          <groupId>org.jmock</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-dep</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <version>2.6.0</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>objenesis</artifactId>
+          <groupId>org.objenesis</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>cglib-nodep</artifactId>
+          <groupId>cglib</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jmock</artifactId>
+          <groupId>org.jmock</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.sun</groupId>
+      <artifactId>tools</artifactId>
+      <version>11.0.15</version>
+      <scope>system</scope>
+      <systemPath>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/../lib/tools.jar</systemPath>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+  <properties>
+    <commons-lang3.version>3.3.1</commons-lang3.version>
+    <commons-io.version>2.7</commons-io.version>
+  </properties>
+</project>

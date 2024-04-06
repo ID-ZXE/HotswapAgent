@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class BasicController {
 
-//    @Value("${tag}")
+//    @Value("${tag:default}")
 //    private String tag;
 
     // http://127.0.0.1:8080/tag
