@@ -27,6 +27,8 @@ import org.hotswap.agent.util.Version;
 import org.hotswap.agent.watch.Watcher;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -69,16 +71,31 @@ public class HotswapAgent {
 
     public static void premain(String args, Instrumentation inst) {
         LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
+        // 清空class文件夹
         LocalCompileHandler.cleanOldClassFile();
         parseArgs(args);
         fixJboss7Modules();
         PluginManager.getInstance().init(inst);
 
+        watchExtraClasspath();
         // 远程编译器初始化
-        LocalCompileHandler.init((AbstractNIO2Watcher) PluginManager.getInstance().getWatcher(), HotswapConstants.EXT_CLASS_PATH);
         EmbedHttpServer.start();
         LOGGER.debug("Hotswap agent initialized.");
+    }
 
+    public static void watchExtraClasspath() {
+        File extraClasspathDir = new File(HotswapConstants.EXT_CLASS_PATH);
+        if (!extraClasspathDir.exists()) {
+            boolean mkdirs = extraClasspathDir.mkdirs();
+            if (!mkdirs) {
+                throw new RuntimeException("create ext dir failure");
+            }
+        }
+        try {
+            ((AbstractNIO2Watcher) PluginManager.getInstance().getWatcher()).addDirectory(extraClasspathDir.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void parseArgs(String args) {

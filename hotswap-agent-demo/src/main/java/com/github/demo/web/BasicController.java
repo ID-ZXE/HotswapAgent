@@ -1,6 +1,6 @@
 package com.github.demo.web;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,16 +13,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class BasicController {
 
+//    @Value("${tag}")
+//    private String tag;
 
-    @Autowired
-    private DemoService demoService;
+    // http://127.0.0.1:8080/tag
+//    @RequestMapping("/tag")
+//    @ResponseBody
+//    public String tag() {
+//        return tag;
+//    }
 
 
     // http://127.0.0.1:8080/hello?name=lisi
     @RequestMapping("/hello")
     @ResponseBody
     public String hello(@RequestParam(name = "name", defaultValue = "unknown user") String name) {
-        return demoService.service() + ":" + name;
+        return "Hello " + name;
     }
 
     // http://127.0.0.1:8080/user

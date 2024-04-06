@@ -71,27 +71,27 @@ public class HotswapperPlugin {
      */
     @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void watchReload(CtClass ctClass, ClassLoader appClassLoader, URL url) throws IOException, CannotCompileException {
-        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
-            LOGGER.trace("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
-            return;
-        }
-
-        LOGGER.debug("Class {} will be reloaded from URL {}", ctClass.getName(), url);
-
-        // search for a class to reload
-        Class clazz;
-        try {
-            clazz  = appClassLoader.loadClass(ctClass.getName());
-        } catch (ClassNotFoundException e) {
-            LOGGER.warning("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
-                    ctClass.getName(), appClassLoader);
-            return;
-        }
-
-        synchronized (reloadMap) {
-            reloadMap.put(clazz, ctClass.toBytecode());
-        }
-        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
+//        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
+//            LOGGER.trace("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
+//            return;
+//        }
+//
+//        LOGGER.debug("Class {} will be reloaded from URL {}", ctClass.getName(), url);
+//
+//        // search for a class to reload
+//        Class clazz;
+//        try {
+//            clazz  = appClassLoader.loadClass(ctClass.getName());
+//        } catch (ClassNotFoundException e) {
+//            LOGGER.warning("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
+//                    ctClass.getName(), appClassLoader);
+//            return;
+//        }
+//
+//        synchronized (reloadMap) {
+//            reloadMap.put(clazz, ctClass.toBytecode());
+//        }
+//        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
     }
 
     /**

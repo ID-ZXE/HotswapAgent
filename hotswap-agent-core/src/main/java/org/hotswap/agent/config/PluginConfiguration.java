@@ -27,11 +27,14 @@ import java.util.regex.Pattern;
 
 import org.hotswap.agent.HotswapAgent;
 import org.hotswap.agent.annotation.Plugin;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.AllExtensionsManager;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.HotswapProperties;
 import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
 import org.hotswap.agent.util.classloader.URLClassPathHelper;
+
+import static org.hotswap.agent.constants.HotswapConstants.EXT_CLASS_PATH;
 
 /**
  * Plugin configuration.
@@ -212,11 +215,13 @@ public class PluginConfiguration {
 
     private void initExtraClassPath() {
         URL[] extraClassPath = getExtraClasspath();
-
+        if (AllExtensionsManager.getClassLoader() == null) {
+            return;
+        }
         // 非指定classloader 不进行增强
-//        if (!Objects.equals(classLoader, AllExtensionsManager.getClassLoader())) {
-//            return;
-//        }
+        if (!Objects.equals(classLoader, AllExtensionsManager.getClassLoader())) {
+            return;
+        }
 
         if (extraClassPath.length > 0 && !checkExcluded()) {
             if (classLoader instanceof HotswapAgentClassLoaderExt) {
@@ -228,6 +233,23 @@ public class PluginConfiguration {
                         "field present is supported.\n*** extraClasspath configuration property will not be " +
                         "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
             }
+        }
+    }
+
+    public static void initExtraClassPath(ClassLoader classLoader) {
+        try {
+            URL[] extraClassPath = new URL[]{new File(EXT_CLASS_PATH).toURI().toURL()};
+            if (classLoader instanceof HotswapAgentClassLoaderExt) {
+                ((HotswapAgentClassLoaderExt) classLoader).$$ha$setExtraClassPath(extraClassPath);
+            } else if (URLClassPathHelper.isApplicable(classLoader)) {
+                URLClassPathHelper.prependClassPath(classLoader, extraClassPath);
+            } else {
+                LOGGER.info("Unable to set extraClasspath to {} on classLoader {}. Only classLoader with 'ucp' " +
+                        "field present is supported.\n*** extraClasspath configuration property will not be " +
+                        "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -2,32 +2,20 @@ package org.hotswap.agent.handle;
 
 import com.taobao.arthas.compiler.DynamicCompiler;
 import org.apache.commons.io.FileUtils;
+import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class LocalCompileHandler {
 
     private static volatile DynamicCompiler dynamicCompiler;
 
-    private static AbstractNIO2Watcher watcher;
-
-    private static String extraClasspath;
-
     private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
-
-    public static void init(AbstractNIO2Watcher watcher, String extraClasspath) {
-        LocalCompileHandler.watcher = watcher;
-        LocalCompileHandler.extraClasspath = extraClasspath;
-    }
 
     public static void compile() throws Exception {
         DynamicCompiler dynamicCompiler = getCompiler();
@@ -47,16 +35,10 @@ public class LocalCompileHandler {
 
         Map<String, byte[]> byteCodes = dynamicCompiler.buildByteCodes();
 
+
         Map<Class<?>, byte[]> reloadMap = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
-            File byteCodeFile = new File(extraClasspath, entry.getKey().replace('.', '/').concat(".class"));
-            String classDestinationPath = Paths.get(extraClasspath, entry.getKey().replace('.', '/').concat(".class")).toString();
-            Path destinationPath = Paths.get(classDestinationPath);
-            if (!Files.exists(destinationPath.getParent())) {
-                Path directories = Files.createDirectories(destinationPath.getParent());
-                watcher.addDirectory(directories);
-            }
-
+            File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
             Class<?> clazz;
             try {
@@ -94,6 +76,7 @@ public class LocalCompileHandler {
         if (dynamicCompiler == null) {
             synchronized (LocalCompileHandler.class) {
                 if (dynamicCompiler == null) {
+                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
                     dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
                 }
             }
