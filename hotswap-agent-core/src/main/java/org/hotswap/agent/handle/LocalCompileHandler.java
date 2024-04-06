@@ -2,6 +2,7 @@ package org.hotswap.agent.handle;
 
 import com.taobao.arthas.compiler.DynamicCompiler;
 import org.apache.commons.io.FileUtils;
+import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
@@ -46,6 +47,7 @@ public class LocalCompileHandler {
 
         Map<String, byte[]> byteCodes = dynamicCompiler.buildByteCodes();
 
+        Map<Class<?>, byte[]> reloadMap = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             File byteCodeFile = new File(extraClasspath, entry.getKey().replace('.', '/').concat(".class"));
             String classDestinationPath = Paths.get(extraClasspath, entry.getKey().replace('.', '/').concat(".class")).toString();
@@ -54,9 +56,21 @@ public class LocalCompileHandler {
                 Path directories = Files.createDirectories(destinationPath.getParent());
                 watcher.addDirectory(directories);
             }
-            FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
-        }
 
+            FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
+            Class<?> clazz;
+            try {
+                clazz = AllExtensionsManager.getClassLoader().loadClass(entry.getKey());
+            } catch (ClassNotFoundException e) {
+                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.",
+                        entry.getKey(), AllExtensionsManager.getClassLoader());
+                throw new RuntimeException(e);
+            }
+            reloadMap.put(clazz, entry.getValue());
+        }
+        if (!reloadMap.isEmpty()) {
+            PluginManager.getInstance().hotswap(reloadMap);
+        }
         LOGGER.info("compile cost {} ms", System.currentTimeMillis() - start);
     }
 
