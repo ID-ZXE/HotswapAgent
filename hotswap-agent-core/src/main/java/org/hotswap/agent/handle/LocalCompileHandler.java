@@ -7,7 +7,7 @@ import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.io.File;
-import java.lang.instrument.Instrumentation;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,16 +21,11 @@ public class LocalCompileHandler {
 
     private static String extraClasspath;
 
-    private static ClassLoader classLoader;
-
-    private static Instrumentation instrumentation;
-
     private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
 
-    public static void init(AbstractNIO2Watcher watcher, String extraClasspath, Instrumentation instrumentation) {
+    public static void init(AbstractNIO2Watcher watcher, String extraClasspath) {
         LocalCompileHandler.watcher = watcher;
         LocalCompileHandler.extraClasspath = extraClasspath;
-        LocalCompileHandler.instrumentation = instrumentation;
     }
 
     public static void compile() throws Exception {
@@ -65,6 +60,16 @@ public class LocalCompileHandler {
         LOGGER.info("compile cost {} ms", System.currentTimeMillis() - start);
     }
 
+    public static void cleanOldClassFile() {
+        LOGGER.info("clean old class file");
+        try {
+            File classDir = new File(HotswapConstants.EXT_CLASS_PATH);
+            FileUtils.cleanDirectory(classDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<File> getJavaFile() {
         File dir = new File(HotswapConstants.SOURCE_FILE_PATH);
         Collection<File> fileCollection = FileUtils.listFiles(dir, new String[]{"java"}, true);
@@ -75,20 +80,11 @@ public class LocalCompileHandler {
         if (dynamicCompiler == null) {
             synchronized (LocalCompileHandler.class) {
                 if (dynamicCompiler == null) {
-                    initCompileClassLoader(instrumentation, HotswapConstants.LAUNCHED_CLASS_LOADER);
-                    dynamicCompiler = new DynamicCompiler(classLoader);
+                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
                 }
             }
         }
         return dynamicCompiler;
-    }
-
-    private static void initCompileClassLoader(Instrumentation inst, String classLoaderName) {
-        // 获取所有已加载的类
-        Class<?>[] loadedClasses = inst.getAllLoadedClasses();
-        // 找出 LaunchedURLClassLoader
-        classLoader = Arrays.stream(loadedClasses).filter(c -> c.getClassLoader() != null && c.getClassLoader().getClass() != null).map(Class::getClassLoader).filter(classLoader -> classLoaderName.equals(classLoader.getClass().getName())).findFirst().orElse(Thread.currentThread().getContextClassLoader());
-        LOGGER.info("compileClassLoader: {}", classLoader);
     }
 
 }

@@ -22,16 +22,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.hotswap.agent.HotswapAgent;
 import org.hotswap.agent.annotation.Plugin;
+import org.hotswap.agent.handle.AllExtensionsManager;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.HotswapProperties;
 import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
@@ -54,7 +50,9 @@ public class PluginConfiguration {
      */
     private static final String INCLUDED_CLASS_LOADERS_KEY = "includedClassLoaderPatterns";
 
-    /** The Constant EXCLUDED_CLASS_LOADERS_KEY. blocked list */
+    /**
+     * The Constant EXCLUDED_CLASS_LOADERS_KEY. blocked list
+     */
     private static final String EXCLUDED_CLASS_LOADERS_KEY = "excludedClassLoaderPatterns";
 
     Properties properties = new HotswapProperties();
@@ -204,7 +202,7 @@ public class PluginConfiguration {
         }
     }
 
-    private void checkProperties(){
+    private void checkProperties() {
         if (properties != null && properties.containsKey(INCLUDED_CLASS_LOADERS_KEY) &&
                 properties.containsKey(EXCLUDED_CLASS_LOADERS_KEY)) {
             throw new IllegalArgumentException("includedClassLoaderPatterns, excludedClassLoaderPatterns in" +
@@ -214,6 +212,12 @@ public class PluginConfiguration {
 
     private void initExtraClassPath() {
         URL[] extraClassPath = getExtraClasspath();
+
+        // 非指定classloader 不进行增强
+//        if (!Objects.equals(classLoader, AllExtensionsManager.getClassLoader())) {
+//            return;
+//        }
+
         if (extraClassPath.length > 0 && !checkExcluded()) {
             if (classLoader instanceof HotswapAgentClassLoaderExt) {
                 ((HotswapAgentClassLoaderExt) classLoader).$$ha$setExtraClassPath(extraClassPath);
@@ -221,8 +225,8 @@ public class PluginConfiguration {
                 URLClassPathHelper.prependClassPath(classLoader, extraClassPath);
             } else {
                 LOGGER.debug("Unable to set extraClasspath to {} on classLoader {}. Only classLoader with 'ucp' " +
-                                "field present is supported.\n*** extraClasspath configuration property will not be " +
-                                "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
+                        "field present is supported.\n*** extraClasspath configuration property will not be " +
+                        "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
             }
         }
     }
@@ -288,7 +292,7 @@ public class PluginConfiguration {
     /**
      * Get configuration property value
      *
-     * @param property property name
+     * @param property     property name
      * @param defaultValue value to return if property not defined
      * @return the property value or null if not defined
      */
@@ -371,7 +375,6 @@ public class PluginConfiguration {
         Plugin pluginAnnotation = pluginClass.getAnnotation(Plugin.class);
         return isDisabledPlugin(pluginAnnotation.name());
     }
-
 
 
     private URL[] convertToURL(String resources) {

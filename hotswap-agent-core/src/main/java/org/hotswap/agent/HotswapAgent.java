@@ -63,21 +63,19 @@ public class HotswapAgent {
      */
     private static String propertiesFilePath;
 
-    private static ClassLoader compileClassLoader;
-
     public static void agentmain(String args, Instrumentation inst) {
         premain(args, inst);
     }
 
     public static void premain(String args, Instrumentation inst) {
         LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
+        LocalCompileHandler.cleanOldClassFile();
         parseArgs(args);
         fixJboss7Modules();
         PluginManager.getInstance().init(inst);
 
         // 远程编译器初始化
-        LocalCompileHandler.init((AbstractNIO2Watcher) PluginManager.getInstance().getWatcher(),
-                HotswapConstants.EXT_CLASS_PATH, inst);
+        LocalCompileHandler.init((AbstractNIO2Watcher) PluginManager.getInstance().getWatcher(), HotswapConstants.EXT_CLASS_PATH);
         EmbedHttpServer.start();
         LOGGER.debug("Hotswap agent initialized.");
 

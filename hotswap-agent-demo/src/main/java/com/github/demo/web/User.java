@@ -1,4 +1,4 @@
-package org.hotswap.agent.demo.web;
+package com.github.demo.web;
 
 /**
  * @author <a href="mailto:chenxilzx1@gmail.com">theonefx</a>

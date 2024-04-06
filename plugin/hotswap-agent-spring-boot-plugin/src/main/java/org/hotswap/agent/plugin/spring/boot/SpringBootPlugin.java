@@ -24,6 +24,7 @@ import org.hotswap.agent.annotation.Init;
 import org.hotswap.agent.annotation.OnClassLoadEvent;
 import org.hotswap.agent.annotation.Plugin;
 import org.hotswap.agent.command.Scheduler;
+import org.hotswap.agent.handle.AllExtensionsManager;
 import org.hotswap.agent.javassist.CannotCompileException;
 import org.hotswap.agent.javassist.ClassPool;
 import org.hotswap.agent.javassist.CtClass;
@@ -36,10 +37,7 @@ import org.hotswap.agent.plugin.spring.boot.transformers.PropertySourceTransform
 import org.hotswap.agent.util.PluginManagerInvoker;
 
 
-@Plugin(name = "SpringBoot", description = "Reload Spring Boot after properties/yaml changed.",
-        testedVersions = {"All between 1.5.x - 2.7.x"}, expectedVersions = {"1.5.x+", "2.x"},
-        supportClass = {PropertySourceLoaderTransformer.class,
-                PropertySourceTransformer.class})
+@Plugin(name = "SpringBoot", description = "Reload Spring Boot after properties/yaml changed.", testedVersions = {"All between 1.5.x - 2.7.x"}, expectedVersions = {"1.5.x+", "2.x"}, supportClass = {PropertySourceLoaderTransformer.class, PropertySourceTransformer.class})
 public class SpringBootPlugin {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringBootPlugin.class);
@@ -65,13 +63,11 @@ public class SpringBootPlugin {
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.boot.SpringApplication")
-    public static void register(ClassLoader appClassLoader, CtClass clazz, ClassPool classPool) throws
-        CannotCompileException, NotFoundException {
+    public static void register(ClassLoader appClassLoader, CtClass clazz, ClassPool classPool) throws CannotCompileException, NotFoundException {
         StringBuilder src = new StringBuilder("{");
         // init a spring plugin with every appclassloader
         src.append(PluginManagerInvoker.buildInitializePlugin(SpringBootPlugin.class));
-        src.append(PluginManagerInvoker.buildCallPluginMethod(SpringBootPlugin.class, "init",
-                "org.springframework.boot.SpringBootVersion.getVersion()", String.class.getName()));
+        src.append(PluginManagerInvoker.buildCallPluginMethod(SpringBootPlugin.class, "init", "org.springframework.boot.SpringBootVersion.getVersion()", String.class.getName()));
         src.append("}");
 
         for (CtConstructor constructor : clazz.getDeclaredConstructors()) {
@@ -79,7 +75,11 @@ public class SpringBootPlugin {
         }
 
         CtMethod method = clazz.getDeclaredMethod("createApplicationContext");
-        method.insertAfter(
-            "{org.hotswap.agent.plugin.spring.boot.listener.PropertySourceChangeListener.register($_);}");
+        method.insertAfter("{org.hotswap.agent.plugin.spring.boot.listener.PropertySourceChangeListener.register($_);}");
+
+        // 注册SpringBoot的Classloader
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        LOGGER.info("registrySpringBootClassLoader contextClassLoader:{}", contextClassLoader);
+        AllExtensionsManager.setClassLoader(contextClassLoader);
     }
 }

@@ -1,4 +1,4 @@
-package org.hotswap.agent.demo.web;
+package com.github.demo.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
