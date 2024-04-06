@@ -18,12 +18,6 @@
  */
 package org.hotswap.agent.plugin.spring.core;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.hotswap.agent.logging.AgentLogger;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +25,11 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Support for Spring MVC mapping caches.
@@ -46,7 +45,7 @@ public class ResetRequestMappingCaches {
             //This is probably a bad idea as Class.forName has lots of issues but this was easiest for now.
             return Class.forName("org.springframework.web.servlet.handler.AbstractHandlerMethodMapping");
         } catch (ClassNotFoundException e) {
-            LOGGER.trace("HandlerMethodMapping class not found");
+            LOGGER.info("HandlerMethodMapping class not found");
             return null;
         }
     }
@@ -73,7 +72,7 @@ public class ResetRequestMappingCaches {
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, c, true, false);
 
         if (mappings.isEmpty()) {
-            LOGGER.trace("Spring: no HandlerMappings found");
+            LOGGER.info("Spring: no HandlerMappings found");
         }
 
         for (Entry<String, ?> e : mappings.entrySet()) {
@@ -93,34 +92,17 @@ public class ResetRequestMappingCaches {
     }
 
     private static void processMappings(Class<?> c, Object am) throws Exception {
-        LOGGER.trace("clearing HandlerMapping for {}", am.getClass());
-        try {
-            Field f = c.getDeclaredField("handlerMethods");
-            f.setAccessible(true);
-            ((Map<?, ?>) f.get(am)).clear();
-            f = c.getDeclaredField("urlMap");
-            f.setAccessible(true);
-            ((Map<?, ?>) f.get(am)).clear();
-            try {
-                f = c.getDeclaredField("nameMap");
-                f.setAccessible(true);
-                ((Map<?, ?>) f.get(am)).clear();
-            } catch (NoSuchFieldException nsfe) {
-                LOGGER.trace("Probably using Spring 4.0 or below: {}", nsfe.getMessage());
-            }
-        } catch (NoSuchFieldException nsfe) {
-            LOGGER.trace("Probably using Spring 4.2+", nsfe.getMessage());
-            Method m = c.getDeclaredMethod("getHandlerMethods");
-            Class<?>[] parameterTypes = new Class[1];
-            parameterTypes[0] = Object.class;
-            Method u = c.getDeclaredMethod("unregisterMapping", parameterTypes);
-            Map<?, ?> unmodifiableHandlerMethods = (Map<?, ?>) m.invoke(am);
-            Object[] keys = unmodifiableHandlerMethods.keySet().toArray();
-            unmodifiableHandlerMethods = null;
-            for (Object key : keys) {
-                LOGGER.trace("Unregistering handler method {}", key);
-                u.invoke(am, key);
-            }
+        LOGGER.info("clearing HandlerMapping for {}", am.getClass());
+        Method m = c.getDeclaredMethod("getHandlerMethods");
+        Class<?>[] parameterTypes = new Class[1];
+        parameterTypes[0] = Object.class;
+        Method u = c.getDeclaredMethod("unregisterMapping", parameterTypes);
+        Map<?, ?> unmodifiableHandlerMethods = (Map<?, ?>) m.invoke(am);
+        Object[] keys = unmodifiableHandlerMethods.keySet().toArray();
+        unmodifiableHandlerMethods = null;
+        for (Object key : keys) {
+            LOGGER.info("Unregistering handler method {}", key);
+            u.invoke(am, key);
         }
         if (am instanceof InitializingBean) {
             ((InitializingBean) am).afterPropertiesSet();

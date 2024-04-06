@@ -133,7 +133,7 @@ public class SpringPlugin {
                 classPool.get("org.springframework.context.ApplicationContext")
         });
         method.insertAfter("org.hotswap.agent.plugin.spring.core.ResetRequestMappingCaches.setHandlerMappings(this.handlerMappings);");
-        LOGGER.debug("registry handler mappings");
+        LOGGER.info("registry handler mappings");
     }
 
     @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY})
