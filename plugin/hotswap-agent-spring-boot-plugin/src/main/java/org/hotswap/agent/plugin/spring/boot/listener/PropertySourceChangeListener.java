@@ -18,6 +18,7 @@
  */
 package org.hotswap.agent.plugin.spring.boot.listener;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 import org.hotswap.agent.logging.AgentLogger;
@@ -29,6 +30,7 @@ import org.hotswap.agent.plugin.spring.reload.BeanChangeEvent;
 import org.hotswap.agent.util.AnnotationHelper;
 import org.hotswap.agent.util.spring.util.ClassUtils;
 import org.hotswap.agent.util.spring.util.ObjectUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -48,14 +50,14 @@ public class PropertySourceChangeListener implements SpringListener<SpringEvent<
         ConfigurableListableBeanFactory configurableListableBeanFactory = context.getBeanFactory();
         if (!(configurableListableBeanFactory instanceof DefaultListableBeanFactory)) {
             LOGGER.debug(
-                "beanFactory is not DefaultListableBeanFactory, skip register PropertySourceChangeBootListener, {}",
-                ObjectUtils.identityToString(configurableListableBeanFactory));
+                    "beanFactory is not DefaultListableBeanFactory, skip register PropertySourceChangeBootListener, {}",
+                    ObjectUtils.identityToString(configurableListableBeanFactory));
             return;
         }
         LOGGER.debug("register PropertySourceChangeBootListener, {}",
-            ObjectUtils.identityToString(configurableListableBeanFactory));
+                ObjectUtils.identityToString(configurableListableBeanFactory));
         PropertySourceChangeListener propertySourceChangeListener = new PropertySourceChangeListener(
-            (DefaultListableBeanFactory)configurableListableBeanFactory);
+                (DefaultListableBeanFactory) configurableListableBeanFactory);
         // add instance to map and instance
         SpringEventSource.INSTANCE.addListener(propertySourceChangeListener);
     }
@@ -82,10 +84,23 @@ public class PropertySourceChangeListener implements SpringListener<SpringEvent<
             Class<?> beanClass = ClassUtils.getUserClass(bean.getClass());
 
             if (AnnotationHelper.hasAnnotation(beanClass, ConfigurationProperties.class.getName())) {
-                LOGGER.debug("refresh configuration properties: {}", beanClass);
+                LOGGER.info("refresh configuration properties: {}", beanClass);
                 String[] beanNames = beanFactory.getBeanNamesForType(beanClass);
                 if (beanNames != null && beanNames.length > 0) {
                     SpringEventSource.INSTANCE.fireEvent(new BeanChangeEvent(beanNames, eventBeanFactory));
+                }
+            } else {
+                Field[] declaredFields = beanClass.getDeclaredFields();
+                for (Field field : declaredFields) {
+                    Value valueAnno = field.getAnnotation(Value.class);
+                    if (Objects.nonNull(valueAnno)) {
+                        LOGGER.info("refresh configuration properties: {}", beanClass);
+                        String[] beanNames = beanFactory.getBeanNamesForType(beanClass);
+                        if (beanNames.length > 0) {
+                            SpringEventSource.INSTANCE.fireEvent(new BeanChangeEvent(beanNames, eventBeanFactory));
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -93,9 +108,13 @@ public class PropertySourceChangeListener implements SpringListener<SpringEvent<
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (!(o instanceof PropertySourceChangeListener)) {return false;}
-        PropertySourceChangeListener that = (PropertySourceChangeListener)o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PropertySourceChangeListener)) {
+            return false;
+        }
+        PropertySourceChangeListener that = (PropertySourceChangeListener) o;
         return Objects.equals(beanFactory, that.beanFactory);
     }
 

@@ -143,7 +143,7 @@ public class SpringPlugin {
         scheduler.scheduleCommand(new SpringChangedReloadCommand(appClassLoader), SpringReloadConfig.reloadDelayMillis);
     }
 
-    @OnResourceFileEvent(path = "/", filter = ".*.properties", events = {FileEvent.MODIFY})
+    @OnResourceFileEvent(path = "/", filter = ".*.properties", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void registerPropertiesListeners(URL url) {
         scheduler.scheduleCommand(new PropertiesChangedCommand(appClassLoader, url, scheduler));
         LOGGER.info("Scheduling Spring reload for properties '{}'", url);

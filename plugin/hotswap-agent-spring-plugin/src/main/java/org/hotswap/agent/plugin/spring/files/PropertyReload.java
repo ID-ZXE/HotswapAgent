@@ -90,7 +90,7 @@ public class PropertyReload {
             String newValue = environment.getProperty(key);
             if ((oldValue != null && !oldValue.equals(newValue)) || (oldValue == null && newValue != null)) {
                 propertyChangeItems.add(new PropertiesChangeEvent.PropertyChangeItem(key, oldValue, newValue));
-                LOGGER.debug("property of '{}' reload, key:{}, oldValue:{}, newValue:{}",
+                LOGGER.info("property of '{}' reload, key:{}, oldValue:{}, newValue:{}",
                         ObjectUtils.identityToString(beanFactory), key, oldValue, newValue);
             }
         }

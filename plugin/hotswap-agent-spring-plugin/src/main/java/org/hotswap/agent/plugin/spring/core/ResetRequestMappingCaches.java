@@ -45,7 +45,7 @@ public class ResetRequestMappingCaches {
             //This is probably a bad idea as Class.forName has lots of issues but this was easiest for now.
             return Class.forName("org.springframework.web.servlet.handler.AbstractHandlerMethodMapping");
         } catch (ClassNotFoundException e) {
-            LOGGER.info("HandlerMethodMapping class not found");
+            LOGGER.error("HandlerMethodMapping class not found");
             return null;
         }
     }
@@ -101,7 +101,7 @@ public class ResetRequestMappingCaches {
         Object[] keys = unmodifiableHandlerMethods.keySet().toArray();
         unmodifiableHandlerMethods = null;
         for (Object key : keys) {
-            LOGGER.info("Unregistering handler method {}", key);
+            LOGGER.trace("Unregistering handler method {}", key);
             u.invoke(am, key);
         }
         if (am instanceof InitializingBean) {
