@@ -157,10 +157,15 @@
                                     <pattern>commons-io</pattern>
                                     <shadedPattern>org.hotswap.agent.commons.io</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>javaparser-core</pattern>
+                                    <shadedPattern>com.github.javaparser</shadedPattern>
+                                </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
                                     <include>commons-io:commons-io</include>
+                                    <include>javaparser-core:javaparser-core</include>
                                 </includes>
                             </artifactSet>
                             <shadeSourcesContent>true</shadeSourcesContent>
@@ -177,6 +182,12 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-core</artifactId>
+            <version>3.25.8</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -50,7 +50,7 @@ public class DynamicJavaFileManager extends ForwardingJavaFileManager<JavaFileMa
                 }
             }
 
-            StringSource stringSource = new StringSource(className);
+            StringSource stringSource = new StringSource(className, sibling.getCharContent(false).toString());
             sourceCodes.add(stringSource);
             // 这里可以存一下动态生成的源代码, 编译完成后输出到文件夹
             // classLoader.registerCompiledSource(stringSource);

@@ -35,11 +35,11 @@ public class StringSource extends SimpleJavaFileObject {
         this.contents = contents;
     }
 
-    public StringSource(String className) {
-        super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
-        this.className = className;
-        this.contents = "";
-    }
+//    public StringSource(String className) {
+//        super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+//        this.className = className;
+//        this.contents = "";
+//    }
 
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
