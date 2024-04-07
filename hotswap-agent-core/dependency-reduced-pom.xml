@@ -52,14 +52,9 @@
                   <pattern>commons-io</pattern>
                   <shadedPattern>org.hotswap.agent.commons.io</shadedPattern>
                 </relocation>
-                <relocation>
-                  <pattern>arthas-memorycompiler</pattern>
-                  <shadedPattern>org.hotswap.agent.compiler</shadedPattern>
-                </relocation>
               </relocations>
               <artifactSet>
                 <includes>
-                  <include>com.taobao.arthas:arthas-memorycompiler</include>
                   <include>commons-io:commons-io</include>
                 </includes>
               </artifactSet>
