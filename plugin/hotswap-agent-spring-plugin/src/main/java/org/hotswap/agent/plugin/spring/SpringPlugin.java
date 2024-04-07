@@ -136,7 +136,7 @@ public class SpringPlugin {
         LOGGER.info("registry handler mappings");
     }
 
-    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY})
+    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void registerResourceListeners(URL url) {
         scheduler.scheduleCommand(new XmlsChangedCommand(appClassLoader, url, scheduler));
         LOGGER.info("Scheduling Spring reload for XML '{}'", url);
@@ -150,7 +150,7 @@ public class SpringPlugin {
         scheduler.scheduleCommand(new SpringChangedReloadCommand(appClassLoader), SpringReloadConfig.reloadDelayMillis);
     }
 
-    @OnResourceFileEvent(path = "/", filter = ".*.yaml", events = {FileEvent.MODIFY})
+    @OnResourceFileEvent(path = "/", filter = ".*.yaml", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void registerYamlListeners(URL url) {
         scheduler.scheduleCommand(new YamlChangedCommand(appClassLoader, url, scheduler));
         // schedule reload after 1000 milliseconds
