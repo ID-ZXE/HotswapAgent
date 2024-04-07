@@ -31,44 +31,44 @@ public class DynamicJavaFileManager extends ForwardingJavaFileManager<JavaFileMa
     public JavaFileObject getJavaFileForOutput(Location location, String className,
                                                JavaFileObject.Kind kind, FileObject sibling) throws IOException {
 
-        for (MemoryByteCode byteCode : byteCodes) {
-            if (byteCode.getClassName().equals(className)) {
-                return byteCode;
-            }
-        }
-
-        MemoryByteCode innerClass = new MemoryByteCode(className);
-        byteCodes.add(innerClass);
-        classLoader.registerCompiledSource(innerClass);
-        return innerClass;
-
-//        if (JavaFileObject.Kind.SOURCE.equals(kind)) {
-//            // 源码
-//            for (StringSource stringSource : this.sourceCodes) {
-//                if (stringSource.getClassName().equals(className)) {
-//                    return stringSource;
-//                }
+//        for (MemoryByteCode byteCode : byteCodes) {
+//            if (byteCode.getClassName().equals(className)) {
+//                return byteCode;
 //            }
-//
-//            StringSource stringSource = new StringSource(className);
-//            sourceCodes.add(stringSource);
-//            // 这里可以存一下动态生成的源代码, 编译完成后输出到文件夹
-//            // classLoader.registerCompiledSource(stringSource);
-//            return stringSource;
-//
-//        } else {
-//            // 字节码
-//            for (MemoryByteCode byteCode : this.byteCodes) {
-//                if (byteCode.getClassName().equals(className)) {
-//                    return byteCode;
-//                }
-//            }
-//
-//            MemoryByteCode innerClass = new MemoryByteCode(className);
-//            byteCodes.add(innerClass);
-//            classLoader.registerCompiledSource(innerClass);
-//            return innerClass;
 //        }
+//
+//        MemoryByteCode innerClass = new MemoryByteCode(className);
+//        byteCodes.add(innerClass);
+//        classLoader.registerCompiledSource(innerClass);
+//        return innerClass;
+
+        if (JavaFileObject.Kind.SOURCE.equals(kind)) {
+            // 源码
+            for (StringSource stringSource : this.sourceCodes) {
+                if (stringSource.getClassName().equals(className)) {
+                    return stringSource;
+                }
+            }
+
+            StringSource stringSource = new StringSource(className);
+            sourceCodes.add(stringSource);
+            // 这里可以存一下动态生成的源代码, 编译完成后输出到文件夹
+            // classLoader.registerCompiledSource(stringSource);
+            return stringSource;
+
+        } else {
+            // 字节码
+            for (MemoryByteCode byteCode : this.byteCodes) {
+                if (byteCode.getClassName().equals(className)) {
+                    return byteCode;
+                }
+            }
+
+            MemoryByteCode innerClass = new MemoryByteCode(className);
+            byteCodes.add(innerClass);
+            classLoader.registerCompiledSource(innerClass);
+            return innerClass;
+        }
 
     }
 
