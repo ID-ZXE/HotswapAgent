@@ -83,7 +83,7 @@ public class LocalCompileHandler {
                     try {
                         URL url = new URL("file:" + HotswapConstants.EXT_CLASS_PATH);
                         File lombokJar = JarUtils.createLombokJar();
-                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{url, lombokJar.toURI().toURL()});
+                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader().getParent(), new URL[]{url, lombokJar.toURI().toURL()});
                     } catch (Exception e) {
                         LOGGER.error("createLombokJar error", e);
                     }
