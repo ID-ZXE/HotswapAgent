@@ -6,9 +6,13 @@ import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.util.JarUtils;
+import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
 
 public class LocalCompileHandler {
@@ -44,8 +48,7 @@ public class LocalCompileHandler {
             try {
                 clazz = AllExtensionsManager.getClassLoader().loadClass(entry.getKey());
             } catch (ClassNotFoundException e) {
-                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.",
-                        entry.getKey(), AllExtensionsManager.getClassLoader());
+                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.", entry.getKey(), AllExtensionsManager.getClassLoader());
                 throw new RuntimeException(e);
             }
             reloadMap.put(clazz, entry.getValue());
@@ -76,7 +79,14 @@ public class LocalCompileHandler {
         if (dynamicCompiler == null) {
             synchronized (LocalCompileHandler.class) {
                 if (dynamicCompiler == null) {
-                     PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+                    try {
+                        URL url = new URL("file:" + HotswapConstants.EXT_CLASS_PATH);
+                        File lombokJar = JarUtils.createLombokJar();
+                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{url, lombokJar.toURI().toURL()});
+                    } catch (Exception e) {
+                        LOGGER.error("createLombokJar error", e);
+                    }
                     dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
                 }
             }
