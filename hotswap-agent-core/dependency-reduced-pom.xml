@@ -81,8 +81,8 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>9</source>
-          <target>9</target>
+          <source>8</source>
+          <target>8</target>
         </configuration>
       </plugin>
     </plugins>
@@ -107,9 +107,9 @@
         <dependency>
           <groupId>com.sun</groupId>
           <artifactId>tools</artifactId>
-          <version>11.0.15</version>
+          <version>${java.version}</version>
           <scope>system</scope>
-          <systemPath>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/../lib/tools.jar</systemPath>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
           <optional>true</optional>
         </dependency>
       </dependencies>
@@ -231,14 +231,6 @@
           <groupId>org.jmock</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>tools</artifactId>
-      <version>11.0.15</version>
-      <scope>system</scope>
-      <systemPath>/Library/Java/JavaVirtualMachines/dcevm-11.0.15+1/Contents/Home/../lib/tools.jar</systemPath>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <properties>

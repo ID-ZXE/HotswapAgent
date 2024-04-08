@@ -82,4 +82,13 @@ public class SpringBootPlugin {
         LOGGER.info("registrySpringBootClassLoader contextClassLoader:{}", contextClassLoader);
         AllExtensionsManager.setClassLoader(contextClassLoader);
     }
+
+    @OnClassLoadEvent(classNameRegexp = "org.springframework.core.env.AbstractEnvironment")
+    public static void cglibAopProxyDisableCache(CtClass ctClass) throws NotFoundException, CannotCompileException {
+        CtMethod method = ctClass.getDeclaredMethod("setActiveProfiles");
+        method.insertBefore("{" + AllExtensionsManager.class.getName() + ".setProfile($1);}");
+
+        LOGGER.debug("patch org.springframework.core.env.AbstractEnvironment");
+    }
+
 }
