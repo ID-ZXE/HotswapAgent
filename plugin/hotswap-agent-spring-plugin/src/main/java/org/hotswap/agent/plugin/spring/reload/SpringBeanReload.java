@@ -35,6 +35,8 @@ import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefiniti
 import org.springframework.beans.factory.config.*;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -269,6 +271,8 @@ public class SpringBeanReload {
     }
 
     private void doReload() {
+        LOGGER.info("doReload");
+
         // when there are changes, it will rerun the while loop
         while (true) {
             // 1. clear cache
@@ -293,7 +297,10 @@ public class SpringBeanReload {
 
             // 7. invoke the Bean lifecycle steps
             // 7.1 invoke BeanFactoryPostProcessor
-            invokeBeanFactoryPostProcessors(beanFactory);
+            if (!ignoreinvokeBeanFactoryPostProcessors()) {
+                invokeBeanFactoryPostProcessors(beanFactory);
+            }
+
             addBeanPostProcessors(beanFactory);
             // 7.2 process @Value and @Autowired of singleton beans excluding destroyed beans
             processAutowiredAnnotationBeans();
@@ -311,6 +318,15 @@ public class SpringBeanReload {
         refreshRequestMapping();
         // 11 clear all process cache
         clearLocalCache();
+    }
+
+    private boolean ignoreinvokeBeanFactoryPostProcessors() {
+        Map<String, ConfigurableEnvironment> beansOfType = beanFactory.getBeansOfType(ConfigurableEnvironment.class);
+        if (CollectionUtils.isEmpty(beansOfType)) {
+            LOGGER.info("beanFactory : {} have no contain ConfigurableEnvironment", ObjectUtils.identityToString(beanFactory));
+            return true;
+        }
+        return false;
     }
 
     private boolean preCheckReload() {
@@ -502,7 +518,7 @@ public class SpringBeanReload {
     private void refreshRequestMapping() {
         // reset mvc initialized, it will update the mapping of url and handler
         LOGGER.debug("refreshRequestMapping of {}", ObjectUtils.identityToString(beanFactory));
-        ResetRequestMappingCaches.reset(beanFactory);
+        ResetRequestMappingCaches.reset(beanFactory, beansToProcess, newBeanNames);
     }
 
     private void processAutowiredAnnotationBeans() {

@@ -39,6 +39,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
@@ -55,7 +56,13 @@ public class PropertyReload {
 
 
     public static void reloadPropertySource(DefaultListableBeanFactory beanFactory) {
-        ConfigurableEnvironment environment = beanFactory.getBean(ConfigurableEnvironment.class);
+        Map<String, ConfigurableEnvironment> beansOfType = beanFactory.getBeansOfType(ConfigurableEnvironment.class);
+        if (CollectionUtils.isEmpty(beansOfType)) {
+            LOGGER.debug("beanFactory : {} have no contain ConfigurableEnvironment", ObjectUtils.identityToString(beanFactory));
+            return;
+        }
+
+        ConfigurableEnvironment environment = beansOfType.values().stream().findFirst().orElseThrow(RuntimeException::new);
         if (environment != null) {
             Map<String, String> oldValueMap = getPropertyOfPropertySource(environment);
             // reload
