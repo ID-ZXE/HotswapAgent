@@ -21,8 +21,8 @@ public class LocalCompileHandler {
     private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
 
     public static void compile() throws Exception {
-        DynamicCompiler dynamicCompiler = getCompiler();
-        compile(dynamicCompiler);
+        StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
+        compile(getCompiler());
     }
 
     private static void compile(DynamicCompiler dynamicCompiler) throws Exception {

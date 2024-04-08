@@ -30,6 +30,8 @@ import java.util.Set;
 
 import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.command.impl.SchedulerImpl;
+import org.hotswap.agent.handle.AllExtensionsManager;
+import org.hotswap.agent.handle.StaticFieldHandler;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.classloader.ClassLoaderDefineClassPatcher;
@@ -102,7 +104,7 @@ public class PluginManager {
      * Check if plugin is initialized in classLoader.
      *
      * @param pluginClassName type of the plugin
-     * @param classLoader classloader of the plugin
+     * @param classLoader     classloader of the plugin
      * @return true/false
      */
     public boolean isPluginInitialized(String pluginClassName, ClassLoader classLoader) {
@@ -171,8 +173,8 @@ public class PluginManager {
 
         // parent of current classloader (system/bootstrap)
         if (getClass().getClassLoader() != null &&
-            classLoader != null &&
-            classLoader.equals(getClass().getClassLoader().getParent()))
+                classLoader != null &&
+                classLoader.equals(getClass().getClassLoader().getParent()))
             return;
 
         // synchronize ClassLoader patching - multiple classloaders may be patched at the same time
@@ -267,7 +269,7 @@ public class PluginManager {
 
     /**
      * Redefine the supplied set of classes using the supplied bytecode.
-     *
+     * <p>
      * This method operates on a set in order to allow interdependent changes to more than one class at the same time
      * (a redefinition of class A can require a redefinition of class B).
      *
@@ -297,6 +299,18 @@ public class PluginManager {
                 LOGGER.debug("... Fail to reload classes {} (autoHotswap), msg is {}", Arrays.toString(classNames), e);
                 throw new IllegalStateException("Unable to redefine classes", e);
             }
+
+            // 静态字段set
+            for (Map.Entry<Class<?>, byte[]> entry : reloadMap.entrySet()) {
+                String className = entry.getKey().getName();
+                try {
+                    Class<?> clazz = AllExtensionsManager.getClassLoader().loadClass(className);
+                    StaticFieldHandler.executeStaticInitMethod(clazz);
+                } catch (Exception e) {
+                    LOGGER.error("executeStaticInitMethod {} error", className, e);
+                }
+            }
+
             reloadMap.clear();
         }
     }
@@ -310,7 +324,7 @@ public class PluginManager {
 
     /**
      * Redefine the supplied set of classes using the supplied bytecode in scheduled command. Actual hotswap is postponed by timeout
-     *
+     * <p>
      * This method operates on a set in order to allow interdependent changes to more than one class at the same time
      * (a redefinition of class A can require a redefinition of class B).
      *

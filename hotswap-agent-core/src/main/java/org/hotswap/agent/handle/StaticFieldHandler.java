@@ -29,12 +29,11 @@ public class StaticFieldHandler {
 
     private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
 
-    public static void generateStaticFieldInitMethod(List<String> javaList) {
+    public static void generateStaticFieldInitMethod(List<File> javaList) {
         long start = System.currentTimeMillis();
         CountDownLatch latch = new CountDownLatch(javaList.size());
-        for (String java : javaList) {
+        for (File javaFile : javaList) {
             try {
-                File javaFile = new File(HotswapConstants.SOURCE_FILE_PATH, java);
                 JavaParser javaParser = new JavaParser();
                 //对文件进行解析操作，读入内存
                 ParseResult<CompilationUnit> result = javaParser.parse(javaFile);
@@ -73,7 +72,7 @@ public class StaticFieldHandler {
                 FileUtils.write(javaFile, outputStr, "UTF-8", false);
                 latch.countDown();
             } catch (Exception e) {
-                LOGGER.error("generateStaticFieldInitMethod {} error", java, e);
+                LOGGER.error("generateStaticFieldInitMethod {} error", javaFile.getName(), e);
             }
         }
         try {
