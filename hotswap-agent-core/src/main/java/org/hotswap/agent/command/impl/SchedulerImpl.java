@@ -22,6 +22,7 @@ import org.hotswap.agent.annotation.handler.WatchEventCommand;
 import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.MergeableCommand;
 import org.hotswap.agent.command.Scheduler;
+import org.hotswap.agent.handle.ResultHandler;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.util.*;
@@ -119,18 +120,24 @@ public class SchedulerImpl implements Scheduler {
      * @param command the command to execute
      */
     private void executeCommand(Command command) {
-        if (command instanceof WatchEventCommand)
-            LOGGER.trace("Executing {}", command); // too much output for debug
-        else
-            LOGGER.debug("Executing {}", command);
+        if (command instanceof WatchEventCommand) LOGGER.trace("Executing {}", command); // too much output for debug
+        else LOGGER.debug("Executing {}", command);
 
         runningCommands.add(command);
-        new CommandExecutor(command) {
+        Thread commandExecutor = new CommandExecutor(command) {
             @Override
             public void finished() {
                 runningCommands.remove(command);
             }
-        }.start();
+        };
+        commandExecutor.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.error("thead:{} has ex ", t.getName(), e);
+            }
+        });
+        ResultHandler.addToResulThread(commandExecutor);
+        commandExecutor.start();
     }
 
     @Override
@@ -139,8 +146,7 @@ public class SchedulerImpl implements Scheduler {
             @Override
             public void run() {
                 for (; ; ) {
-                    if (stopped || !processCommands())
-                        break;
+                    if (stopped || !processCommands()) break;
 
                     // wait for 100 ms
                     try {

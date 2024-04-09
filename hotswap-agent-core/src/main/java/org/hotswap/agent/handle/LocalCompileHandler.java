@@ -55,6 +55,7 @@ public class LocalCompileHandler {
         if (!reloadMap.isEmpty()) {
             PluginManager.getInstance().hotswap(reloadMap);
         }
+        ResultHandler.startResultThread();
         LOGGER.info("compile cost {} ms", System.currentTimeMillis() - start);
     }
 
