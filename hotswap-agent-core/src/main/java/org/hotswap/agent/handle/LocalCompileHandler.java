@@ -79,6 +79,13 @@ public class LocalCompileHandler {
         if (dynamicCompiler == null) {
             synchronized (LocalCompileHandler.class) {
                 if (dynamicCompiler == null) {
+                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+                    try {
+                        File lombokJar = JarUtils.createLombokJar();
+                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
+                    } catch (Exception e) {
+                        LOGGER.error("createLombokJar error", e);
+                    }
                     dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
                 }
             }

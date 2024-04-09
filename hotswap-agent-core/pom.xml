@@ -165,17 +165,12 @@
                                     <pattern>arthas-memorycompiler</pattern>
                                     <shadedPattern>org.hotswap.agent.compiler</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>lombok</pattern>
-                                    <shadedPattern>lombok</shadedPattern>
-                                </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
                                     <include>com.taobao.arthas:arthas-memorycompiler</include>
                                     <include>commons-io:commons-io</include>
                                     <include>com.github.javaparser:javaparser-core</include>
-                                    <include>org.projectlombok:lombok</include>
                                 </includes>
                             </artifactSet>
                             <shadeSourcesContent>true</shadeSourcesContent>
@@ -209,12 +204,6 @@
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core</artifactId>
             <version>3.25.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
         </dependency>
 
         <dependency>

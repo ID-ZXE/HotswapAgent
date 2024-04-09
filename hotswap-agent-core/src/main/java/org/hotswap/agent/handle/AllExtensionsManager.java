@@ -23,16 +23,6 @@ public class AllExtensionsManager {
 
     public static void setClassLoader(ClassLoader classLoader) {
         AllExtensionsManager.classLoader = classLoader;
-
-        PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
-        try {
-            URL url = new URL("file:" + HotswapConstants.EXT_CLASS_PATH);
-            File lombokJar = JarUtils.createLombokJar();
-            URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{url, lombokJar.toURI().toURL()});
-        } catch (Exception e) {
-            LOGGER.error("createLombokJar error", e);
-        }
-
         setAppInfo();
     }
 
@@ -47,7 +37,7 @@ public class AllExtensionsManager {
             properties.load(resourceAsStream);
 
             AllExtensionsManager.app = properties.getProperty("spring.application.name");
-            LOGGER.info("app init {} ", app);
+            LOGGER.info("app is {} ", app);
         } catch (Exception e) {
             LOGGER.error("setAppInfo failure", e);
         }
@@ -67,7 +57,7 @@ public class AllExtensionsManager {
             return;
         }
         AllExtensionsManager.profile = profiles[0];
-        LOGGER.info("profile init {} ", profile);
+        LOGGER.info("profile is {} ", profile);
     }
 
 }
