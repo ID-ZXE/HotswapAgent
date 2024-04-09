@@ -167,7 +167,7 @@
                                 </relocation>
                                 <relocation>
                                     <pattern>lombok</pattern>
-                                    <shadedPattern>org.hotswap.agent.lombok</shadedPattern>
+                                    <shadedPattern>lombok</shadedPattern>
                                 </relocation>
                             </relocations>
                             <artifactSet>

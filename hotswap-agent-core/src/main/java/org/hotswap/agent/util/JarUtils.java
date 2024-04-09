@@ -3,6 +3,7 @@ package org.hotswap.agent.util;
 
 import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.constants.HotswapConstants;
+import org.hotswap.agent.logging.AgentLogger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,9 +12,13 @@ import java.io.InputStream;
 
 public class JarUtils {
 
+    private static AgentLogger LOGGER = AgentLogger.getLogger(JarUtils.class);
+
+    private static final String LOMBOK = "lombok.jar";
+
     private static File createJarFile(File file, String filename) throws IOException {
         try {
-            InputStream inputStream = JarUtils.class.getClassLoader().getResourceAsStream(filename);
+            InputStream inputStream = ClassLoader.getSystemResources(filename).nextElement().openStream();
             FileOutputStream fos = new FileOutputStream(file);
             byte[] b = new byte[1024];
             int length;
@@ -36,11 +41,11 @@ public class JarUtils {
                 boolean mkdirs = dir.mkdirs();
             }
 
-            File file = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");
+            File file = new File(HotswapConstants.EXT_CLASS_PATH, LOMBOK);
             if (!file.exists()) {
                 boolean newFile = file.createNewFile();
             }
-            return JarUtils.createJarFile(file, "lombok.jar");
+            return JarUtils.createJarFile(file, LOMBOK);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -9,3 +9,4 @@
 *.idea
 *.iml
 pom.xml.releaseBackup
+dependency-reduced-pom.xml

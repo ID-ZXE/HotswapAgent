@@ -1,8 +1,14 @@
 package org.hotswap.agent.handle;
 
+import org.hotswap.agent.config.PluginConfiguration;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.util.JarUtils;
+import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 public class AllExtensionsManager {
@@ -17,6 +23,16 @@ public class AllExtensionsManager {
 
     public static void setClassLoader(ClassLoader classLoader) {
         AllExtensionsManager.classLoader = classLoader;
+
+        PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+        try {
+            URL url = new URL("file:" + HotswapConstants.EXT_CLASS_PATH);
+            File lombokJar = JarUtils.createLombokJar();
+            URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{url, lombokJar.toURI().toURL()});
+        } catch (Exception e) {
+            LOGGER.error("createLombokJar error", e);
+        }
+
         setAppInfo();
     }
 
