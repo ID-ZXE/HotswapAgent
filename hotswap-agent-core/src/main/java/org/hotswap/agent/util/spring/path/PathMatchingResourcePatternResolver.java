@@ -52,10 +52,10 @@ import org.hotswap.agent.util.spring.util.StringUtils;
  * A {@link ResourcePatternResolver} implementation that is able to resolve a
  * specified resource location path into one or more matching Resources. The
  * source path may be a simple path which has a one-to-one mapping to a target
- * {@link org.hotswap.agent.util.spring.io.resource.springframework.core.io.Resource}
+ * {@link org.hotswap.agent.util.spring.io.resource.Resource}
  * , or alternatively may contain the special "{@code classpath*:}" prefix
  * and/or internal Ant-style regular expressions (matched using Spring's
- * {@link org.hotswap.agent.util.spring.path.springframework.util.AntPathMatcher}
+ * {@link org.hotswap.agent.util.spring.path.AntPathMatcher}
  * utility). Both of the latter are effectively wildcards.
  *
  * <p>
@@ -188,7 +188,7 @@ import org.hotswap.agent.util.spring.util.StringUtils;
  * @since 1.0.2
  * @see #CLASSPATH_ALL_URL_PREFIX
  * @see org.hotswap.agent.util.spring.path.AntPathMatcher
- * @see org.hotswap.agent.util.spring.io.loader.springframework.core.io.ResourceLoader#getResource(String)
+ * @see org.hotswap.agent.util.spring.io.loader.ResourceLoader#getResource(String)
  * @see ClassLoader#getResources(String)
  */
 public class PathMatchingResourcePatternResolver implements ResourcePatternResolver {
@@ -369,8 +369,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      *            a URL as returned from the ClassLoader
      * @return the corresponding Resource object
      * @see java.lang.ClassLoader#getResources
-     * @see org.hotswap.agent.util.spring.io.resource.springframework.core.io.
-     *      Resource
+     * @see org.hotswap.agent.util.spring.io.resource.Resource
      */
     protected Resource convertClassLoaderURL(URL url) {
         return new UrlResource(url);
@@ -432,7 +431,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      *             in case of I/O errors
      * @see #doFindPathMatchingJarResources
      * @see #doFindPathMatchingFileResources
-     * @see org.hotswap.agent.util.spring.path.springframework.util.PathMatcher
+     * @see org.hotswap.agent.util.spring.path.PathMatcher
      */
     protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
         String rootDirPath = determineRootDir(locationPattern);
@@ -532,7 +531,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      *            the resource handle to check (usually the root directory to
      *            start path matching from)
      * @see #doFindPathMatchingJarResources
-     * @see org.hotswap.agent.util.spring.util.springframework.util.ResourceUtils#isJarURL
+     * @see org.hotswap.agent.util.spring.util.ResourceUtils#isJarURL
      */
     protected boolean isJarResource(Resource resource) throws IOException {
         return ResourceUtils.isJarURL(resource.getURL());
@@ -550,7 +549,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @throws IOException
      *             in case of I/O errors
      * @see java.net.JarURLConnection
-     * @see org.hotswap.agent.util.spring.path.springframework.util.PathMatcher
+     * @see org.hotswap.agent.util.spring.path.PathMatcher
      */
     protected Set<Resource> doFindPathMatchingJarResources(Resource rootDirResource, String subPattern) throws IOException {
 
@@ -656,7 +655,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @throws IOException
      *             in case of I/O errors
      * @see #retrieveMatchingFiles
-     * @see org.hotswap.agent.util.spring.path.springframework.util.PathMatcher
+     * @see org.hotswap.agent.util.spring.path.PathMatcher
      */
     protected Set<Resource> doFindPathMatchingFileResources(Resource rootDirResource, String subPattern) throws IOException {
 
@@ -684,7 +683,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @throws IOException
      *             in case of I/O errors
      * @see #retrieveMatchingFiles
-     * @see org.hotswap.agent.util.spring.path.springframework.util.PathMatcher
+     * @see org.hotswap.agent.util.spring.path.PathMatcher
      */
     protected Set<Resource> doFindMatchingFileSystemResources(File rootDir, String subPattern) throws IOException {
         if (logger.isDebugEnabled()) {
