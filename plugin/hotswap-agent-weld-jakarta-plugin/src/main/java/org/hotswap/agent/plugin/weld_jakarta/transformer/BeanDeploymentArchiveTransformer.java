@@ -36,7 +36,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class BeanDeploymentArchiveTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanDeploymentArchiveTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanDeploymentArchiveTransformer.class);
 
     /**
      * Basic WeldBeanDeploymentArchive transformation.

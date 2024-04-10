@@ -60,7 +60,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
         }
 )
 public class MojarraPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MojarraPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MojarraPlugin.class);
 
     @Init
     Scheduler scheduler;

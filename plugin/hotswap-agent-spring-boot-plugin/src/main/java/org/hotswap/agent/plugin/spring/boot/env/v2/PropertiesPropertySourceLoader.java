@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class PropertiesPropertySourceLoader extends BasePropertiesPropertySourceLoader<List<Map<String, ?>>> {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertiesPropertySourceLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertiesPropertySourceLoader.class);
 
     private org.springframework.boot.env.PropertiesPropertySourceLoader propertiesPropertySourceLoader;
     private Resource resource;

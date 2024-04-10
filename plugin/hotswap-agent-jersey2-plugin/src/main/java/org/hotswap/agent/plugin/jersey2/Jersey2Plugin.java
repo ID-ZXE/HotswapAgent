@@ -44,7 +44,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
         testedVersions = {"2.10.1"},
         expectedVersions = {"2.10.1"})
 public class Jersey2Plugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Jersey2Plugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Jersey2Plugin.class);
 
     @Init
     Scheduler scheduler;

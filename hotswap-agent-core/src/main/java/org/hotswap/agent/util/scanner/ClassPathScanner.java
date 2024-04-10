@@ -38,7 +38,7 @@ import java.util.jar.JarFile;
  * @author Jiri Bubnik
  */
 public class ClassPathScanner implements Scanner {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassPathScanner.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassPathScanner.class);
 
     // scan for files inside JAR file - e.g. jar:file:\J:\HotswapAgent\target\HotswapAgent-1.0.jar!\org\hotswap\agent\plugin
     public static final String JAR_URL_SEPARATOR = "!/";

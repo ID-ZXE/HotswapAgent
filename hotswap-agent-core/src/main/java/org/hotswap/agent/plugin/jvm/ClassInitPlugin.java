@@ -48,7 +48,7 @@ import org.hotswap.agent.logging.AgentLogger;
         testedVersions = {"DCEVM"})
 public class ClassInitPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassInitPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassInitPlugin.class);
 
     private static final String HOTSWAP_AGENT_CLINIT_METHOD = "$$ha$clinit";
 

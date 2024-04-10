@@ -49,7 +49,7 @@ import org.hotswap.agent.watch.WatchFileEvent;
  */
 public class WatchEventCommand<T extends Annotation> extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WatchEventCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WatchEventCommand.class);
 
     private final PluginAnnotation<T> pluginAnnotation;
     private final WatchEventDTO watchEventDTO;

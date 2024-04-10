@@ -28,7 +28,7 @@ import org.springframework.core.io.Resource;
 
 public class PropertiesPropertySourceLoader extends BasePropertiesPropertySourceLoader<Properties> {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertiesPropertySourceLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertiesPropertySourceLoader.class);
     final String name;
     final Resource resource;
     final String profile;

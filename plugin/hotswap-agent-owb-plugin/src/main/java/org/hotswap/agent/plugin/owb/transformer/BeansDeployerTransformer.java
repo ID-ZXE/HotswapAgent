@@ -36,7 +36,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class BeansDeployerTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeansDeployerTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeansDeployerTransformer.class);
 
     /**
      * Basic CdiArchive transformation.

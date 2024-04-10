@@ -31,7 +31,7 @@ import java.security.ProtectionDomain;
  */
 @Deprecated
 public class AppClassLoaderExecutor {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AnnotationProcessor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AnnotationProcessor.class);
 
     ClassLoader appClassLoader;
     ProtectionDomain protectionDomain;

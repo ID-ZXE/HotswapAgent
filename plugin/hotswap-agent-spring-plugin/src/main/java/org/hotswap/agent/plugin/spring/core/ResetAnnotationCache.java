@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class ResetAnnotationCache {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ResetAnnotationCache.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResetAnnotationCache.class);
     /**
      * Reset Spring annotation scanner.
      * @since 5.x

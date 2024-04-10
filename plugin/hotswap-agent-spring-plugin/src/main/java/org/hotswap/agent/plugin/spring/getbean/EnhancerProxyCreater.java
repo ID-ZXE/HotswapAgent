@@ -36,7 +36,7 @@ import java.util.WeakHashMap;
  */
 public class EnhancerProxyCreater {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(EnhancerProxyCreater.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(EnhancerProxyCreater.class);
     private static EnhancerProxyCreater INSTANCE;
     public static final String SPRING_PACKAGE = "org.springframework.cglib.";
     public static final String CGLIB_PACKAGE = "net.sf.cglib.";

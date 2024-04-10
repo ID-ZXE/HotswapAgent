@@ -36,7 +36,7 @@ import org.hotswap.agent.plugin.deltaspike.DeltaSpikePlugin;
  */
 public class PartialBeanClassRefreshCommand extends MergeableCommand  {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanClassRefreshCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanClassRefreshCommand.class);
 
     ClassLoader appClassLoader;
     Object partialBean;

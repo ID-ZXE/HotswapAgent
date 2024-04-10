@@ -35,7 +35,7 @@ import org.hotswap.agent.versions.VersionRange;
  * @author alpapad@gmail.com
  */
 public class MavenMatcher implements VersionMatcher {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MavenMatcher.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MavenMatcher.class);
 
 	/** The included versions. */
 	private final VersionRange includes;

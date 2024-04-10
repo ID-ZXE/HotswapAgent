@@ -37,7 +37,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class PartialBeanClassRefreshAgent {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanClassRefreshAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanClassRefreshAgent.class);
 
     public static void refreshPartialBeanClass(ClassLoader classLoader, Object partialBean, String oldSignaturesForProxyCheck) {
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();

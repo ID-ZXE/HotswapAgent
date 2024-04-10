@@ -46,7 +46,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         supportClass = { CxfJAXRSTransformer.class})
 public class CxfJAXRSPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSPlugin.class);
     private static final Set<String> PATH_ANNOTATIONS = new HashSet<>(Arrays.asList("jakarta.ws.rs.Path", "javax.ws.rs.Path"));
 
 

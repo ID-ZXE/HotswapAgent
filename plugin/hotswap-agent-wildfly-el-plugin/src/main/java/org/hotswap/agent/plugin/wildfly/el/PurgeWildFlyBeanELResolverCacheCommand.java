@@ -33,7 +33,7 @@ import org.hotswap.agent.logging.AgentLogger;
 public class PurgeWildFlyBeanELResolverCacheCommand extends MergeableCommand {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PurgeWildFlyBeanELResolverCacheCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PurgeWildFlyBeanELResolverCacheCommand.class);
 
     /** The app class loader. */
     private ClassLoader appClassLoader;

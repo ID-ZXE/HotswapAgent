@@ -46,7 +46,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ProxyRefreshAgent {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyRefreshAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyRefreshAgent.class);
 
     /**
      * Recreate proxy classes, Called from BeanClassRefreshCommand.

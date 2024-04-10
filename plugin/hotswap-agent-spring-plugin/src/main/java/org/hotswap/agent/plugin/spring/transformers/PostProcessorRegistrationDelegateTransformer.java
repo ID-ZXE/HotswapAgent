@@ -25,7 +25,7 @@ import org.hotswap.agent.javassist.expr.MethodCall;
 import org.hotswap.agent.logging.AgentLogger;
 
 public class PostProcessorRegistrationDelegateTransformer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PostProcessorRegistrationDelegateTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PostProcessorRegistrationDelegateTransformer.class);
 
     /**
      * @param clazz

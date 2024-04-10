@@ -30,7 +30,7 @@ import org.hotswap.agent.logging.AgentLogger;
  */
 public class PurgeBeanELResolverCacheCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PurgeBeanELResolverCacheCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PurgeBeanELResolverCacheCommand.class);
 
     private ClassLoader appClassLoader;
 

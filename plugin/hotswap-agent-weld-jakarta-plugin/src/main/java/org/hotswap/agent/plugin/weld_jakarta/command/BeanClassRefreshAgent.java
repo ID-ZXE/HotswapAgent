@@ -48,7 +48,7 @@ import org.jboss.weld.manager.BeanManagerImpl;
  */
 public class BeanClassRefreshAgent {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshAgent.class);
 
     /**
      * Flag for checking reload status. It is used in unit tests for waiting for reload finish.

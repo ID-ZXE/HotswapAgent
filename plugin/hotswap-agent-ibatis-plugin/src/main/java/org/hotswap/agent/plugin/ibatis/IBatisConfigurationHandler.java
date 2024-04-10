@@ -37,7 +37,7 @@ import com.ibatis.sqlmap.engine.builder.xml.XmlParserState;
  * @date 2021-6-18
  */
 public class IBatisConfigurationHandler {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(IBatisConfigurationHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(IBatisConfigurationHandler.class);
     private static Resource[] configLocations;
     private static Resource[] mappingLocations;
     private static Properties properties;

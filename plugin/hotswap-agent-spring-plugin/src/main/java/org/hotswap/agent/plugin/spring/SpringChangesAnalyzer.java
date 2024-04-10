@@ -31,7 +31,7 @@ import org.hotswap.agent.plugin.spring.utils.ClassSignatureComparer;
  * @author Erki Ehtla
  */
 public class SpringChangesAnalyzer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(SpringPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringPlugin.class);
 
     private ClassPool cp;
 

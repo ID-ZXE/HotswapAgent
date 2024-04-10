@@ -38,7 +38,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ClassResourceInfoProxyHelper {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassResourceInfoProxyHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassResourceInfoProxyHelper.class);
 
     private static Class<?> classResourceInfoProxyClass = null;
 

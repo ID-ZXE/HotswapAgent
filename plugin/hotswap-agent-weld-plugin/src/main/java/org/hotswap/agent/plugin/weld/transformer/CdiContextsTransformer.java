@@ -38,7 +38,7 @@ import org.hotswap.agent.plugin.weld.beans.WeldHotswapContext;
  */
 public class CdiContextsTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CdiContextsTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CdiContextsTransformer.class);
 
     public static final String BOUND_SESSION_BEAN_STORE_REGISTRY = "$$ha$boundSessionBeanStoreRegistry";
 

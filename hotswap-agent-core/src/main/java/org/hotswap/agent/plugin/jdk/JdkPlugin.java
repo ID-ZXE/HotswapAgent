@@ -45,7 +45,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         )
 public class JdkPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(JdkPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(JdkPlugin.class);
 
     /**
      * Flag to check reload status. It is necessary (in unit tests)to wait for reload is finished before the test

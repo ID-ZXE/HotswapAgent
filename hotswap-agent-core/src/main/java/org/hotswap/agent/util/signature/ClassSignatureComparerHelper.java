@@ -31,7 +31,7 @@ import org.hotswap.agent.logging.AgentLogger;
  */
 public class ClassSignatureComparerHelper {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassSignatureComparerHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassSignatureComparerHelper.class);
 
     public static String getCtClassSignature(CtClass ctClass, ClassSignatureElement[] signatureElements) throws Exception {
         CtClassSignature signature = new CtClassSignature(ctClass);

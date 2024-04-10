@@ -40,7 +40,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  * @author Jiri Bubnik
  */
 public class EntityManagerFactoryProxy {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(EntityManagerFactoryProxy.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(EntityManagerFactoryProxy.class);
     // Map persistenceUnitName -> Wrapper instance
     private static Map<String, EntityManagerFactoryProxy> proxiedFactories = new HashMap<>();
     // hold lock during refresh. The lock is checked on each factory method call.

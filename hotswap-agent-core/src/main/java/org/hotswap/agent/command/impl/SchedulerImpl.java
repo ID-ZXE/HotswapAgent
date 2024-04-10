@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Jiri Bubnik
  */
 public class SchedulerImpl implements Scheduler {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(SchedulerImpl.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(SchedulerImpl.class);
 
     int DEFAULT_SCHEDULING_TIMEOUT = 100;
 

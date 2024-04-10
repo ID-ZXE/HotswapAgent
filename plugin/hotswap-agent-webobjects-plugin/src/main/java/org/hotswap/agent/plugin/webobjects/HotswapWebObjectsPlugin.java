@@ -46,7 +46,7 @@ public class HotswapWebObjectsPlugin {
 
     // Agent logger is a very simple custom logging mechanism. Do not use any common logging framework
     // to avoid compatibility and classloading issues.
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HotswapWebObjectsPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapWebObjectsPlugin.class);
 
     @Init
     Scheduler scheduler;

@@ -34,7 +34,7 @@ import org.hotswap.agent.plugin.proxy.java.ProxyGenerator;
  */
 public class ReloadJavaProxyCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ReloadJavaProxyCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReloadJavaProxyCommand.class);
 
     private ClassLoader classLoader;
     private String className;

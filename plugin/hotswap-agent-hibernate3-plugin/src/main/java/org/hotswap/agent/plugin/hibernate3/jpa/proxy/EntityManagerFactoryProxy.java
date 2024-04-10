@@ -45,7 +45,7 @@ import org.hotswap.agent.util.ReflectionHelper;
 public class EntityManagerFactoryProxy {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(EntityManagerFactoryProxy.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(EntityManagerFactoryProxy.class);
 
     /** The proxied factories. */
     // Map persistenceUnitName -> Wrapper instance

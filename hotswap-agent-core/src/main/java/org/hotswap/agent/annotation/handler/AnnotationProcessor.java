@@ -35,7 +35,7 @@ import java.util.Map;
  * @author Jiri Bubnik
  */
 public class AnnotationProcessor {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AnnotationProcessor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AnnotationProcessor.class);
 
     protected PluginManager pluginManager;
 

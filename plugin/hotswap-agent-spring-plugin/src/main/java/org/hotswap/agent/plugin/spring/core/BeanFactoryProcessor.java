@@ -39,7 +39,7 @@ import java.util.function.Predicate;
 
 public class BeanFactoryProcessor {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanFactoryProcessor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanFactoryProcessor.class);
 
     public static void removeBeanDefinition(DefaultListableBeanFactory beanFactory, String beanName) {
         resetEmbeddedValueResolvers(beanFactory, beanName);

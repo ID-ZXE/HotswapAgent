@@ -187,12 +187,12 @@ import org.hotswap.agent.util.spring.util.StringUtils;
  * @author Costin Leau
  * @since 1.0.2
  * @see #CLASSPATH_ALL_URL_PREFIX
- * @see org.hotswap.agent.util.spring.path.springframework.util.AntPathMatcher
+ * @see org.hotswap.agent.util.spring.path.AntPathMatcher
  * @see org.hotswap.agent.util.spring.io.loader.springframework.core.io.ResourceLoader#getResource(String)
  * @see ClassLoader#getResources(String)
  */
 public class PathMatchingResourcePatternResolver implements ResourcePatternResolver {
-    private static AgentLogger logger = AgentLogger.getLogger(PathMatchingResourcePatternResolver.class);
+    private static final AgentLogger logger = AgentLogger.getLogger(PathMatchingResourcePatternResolver.class);
 
     private static Method equinoxResolveMethod;
 
@@ -217,8 +217,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * <p>
      * ClassLoader access will happen via the thread context class loader.
      *
-     * @see org.hotswap.agent.util.spring.io.loader.springframework.core.io.
-     *      DefaultResourceLoader
+     * @see org.hotswap.agent.util.spring.io.loader.DefaultResourceLoader
      */
     public PathMatchingResourcePatternResolver() {
         this.resourceLoader = new DefaultResourceLoader();
@@ -246,8 +245,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      *            the ClassLoader to load classpath resources with, or
      *            {@code null} for using the thread context class loader at the
      *            time of actual resource access
-     * @see org.hotswap.agent.util.spring.io.loader.springframework.core.io.
-     *      DefaultResourceLoader
+     * @see org.hotswap.agent.util.spring.io.loader.DefaultResourceLoader
      */
     public PathMatchingResourcePatternResolver(ClassLoader classLoader) {
         this.resourceLoader = new DefaultResourceLoader(classLoader);
@@ -269,8 +267,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * Set the PathMatcher implementation to use for this resource pattern
      * resolver. Default is AntPathMatcher.
      *
-     * @see org.hotswap.agent.util.spring.path.springframework.util.
-     *      AntPathMatcher
+     * @see org.hotswap.agent.util.spring.path.AntPathMatcher
      */
     public void setPathMatcher(PathMatcher pathMatcher) {
         Assert.notNull(pathMatcher, "PathMatcher must not be null");

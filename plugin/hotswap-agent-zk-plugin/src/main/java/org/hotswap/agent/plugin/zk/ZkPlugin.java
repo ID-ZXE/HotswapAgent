@@ -36,7 +36,7 @@ import java.util.WeakHashMap;
         testedVersions = {"6.5.2"},
         expectedVersions = {"5x", "6x", "7x?"})
 public class ZkPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ZkPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ZkPlugin.class);
 
     // clear labels cache
     ReflectionCommand refreshLabels = new ReflectionCommand(this, "org.zkoss.util.resource.Labels", "reset");

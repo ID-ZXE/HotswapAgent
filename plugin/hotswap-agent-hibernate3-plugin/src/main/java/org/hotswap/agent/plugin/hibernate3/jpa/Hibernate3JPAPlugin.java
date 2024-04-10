@@ -62,7 +62,7 @@ public class Hibernate3JPAPlugin {
     private static final String ENTITY_ANNOTATION = "javax.persistence.Entity";
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPAPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPAPlugin.class);
 
     /** The scheduler. */
     @Init

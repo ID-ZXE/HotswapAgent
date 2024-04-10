@@ -54,7 +54,7 @@ import static org.hotswap.agent.util.ReflectionHelper.get;
  * Reload spring beans.
  */
 public class SpringBeanReload {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(SpringBeanReload.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringBeanReload.class);
 
     private AtomicBoolean isReloading = new AtomicBoolean(false);
 

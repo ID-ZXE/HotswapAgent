@@ -33,7 +33,7 @@ import org.hotswap.agent.plugin.deltaspike.transformer.RepositoryTransformer;
  */
 public class RepositoryRefreshCommand  extends MergeableCommand  {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(RepositoryRefreshCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(RepositoryRefreshCommand.class);
 
     ClassLoader appClassLoader;
     String repoClassName;

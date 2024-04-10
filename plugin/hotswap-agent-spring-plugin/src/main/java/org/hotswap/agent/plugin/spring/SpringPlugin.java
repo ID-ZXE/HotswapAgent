@@ -301,4 +301,18 @@ public class SpringPlugin {
 
         LOGGER.debug("org.springframework.aop.framework.CglibAopProxy - cglib Enhancer cache disabled");
     }
+
+    @OnClassLoadEvent(classNameRegexp = "org.sringframework.transaction.interceptor.AbstractFallbackTransactionAttributeSource")
+    public static void txCache(CtClass clazz, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtClass ctClass1 = classPool.getCtClass("java.lang.reflect.Method");
+        CtClass ctClass2 = classPool.getCtClass("java.lang.Class");
+        CtMethod method = clazz.getDeclaredMethod("getCacheKey", new CtClass[]{ctClass1, ctClass2});
+        method.insertBefore("try {\n" +
+                "attributeCache.clear();" +
+                "\t\t} catch (java.lang.Exception e) {\n" +
+                "\t\t\te.printStackTrace( );\n" +
+                "\t\t}");
+    }
+
+
 }

@@ -41,7 +41,7 @@ import org.hotswap.agent.watch.WatchFileEvent;
  * @author Vladimir Dvorak
  */
 public class BeanClassRefreshCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshCommand.class);
 
     ClassLoader classLoader;
 

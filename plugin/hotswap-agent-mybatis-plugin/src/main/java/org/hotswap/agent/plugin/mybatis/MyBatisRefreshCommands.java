@@ -31,7 +31,7 @@ import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
  * @author Vladimir Dvorak
  */
 public class MyBatisRefreshCommands {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MyBatisRefreshCommands.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisRefreshCommands.class);
 
     /**
      * Flag to check reload status.

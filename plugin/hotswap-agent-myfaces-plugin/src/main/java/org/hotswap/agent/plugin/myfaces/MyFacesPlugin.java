@@ -55,7 +55,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
         )
 public class MyFacesPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MyFacesPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MyFacesPlugin.class);
 
     @Init
     Scheduler scheduler;

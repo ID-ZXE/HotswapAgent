@@ -41,7 +41,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class MyBatisTransformers {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MyBatisTransformers.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisTransformers.class);
 
     public static final String SRC_FILE_NAME_FIELD = "$$ha$srcFileName";
     public static final String REFRESH_DOCUMENT_METHOD = "$$ha$refreshDocument";

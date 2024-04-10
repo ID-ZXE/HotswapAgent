@@ -44,7 +44,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class RepositoryRefreshAgent {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(RepositoryRefreshAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(RepositoryRefreshAgent.class);
 
     public static boolean reloadFlag = false;
 

@@ -13,7 +13,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class HaCdiExtraCxfContext implements HaCdiExtraContext {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HaCdiExtraCxfContext.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HaCdiExtraCxfContext.class);
 
     public static void registerExtraContext(Object pluginInstance) {
         HaCdiExtraCxfContext context = new HaCdiExtraCxfContext(pluginInstance);

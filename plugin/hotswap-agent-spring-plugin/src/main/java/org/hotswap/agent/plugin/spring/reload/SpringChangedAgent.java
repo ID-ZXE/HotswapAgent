@@ -45,7 +45,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  * The type Spring changed agent.
  */
 public class SpringChangedAgent implements SpringListener<SpringEvent<?>>, Comparable<SpringChangedAgent> {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(SpringChangedAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringChangedAgent.class);
 
     private static final AtomicInteger waitingReloadCount = new AtomicInteger(0);
 

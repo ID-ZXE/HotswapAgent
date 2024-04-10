@@ -52,7 +52,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         expectedVersions = { "3.0.14" })
 public class ResteasyRegistryPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ResteasyRegistryPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResteasyRegistryPlugin.class);
 
     private static final String PATH_ANNOTATION = "javax.ws.rs.Path";
 

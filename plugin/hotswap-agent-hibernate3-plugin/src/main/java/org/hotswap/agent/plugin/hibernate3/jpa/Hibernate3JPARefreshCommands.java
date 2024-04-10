@@ -32,7 +32,7 @@ import org.hotswap.agent.plugin.hibernate3.jpa.proxy.EntityManagerFactoryProxy;
 public class Hibernate3JPARefreshCommands {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPARefreshCommands.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPARefreshCommands.class);
 
     /**
      * Flag to check reload status.

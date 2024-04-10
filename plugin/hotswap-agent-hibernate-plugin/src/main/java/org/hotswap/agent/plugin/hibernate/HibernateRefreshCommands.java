@@ -31,7 +31,7 @@ import org.hotswap.agent.plugin.hibernate.proxy.SessionFactoryProxy;
  * @author Jiri Bubnik
  */
 public class HibernateRefreshCommands {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HibernateRefreshCommands.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HibernateRefreshCommands.class);
 
     /**
      * Flag to check reload status.

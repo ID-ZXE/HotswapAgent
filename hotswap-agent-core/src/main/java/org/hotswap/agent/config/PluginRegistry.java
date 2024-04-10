@@ -40,7 +40,7 @@ import org.hotswap.agent.util.scanner.ClassPathScanner;
  */
 public class PluginRegistry {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PluginRegistry.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PluginRegistry.class);
 
     // plugin class -> Map (ClassLoader -> Plugin instance)
     protected Map<Class, Map<ClassLoader, Object>> registeredPlugins = Collections.synchronizedMap(new HashMap<Class, Map<ClassLoader, Object>>());

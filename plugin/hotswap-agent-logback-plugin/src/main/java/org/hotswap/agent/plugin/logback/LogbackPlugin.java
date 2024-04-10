@@ -44,7 +44,7 @@ import java.util.Set;
         testedVersions = {"1.0.6"}
 )
 public class LogbackPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LogbackPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(LogbackPlugin.class);
 
     @Init
     Watcher watcher;

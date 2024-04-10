@@ -44,7 +44,7 @@ import static org.hotswap.agent.constants.HotswapConstants.EXT_CLASS_PATH;
  * @author Jiri Bubnik
  */
 public class PluginConfiguration {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PluginConfiguration.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PluginConfiguration.class);
 
     private static final String PLUGIN_CONFIGURATION = "hotswap-agent.properties";
 
@@ -215,11 +215,11 @@ public class PluginConfiguration {
 
     private void initExtraClassPath() {
         URL[] extraClassPath = getExtraClasspath();
-        if (AllExtensionsManager.getClassLoader() == null) {
+        if (AllExtensionsManager.getInstance().getClassLoader() == null) {
             return;
         }
         // 非指定classloader 不进行增强
-        if (!Objects.equals(classLoader, AllExtensionsManager.getClassLoader())) {
+        if (!Objects.equals(classLoader, AllExtensionsManager.getInstance().getClassLoader())) {
             return;
         }
 

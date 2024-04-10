@@ -1,62 +1,62 @@
 package org.hotswap.agent.handle;
 
-import org.hotswap.agent.config.PluginConfiguration;
-import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.util.JarUtils;
-import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
-import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 public class AllExtensionsManager {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AllExtensionsManager.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AllExtensionsManager.class);
 
-    private static ClassLoader classLoader;
+    private static final AllExtensionsManager INSTANCE = new AllExtensionsManager();
 
-    private static String app;
+    private ClassLoader classLoader;
 
-    private static String profile;
+    private String app;
 
-    public static void setClassLoader(ClassLoader classLoader) {
-        AllExtensionsManager.classLoader = classLoader;
+    private String profile;
+
+    public static AllExtensionsManager getInstance() {
+        return INSTANCE;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
         setAppInfo();
     }
 
-    public static ClassLoader getClassLoader() {
-        return AllExtensionsManager.classLoader;
+    public ClassLoader getClassLoader() {
+        return this.classLoader;
     }
 
-    public static void setAppInfo() {
+    public void setAppInfo() {
         try {
-            InputStream resourceAsStream = AllExtensionsManager.classLoader.getResourceAsStream("application.properties");
+            InputStream resourceAsStream = this.classLoader.getResourceAsStream("application.properties");
             Properties properties = new Properties();
             properties.load(resourceAsStream);
 
-            AllExtensionsManager.app = properties.getProperty("spring.application.name");
+            this.app = properties.getProperty("spring.application.name");
             LOGGER.info("app is {} ", app);
         } catch (Exception e) {
             LOGGER.error("setAppInfo failure", e);
         }
     }
 
-    public static String getApp() {
+    public String getApp() {
         return app;
     }
 
-    public static String getProfile() {
+    public String getProfile() {
         return profile;
     }
 
-    public static void setProfile(String... profiles) {
+    public void setProfile(String... profiles) {
         if (profiles.length == 0) {
             LOGGER.info("profile not exists, set profile is default");
             return;
         }
-        AllExtensionsManager.profile = profiles[0];
+        this.profile = profiles[0];
         LOGGER.info("profile is {} ", profile);
     }
 

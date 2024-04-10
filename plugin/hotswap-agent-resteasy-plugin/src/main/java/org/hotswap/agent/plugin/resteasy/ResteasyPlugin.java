@@ -56,7 +56,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         )
 public class ResteasyPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ResteasyPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResteasyPlugin.class);
 
     private static final String PATH_ANNOTATION = "javax.ws.rs.Path";
 

@@ -43,7 +43,7 @@ import java.net.URL;
 @Plugin(name = "WatchResources", description = "Support for watchResources configuration property.",
         testedVersions = {"JDK 1.7.0_45"}, expectedVersions = {"JDK 1.6+"})
 public class WatchResourcesPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WatchResourcesPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WatchResourcesPlugin.class);
 
     @Init
     Watcher watcher;

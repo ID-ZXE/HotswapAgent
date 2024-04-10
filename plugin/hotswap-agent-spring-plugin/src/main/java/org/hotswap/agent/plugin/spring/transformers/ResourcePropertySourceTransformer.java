@@ -6,7 +6,7 @@ import org.hotswap.agent.logging.AgentLogger;
 
 public class ResourcePropertySourceTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ResourcePropertySourceTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResourcePropertySourceTransformer.class);
 
     /**
      * Insert at the beginning of the method:

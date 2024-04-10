@@ -43,7 +43,7 @@ import java.util.*;
  * @author Jiri Bubnik
  */
 public class AnonymousClassInfos {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AnonymousClassInfos.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AnonymousClassInfos.class);
 
     // start indexing hotswap created synthetic anonymous classes from this index to avoid collision with existing
     public static final int UNIQUE_CLASS_START_INDEX = 10000;

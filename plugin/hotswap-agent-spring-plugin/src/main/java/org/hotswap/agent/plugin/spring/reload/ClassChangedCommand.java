@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * Add changed Class to SpringChangedAgent.
  */
 public class ClassChangedCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassChangedCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassChangedCommand.class);
     private static final Set<String> IGNORE_PACKAGES = new HashSet<>();
 
     ClassLoader appClassLoader;

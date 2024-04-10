@@ -31,7 +31,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  * Created by bubnik on 5.6.2014.
  */
 public class TomcatSetup {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(TomcatSetup.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(TomcatSetup.class);
 
     public TomcatSetup(ClassLoader originalClassLoader) {
 

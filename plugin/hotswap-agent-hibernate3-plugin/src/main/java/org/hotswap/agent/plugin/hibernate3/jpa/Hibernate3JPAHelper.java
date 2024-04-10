@@ -39,7 +39,7 @@ import java.util.Set;
 public class Hibernate3JPAHelper {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPAHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPAHelper.class);
 
     /** The wrapped persistence unit names. */
     // each persistence unit should be wrapped only once

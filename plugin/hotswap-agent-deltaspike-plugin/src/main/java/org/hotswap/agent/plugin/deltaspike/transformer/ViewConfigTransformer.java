@@ -39,7 +39,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class ViewConfigTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigTransformer.class);
 
     private static final String VIEW_CONFIG_RESOLVER_PROXY_FIELD = "$$ha$viewConfigResolverProxy";
 

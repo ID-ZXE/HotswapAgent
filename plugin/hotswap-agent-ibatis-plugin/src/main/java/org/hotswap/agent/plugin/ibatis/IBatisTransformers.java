@@ -35,7 +35,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  * @date 2021-6-18
  */
 public class IBatisTransformers {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(IBatisTransformers.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(IBatisTransformers.class);
     public static final String REFRESH_METHOD = "$$ha$refresh";
 
     /**

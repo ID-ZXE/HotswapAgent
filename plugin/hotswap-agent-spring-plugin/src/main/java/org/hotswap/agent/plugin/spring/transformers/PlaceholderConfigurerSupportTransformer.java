@@ -25,7 +25,7 @@ import org.hotswap.agent.logging.AgentLogger;
 import java.util.Arrays;
 
 public class PlaceholderConfigurerSupportTransformer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PlaceholderConfigurerSupportTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PlaceholderConfigurerSupportTransformer.class);
 
     /**
      * @param clazz

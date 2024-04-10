@@ -24,7 +24,7 @@ import org.hotswap.agent.logging.AgentLogger;
  */
 public class LifecycleImplTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LifecycleImplTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(LifecycleImplTransformer.class);
 
     
     @OnClassLoadEvent(classNameRegexp = LIFECYCLE_IMPL_CLASS)

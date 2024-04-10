@@ -33,7 +33,7 @@ import java.util.List;
  * @author Jiri Bubnik
  */
 public class ReflectionCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ReflectionCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReflectionCommand.class);
 
     /**
      * Run the method on target object.

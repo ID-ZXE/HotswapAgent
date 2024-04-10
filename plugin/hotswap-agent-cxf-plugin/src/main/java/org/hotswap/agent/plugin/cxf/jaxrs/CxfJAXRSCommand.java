@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 public class CxfJAXRSCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSCommand.class);
 
     private ClassLoader classLoader;
     private ClassResourceInfo criProxy;

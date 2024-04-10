@@ -37,7 +37,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class RepositoryTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(RepositoryTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(RepositoryTransformer.class);
 
     public static final String REINITIALIZE_METHOD = "$$ha$reinitialize";
 

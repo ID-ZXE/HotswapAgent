@@ -20,17 +20,15 @@ package org.hotswap.agent;
 
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.EmbedHttpServer;
-import org.hotswap.agent.handle.LocalCompileHandler;
+import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.util.Version;
-import org.hotswap.agent.watch.Watcher;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +44,7 @@ import java.util.Set;
  * @author Jiri Bubnik
  */
 public class HotswapAgent {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HotswapAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapAgent.class);
 
     /**
      * Force disable plugin, this plugin is skipped during scanning process.
@@ -72,12 +70,14 @@ public class HotswapAgent {
     public static void premain(String args, Instrumentation inst) {
         LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
         // 清空class文件夹
-        LocalCompileHandler.cleanOldClassFile();
+        CompileEngine.getInstance().cleanOldClassFile();
         parseArgs(args);
         fixJboss7Modules();
         PluginManager.getInstance().init(inst);
 
         watchExtraClasspath();
+        AbstractNIO2Watcher abstractNIO2Watcher = (AbstractNIO2Watcher) PluginManager.getInstance().getWatcher();
+        HotswapApplication.getInstance().setDispatcher(abstractNIO2Watcher.getDispatcher());
         // 远程编译器初始化
         EmbedHttpServer.start();
         LOGGER.debug("Hotswap agent initialized.");

@@ -32,7 +32,7 @@ import org.hotswap.agent.logging.AgentLogger;
  */
 public class ViewConfigReloadCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigReloadCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigReloadCommand.class);
 
     ClassLoader classLoader;
     Object viewConfigExtension;

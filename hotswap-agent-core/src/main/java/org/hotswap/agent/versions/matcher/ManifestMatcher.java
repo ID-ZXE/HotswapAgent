@@ -43,7 +43,7 @@ import org.hotswap.agent.versions.VersionRange;
  * @author alpapad@gmail.com
  */
 public class ManifestMatcher implements VersionMatcher {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ManifestMatcher.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ManifestMatcher.class);
 
     /** The included versions range */
     private final VersionRange includes;

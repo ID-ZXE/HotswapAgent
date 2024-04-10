@@ -27,7 +27,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class PurgeJbossReflectionUtil  extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PurgeBeanELResolverCacheCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PurgeBeanELResolverCacheCommand.class);
 
     private ClassLoader appClassLoader;
 

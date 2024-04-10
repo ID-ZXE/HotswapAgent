@@ -76,7 +76,7 @@ import org.hotswap.agent.util.classloader.ClassLoaderHelper;
         description = "Swap anonymous inner class names to avoid not compatible changes.",
         testedVersions = {"DCEVM"})
 public class AnonymousClassPatchPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AnonymousClassPatchPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AnonymousClassPatchPlugin.class);
 
     @Init
     static HotswapTransformer hotswapTransformer;

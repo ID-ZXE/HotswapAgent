@@ -26,7 +26,7 @@ import org.hotswap.agent.plugin.mojarra.MojarraConstants;
  */
 public class BeanManagerTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanManagerTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanManagerTransformer.class);
 
     public static final String DIRTY_BEANS_FIELD = "DIRTY_BEANS";
 

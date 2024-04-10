@@ -13,7 +13,6 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.io.File;
@@ -27,11 +26,10 @@ public class StaticFieldHandler {
 
     private static final String STATIC_FIELD_INIT_METHOD = "$$hotswap$$_get";
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
 
     public static void generateStaticFieldInitMethod(List<File> javaList) {
         long start = System.currentTimeMillis();
-        CountDownLatch latch = new CountDownLatch(javaList.size());
         for (File javaFile : javaList) {
             try {
                 JavaParser javaParser = new JavaParser();
@@ -70,15 +68,9 @@ public class StaticFieldHandler {
                 }
                 String outputStr = new DefaultPrettyPrinter().print(result.getResult().get());
                 FileUtils.write(javaFile, outputStr, "UTF-8", false);
-                latch.countDown();
             } catch (Exception e) {
                 LOGGER.error("generateStaticFieldInitMethod {} error", javaFile.getName(), e);
             }
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            LOGGER.error("generateStaticFieldInitMethod await error", e);
         }
         LOGGER.info("generateStaticFieldInitMethod cost:{}", System.currentTimeMillis() - start);
     }

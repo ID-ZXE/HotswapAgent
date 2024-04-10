@@ -85,7 +85,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
     )
 public class ELResolverPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ELResolverPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ELResolverPlugin.class);
 
     public static final String PURGE_CLASS_CACHE_METHOD_NAME = "$$ha$resetCache";
 

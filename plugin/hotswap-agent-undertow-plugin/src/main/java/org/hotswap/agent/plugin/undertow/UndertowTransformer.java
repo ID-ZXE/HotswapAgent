@@ -30,7 +30,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class UndertowTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(UndertowTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(UndertowTransformer.class);
 
     @OnClassLoadEvent(classNameRegexp = "io.undertow.servlet.core.DeploymentManagerImpl")
     public static void patchWebappLoader(CtClass ctClass) throws NotFoundException, CannotCompileException, ClassNotFoundException {

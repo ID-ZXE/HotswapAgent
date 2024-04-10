@@ -55,7 +55,7 @@ import java.util.Set;
  * @author Jiri Bubnik
  */
 public class ClassPathBeanDefinitionScannerAgent {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassPathBeanDefinitionScannerAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassPathBeanDefinitionScannerAgent.class);
 
     private static Map<ClassPathBeanDefinitionScanner, ClassPathBeanDefinitionScannerAgent> instances = new HashMap<>();
 

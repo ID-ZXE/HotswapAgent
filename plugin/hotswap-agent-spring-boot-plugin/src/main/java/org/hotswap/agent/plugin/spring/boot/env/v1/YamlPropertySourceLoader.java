@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class YamlPropertySourceLoader extends BasePropertiesPropertySourceLoader<Map<String, Object>> {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(YamlPropertySourceLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(YamlPropertySourceLoader.class);
 
     final String profile;
     final Resource resource;

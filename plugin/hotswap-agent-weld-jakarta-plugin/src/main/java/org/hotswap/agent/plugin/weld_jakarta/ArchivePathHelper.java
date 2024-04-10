@@ -29,7 +29,7 @@ import org.hotswap.agent.logging.AgentLogger;
 
 public class ArchivePathHelper {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ArchivePathHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ArchivePathHelper.class);
 
     public static String getNormalizedArchivePath(CtClass ctClass) throws NotFoundException {
         String classFilePath = ctClass.getURL().getFile();

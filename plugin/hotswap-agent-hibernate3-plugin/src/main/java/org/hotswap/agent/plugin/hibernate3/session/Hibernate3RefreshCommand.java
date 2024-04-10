@@ -31,7 +31,7 @@ import org.hotswap.agent.plugin.hibernate3.session.proxy.SessionFactoryProxy;
 public class Hibernate3RefreshCommand {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3RefreshCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3RefreshCommand.class);
 
     /**
      * Flag to check reload status. In unit test we need to wait for reload

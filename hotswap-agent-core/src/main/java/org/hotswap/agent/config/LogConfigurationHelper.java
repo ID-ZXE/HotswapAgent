@@ -33,7 +33,7 @@ import org.hotswap.agent.logging.AgentLogger;
  * Configure LOG level and handler according to properties.
  */
 public class LogConfigurationHelper {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LogConfigurationHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(LogConfigurationHelper.class);
 
     public static final String LOGGER_PREFIX = "LOGGER";
     public static final String DATETIME_FORMAT = "LOGGER_DATETIME_FORMAT";

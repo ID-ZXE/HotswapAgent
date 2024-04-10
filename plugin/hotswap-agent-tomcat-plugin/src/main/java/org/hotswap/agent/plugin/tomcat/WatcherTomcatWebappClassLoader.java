@@ -30,7 +30,7 @@ import org.hotswap.agent.util.classloader.WatchResourcesClassLoader;
  * Created by bubnik on 4.6.2014.
  */
 public class WatcherTomcatWebappClassLoader extends WatchResourcesClassLoader {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WatcherTomcatWebappClassLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WatcherTomcatWebappClassLoader.class);
 
     public WatcherTomcatWebappClassLoader(ClassLoader originalClassLoader) {
         super(originalClassLoader);

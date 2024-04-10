@@ -51,7 +51,7 @@ import java.net.URL;
         expectedVersions = {"4x", "5x", "6x", "7x", "8x", "9x"}
 )
 public class JettyPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(JettyPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(JettyPlugin.class);
 
     @Init
     PluginConfiguration pluginConfiguration;

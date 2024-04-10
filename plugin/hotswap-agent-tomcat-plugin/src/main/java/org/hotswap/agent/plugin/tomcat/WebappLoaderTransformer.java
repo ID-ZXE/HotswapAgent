@@ -32,7 +32,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  * Created by bubnik on 9.6.2014.
  */
 public class WebappLoaderTransformer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WebappLoaderTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WebappLoaderTransformer.class);
 
     private static boolean webappClassLoaderPatched = false;
 

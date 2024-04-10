@@ -1,6 +1,7 @@
 package org.hotswap.agent.handle;
 
 import com.taobao.arthas.compiler.DynamicCompiler;
+import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.config.PluginManager;
@@ -14,18 +15,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class LocalCompileHandler {
+public class CompileEngine {
 
-    private static volatile DynamicCompiler dynamicCompiler;
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
+    private static final CompileEngine INSTANCE = new CompileEngine();
 
-    public static void compile() throws Exception {
+    private volatile DynamicCompiler dynamicCompiler;
+
+    private volatile Map<Class<?>, byte[]> reloadMap = null;
+
+    public static CompileEngine getInstance() {
+        return INSTANCE;
+    }
+
+    public void compile() throws Exception {
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         compile(getCompiler());
     }
 
-    private static void compile(DynamicCompiler dynamicCompiler) throws Exception {
+    private void compile(DynamicCompiler dynamicCompiler) throws Exception {
         long start = System.currentTimeMillis();
         for (File file : getJavaFile()) {
             String sourceCode = FileUtils.readFileToString(file, "UTF-8");
@@ -39,27 +48,31 @@ public class LocalCompileHandler {
         Map<String, byte[]> byteCodes = dynamicCompiler.buildByteCodes();
 
 
-        Map<Class<?>, byte[]> reloadMap = new HashMap<>();
+        this.reloadMap = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
             Class<?> clazz;
             try {
-                clazz = AllExtensionsManager.getClassLoader().loadClass(entry.getKey());
+                clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(entry.getKey());
             } catch (ClassNotFoundException e) {
-                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.", entry.getKey(), AllExtensionsManager.getClassLoader());
+                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.", entry.getKey(), AllExtensionsManager.getInstance().getClassLoader());
                 throw new RuntimeException(e);
             }
-            reloadMap.put(clazz, entry.getValue());
+            this.reloadMap.put(clazz, entry.getValue());
         }
-        if (!reloadMap.isEmpty()) {
-            PluginManager.getInstance().hotswap(reloadMap);
-        }
-        ResultHandler.startResultThread();
         LOGGER.info("compile cost {} ms", System.currentTimeMillis() - start);
     }
 
-    public static void cleanOldClassFile() {
+    public Map<Class<?>, byte[]> getCompileResult() {
+        return this.reloadMap;
+    }
+
+    public void cleanCompileResult() {
+        this.reloadMap.clear();
+    }
+
+    public void cleanOldClassFile() {
         LOGGER.info("clean old class file");
         try {
             File classDir = new File(HotswapConstants.EXT_CLASS_PATH);
@@ -69,24 +82,24 @@ public class LocalCompileHandler {
         }
     }
 
-    public static List<File> getJavaFile() {
+    public List<File> getJavaFile() {
         File dir = new File(HotswapConstants.SOURCE_FILE_PATH);
         Collection<File> fileCollection = FileUtils.listFiles(dir, new String[]{"java"}, true);
         return new ArrayList<>(fileCollection);
     }
 
-    private static DynamicCompiler getCompiler() {
+    private DynamicCompiler getCompiler() {
         if (dynamicCompiler == null) {
-            synchronized (LocalCompileHandler.class) {
+            synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getClassLoader());
+                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getInstance().getClassLoader());
                     try {
                         File lombokJar = JarUtils.createLombokJar();
-                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
+                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
                     } catch (Exception e) {
                         LOGGER.error("createLombokJar error", e);
                     }
-                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getClassLoader());
+                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
                 }
             }
         }

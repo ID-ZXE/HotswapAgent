@@ -43,7 +43,7 @@ import org.hotswap.agent.util.spring.path.PathMatchingResourcePatternResolver;
 public class DeploymentInfo {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(DeploymentInfo.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(DeploymentInfo.class);
     
     /** The set of maven coordinates this deployment depends on. */
     private Set<MavenInfo> maven = new LinkedHashSet<>();

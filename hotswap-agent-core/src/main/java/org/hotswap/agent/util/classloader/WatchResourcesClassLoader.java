@@ -41,7 +41,7 @@ import java.util.*;
  * @author Jiri Bubnik
  */
 public class WatchResourcesClassLoader extends URLClassLoader {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WatchResourcesClassLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WatchResourcesClassLoader.class);
 
     /**
      * URLs of changed resources. Use this set to check if the resource was changed and hence should

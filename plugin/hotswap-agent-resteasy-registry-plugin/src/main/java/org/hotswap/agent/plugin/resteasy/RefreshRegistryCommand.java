@@ -51,7 +51,7 @@ import org.jboss.resteasy.spi.Registry;
  */
 public class RefreshRegistryCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(RefreshRegistryCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(RefreshRegistryCommand.class);
 
     private ClassLoader classLoader;
 

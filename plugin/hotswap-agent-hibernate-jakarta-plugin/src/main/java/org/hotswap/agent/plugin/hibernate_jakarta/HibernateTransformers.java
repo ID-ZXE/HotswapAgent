@@ -30,7 +30,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  * Static transformers for Hibernate plugin.
  */
 public class HibernateTransformers {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HibernateTransformers.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HibernateTransformers.class);
 
     private static Boolean isJakarta;
 

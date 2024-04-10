@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 public class JarUtils {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(JarUtils.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(JarUtils.class);
 
     private static final String LOMBOK = "lombok.jar";
 

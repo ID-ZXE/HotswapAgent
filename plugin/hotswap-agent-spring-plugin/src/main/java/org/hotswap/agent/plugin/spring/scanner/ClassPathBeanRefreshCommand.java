@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * This commands merges events of watcher.event(CREATE) and transformer hotswap reload to a single refresh command.
  */
 public class ClassPathBeanRefreshCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassPathBeanRefreshCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassPathBeanRefreshCommand.class);
 
     ClassLoader appClassLoader;
 

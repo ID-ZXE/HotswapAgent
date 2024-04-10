@@ -50,7 +50,7 @@ import org.hotswap.agent.logging.AgentLogger;
  * @see #monitor
  */
 public class WeakReferenceMonitor {
-    private static AgentLogger logger = AgentLogger.getLogger(WeakReferenceMonitor.class);
+    private static final AgentLogger logger = AgentLogger.getLogger(WeakReferenceMonitor.class);
 
     // Queue receiving reachability events
     private static final ReferenceQueue<Object> handleQueue = new ReferenceQueue<Object>();

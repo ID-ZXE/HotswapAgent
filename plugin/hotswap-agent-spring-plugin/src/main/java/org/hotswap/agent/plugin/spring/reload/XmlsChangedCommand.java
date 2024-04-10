@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * Add changed xmls to SpringChangedAgent.
  */
 public class XmlsChangedCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(XmlsChangedCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(XmlsChangedCommand.class);
 
     ClassLoader appClassLoader;
 

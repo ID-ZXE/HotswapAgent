@@ -33,7 +33,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class PartialBeanTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PartialBeanTransformer.class);
 
     /**
      * Patch partial bean binding extension.

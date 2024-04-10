@@ -29,7 +29,7 @@ import org.hotswap.agent.logging.AgentLogger;
 
 public class PropertySourceTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertySourceTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertySourceTransformer.class);
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.core.env.MapPropertySource")
     public static void transformMapPropertySource(CtClass clazz, ClassPool classPool) throws NotFoundException, CannotCompileException {

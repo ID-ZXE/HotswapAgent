@@ -18,13 +18,18 @@
  */
 package org.hotswap.agent.watch.nio;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.io.FileUtils;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.watch.WatchEventListener;
 import org.hotswap.agent.watch.WatchFileEvent;
@@ -33,35 +38,42 @@ import org.hotswap.agent.watch.WatchFileEvent;
  * The EventDispatcher holds a queue of all events collected by the watcher but
  * not yet processed. It runs on its own thread and is responsible for calling
  * all the registered listeners.
- *
+ * <p>
  * Since file system events can spawn too fast, this implementation works as
  * buffer for fast spawning events. The watcher is now responsible for
  * collecting and pushing events in this queue.
- *
  */
 public class EventDispatcher implements Runnable {
 
-    /** The logger. */
+    /**
+     * The logger.
+     */
     protected AgentLogger LOGGER = AgentLogger.getLogger(this.getClass());
+
+    private final AtomicBoolean CHANNEL = new AtomicBoolean(false);
+
+    private CountDownLatch countDownLatch;
 
     /**
      * The Class Event.
      */
     static class Event {
 
-        /** The event. */
+        /**
+         * The event.
+         */
         final WatchEvent<Path> event;
 
-        /** The path. */
+        /**
+         * The path.
+         */
         final Path path;
 
         /**
          * Instantiates a new event.
          *
-         * @param event
-         *            the event
-         * @param path
-         *            the path
+         * @param event the event
+         * @param path  the path
          */
         public Event(WatchEvent<Path> event, Path path) {
             super();
@@ -70,27 +82,66 @@ public class EventDispatcher implements Runnable {
         }
     }
 
-    /** The map of listeners.  This is managed by the watcher service*/
+    /**
+     * The map of listeners.  This is managed by the watcher service
+     */
     private final Map<Path, List<WatchEventListener>> listeners;
 
-    /** The working queue. The event queue is drained and all pending events are added in this list */
+    /**
+     * The working queue. The event queue is drained and all pending events are added in this list
+     */
     private final ArrayList<Event> working = new ArrayList<>();
 
-    /** The runnable. */
+    /**
+     * The runnable.
+     */
     private Thread runnable = null;
 
     /**
      * Instantiates a new event dispatcher.
      *
-     * @param listeners
-     *            the listeners
+     * @param listeners the listeners
      */
     public EventDispatcher(Map<Path, List<WatchEventListener>> listeners) {
         super();
         this.listeners = listeners;
     }
 
-    /** The event queue. */
+    public void openChannel() {
+        LOGGER.info("hotswap open channel");
+        CHANNEL.compareAndSet(false, true);
+        countDownLatch = new CountDownLatch(1);
+    }
+
+    public void closeChannel() {
+        CHANNEL.compareAndSet(true, false);
+    }
+
+    public CountDownLatch getCountDownLatch() {
+        return countDownLatch;
+    }
+
+    public void release() {
+        LOGGER.info("close channel");
+        if (countDownLatch.getCount() > 0) {
+            countDownLatch.countDown();
+        }
+        reset();
+        closeChannel();
+    }
+
+    private void reset() {
+        try {
+            FileUtils.cleanDirectory(new File(HotswapConstants.SOURCE_FILE_PATH));
+        } catch (Exception e) {
+            LOGGER.error("reset failure", e);
+        }
+    }
+
+
+    /**
+     * The event queue.
+     */
     private final ArrayBlockingQueue<Event> eventQueue = new ArrayBlockingQueue<>(500);
 
     /*
@@ -109,6 +160,15 @@ public class EventDispatcher implements Runnable {
          * d) empty working queue
          */
         while (true) {
+            // 等待启动
+            if (!CHANNEL.get()) {
+                try {
+                    Thread.sleep(50L);
+                } catch (InterruptedException ignore) {
+                }
+                continue;
+            }
+
             // finish any pending ones
             for (Event e : working) {
                 callListeners(e.event, e.path);
@@ -144,10 +204,8 @@ public class EventDispatcher implements Runnable {
     /**
      * Adds the.
      *
-     * @param event
-     *            the event
-     * @param path
-     *            the path
+     * @param event the event
+     * @param path  the path
      */
     public void add(WatchEvent<Path> event, Path path) {
         eventQueue.offer(new Event(event, path));
@@ -157,10 +215,8 @@ public class EventDispatcher implements Runnable {
      * Call the listeners.
      * Listeners are organized per path in a Map. The number of paths is low so a simple iteration should be fast enough.
      *
-     * @param event
-     *            the event
-     * @param path
-     *            the path
+     * @param event the event
+     * @param path  the path
      */
     // notify listeners about new event
     private void callListeners(final WatchEvent<?> event, final Path path) {
@@ -197,8 +253,7 @@ public class EventDispatcher implements Runnable {
     /**
      * Stop.
      *
-     * @throws InterruptedException
-     *             the interrupted exception
+     * @throws InterruptedException the interrupted exception
      */
     public void stop() throws InterruptedException {
         if (runnable != null) {

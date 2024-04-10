@@ -34,7 +34,7 @@ import org.hotswap.agent.logging.AgentLogger;
 public class GeneratorParametersRecorder {
     // this Map is used in the App ClassLoader
     public static ConcurrentHashMap<String, GeneratorParams> generatorParams = new ConcurrentHashMap<>();
-    private static AgentLogger LOGGER = AgentLogger
+    private static final AgentLogger LOGGER = AgentLogger
             .getLogger(GeneratorParametersRecorder.class);
 
     /**

@@ -27,7 +27,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  * Utility method for classloaders.
  */
 public class ClassLoaderHelper {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassLoaderHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassLoaderHelper.class);
 
     public static Method findLoadedClass;
 

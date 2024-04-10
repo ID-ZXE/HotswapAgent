@@ -78,7 +78,7 @@ import org.hotswap.agent.util.signature.ClassSignatureElement;
  */
 public class BeanClassRefreshAgent {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshAgent.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanClassRefreshAgent.class);
 
     /**
      * Reload bean in existing bean manager. Called by a reflection command from BeanRefreshCommand transformer.

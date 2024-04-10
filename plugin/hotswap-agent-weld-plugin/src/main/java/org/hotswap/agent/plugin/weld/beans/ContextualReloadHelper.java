@@ -36,7 +36,7 @@ import org.jboss.weld.bean.ManagedBean;
  */
 public class ContextualReloadHelper {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ContextualReloadHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ContextualReloadHelper.class);
 
     public static void reload(WeldHotswapContext ctx) {
         Set<Contextual<Object>> beans = ctx.$$ha$getBeansToReloadWeld();

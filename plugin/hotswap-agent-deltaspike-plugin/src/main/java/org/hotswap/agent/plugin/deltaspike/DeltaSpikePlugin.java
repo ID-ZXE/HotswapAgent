@@ -62,7 +62,7 @@ import org.hotswap.agent.util.AnnotationHelper;
 )
 public class DeltaSpikePlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikePlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikePlugin.class);
 
     private static final String REPOSITORY_ANNOTATION = "org.apache.deltaspike.data.api.Repository";
     public static final int WAIT_ON_REDEFINE = 500;

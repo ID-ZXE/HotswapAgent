@@ -40,7 +40,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
 )
 public class OmnifacesPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(OmnifacesPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(OmnifacesPlugin.class);
 
     private boolean initialized;
 

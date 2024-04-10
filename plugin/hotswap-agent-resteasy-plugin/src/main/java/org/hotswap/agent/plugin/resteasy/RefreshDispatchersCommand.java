@@ -38,7 +38,7 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
  */
 public class RefreshDispatchersCommand extends MergeableCommand {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(RefreshDispatchersCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(RefreshDispatchersCommand.class);
 
     ClassLoader classLoader;
 

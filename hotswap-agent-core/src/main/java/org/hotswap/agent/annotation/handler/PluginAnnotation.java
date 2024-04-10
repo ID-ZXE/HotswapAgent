@@ -38,7 +38,7 @@ import org.hotswap.agent.versions.matcher.PluginMatcher;
  * @author Jiri Bubnik
  */
 public class PluginAnnotation<T extends Annotation> {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PluginAnnotation.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PluginAnnotation.class);
 
     // the main plugin class
     Class<?> pluginClass;

@@ -46,7 +46,7 @@ import org.hotswap.agent.plugin.mybatis.transformers.MyBatisTransformers;
         expectedVersions = {"3.5.9"},
         supportClass = {MyBatisTransformers.class})
 public class MyBatisPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(MyBatisPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisPlugin.class);
 
     @Init
     Scheduler scheduler;

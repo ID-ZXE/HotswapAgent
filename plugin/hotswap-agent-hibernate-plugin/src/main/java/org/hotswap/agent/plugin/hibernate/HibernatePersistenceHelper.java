@@ -37,7 +37,7 @@ import java.util.Set;
  * @author Jiri Bubnik
  */
 public class HibernatePersistenceHelper {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HibernatePersistenceHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HibernatePersistenceHelper.class);
 
     // each persistence unit should be wrapped only once
     static Set<String> wrappedPersistenceUnitNames = new HashSet<>();

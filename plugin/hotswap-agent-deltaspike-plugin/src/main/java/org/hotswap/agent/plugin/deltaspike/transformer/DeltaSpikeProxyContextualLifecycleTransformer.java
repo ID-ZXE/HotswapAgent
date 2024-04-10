@@ -32,7 +32,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class DeltaSpikeProxyContextualLifecycleTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikeProxyContextualLifecycleTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikeProxyContextualLifecycleTransformer.class);
 
     /**
      * Register DeltaspikePlugin and add hook to create method to DeltaSpikeProxyContextualLifecycle.

@@ -33,7 +33,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
 public class Hibernate3JPATransformers {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPATransformers.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3JPATransformers.class);
 
     /**
      * Override HibernatePersistence.createContainerEntityManagerFactory() to return EntityManagerFactory proxy object.

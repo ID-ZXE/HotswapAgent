@@ -66,7 +66,7 @@ import org.hotswap.agent.watch.Watcher;
         supportClass = { BeansDeployerTransformer.class, CdiContextsTransformer.class, ProxyFactoryTransformer.class, AbstractProducerTransformer.class })
 public class OwbJakartaPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(OwbJakartaPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(OwbJakartaPlugin.class);
 
     private static final String VETOED_ANNOTATION = "jakarta.enterprise.inject.Vetoed";
     private static final String DS_EXCLUDED_ANNOTATION = "org.apache.deltaspike.core.api.exclude.Exclude";

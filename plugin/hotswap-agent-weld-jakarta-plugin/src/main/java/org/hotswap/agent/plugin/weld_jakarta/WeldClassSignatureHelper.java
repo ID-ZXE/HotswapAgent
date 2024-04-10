@@ -29,7 +29,7 @@ import org.hotswap.agent.util.signature.ClassSignatureElement;
  */
 public class WeldClassSignatureHelper {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WeldClassSignatureHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WeldClassSignatureHelper.class);
 
     private static final ClassSignatureElement[] SIGNATURE_ELEM_PROXY = {
             ClassSignatureElement.SUPER_CLASS,

@@ -29,7 +29,7 @@ import org.hotswap.agent.plugin.cdi.HaCdiCommons;
 
 public class AbstractClassBeanTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AbstractClassBeanTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AbstractClassBeanTransformer.class);
 
     /**
      *

@@ -36,7 +36,7 @@ import java.util.List;
  * @author Jiri Bubnik
  */
 public class ClassPathAnnotationScanner {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassPathAnnotationScanner.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassPathAnnotationScanner.class);
 
     // Annotation name to search for
     String annotation;

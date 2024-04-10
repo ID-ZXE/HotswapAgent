@@ -37,7 +37,7 @@ import org.hotswap.agent.plugin.hibernate3.session.proxy.OverrideConfig.Configur
 public class ReInitializableHelper {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ReInitializableHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReInitializableHelper.class);
 
     /**
      * Hot swap.

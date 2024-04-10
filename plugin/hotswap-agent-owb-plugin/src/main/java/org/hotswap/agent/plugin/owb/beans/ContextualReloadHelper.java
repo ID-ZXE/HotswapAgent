@@ -36,7 +36,7 @@ import org.hotswap.agent.logging.AgentLogger;
  * @author alpapad@gmail.com
  */
 public class ContextualReloadHelper {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ContextualReloadHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ContextualReloadHelper.class);
 
     public static void reload(OwbHotswapContext ctx) {
         Set<Contextual<Object>> beans = ctx.$$ha$getBeansToReloadOwb();

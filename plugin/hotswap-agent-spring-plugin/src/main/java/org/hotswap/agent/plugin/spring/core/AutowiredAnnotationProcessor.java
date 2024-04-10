@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public class AutowiredAnnotationProcessor {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(AutowiredAnnotationProcessor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(AutowiredAnnotationProcessor.class);
 
     public static void processSingletonBeanInjection(DefaultListableBeanFactory beanFactory) {
         try {

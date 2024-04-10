@@ -32,7 +32,7 @@ import org.hotswap.agent.plugin.cdi.HaCdiCommons;
  */
 public class DeltaSpikeProxyTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikeProxyTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(DeltaSpikeProxyTransformer.class);
 
     /**
      * Delegates ClassUtils.tryToLoadClassForName to org.hotswap.agent.plugin.deltaspike.command.ProxyClassLoadingDelegate::tryToLoadClassForName

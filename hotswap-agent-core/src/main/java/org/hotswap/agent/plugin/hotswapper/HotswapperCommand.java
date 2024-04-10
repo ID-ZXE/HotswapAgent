@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Jiri Bubnik
  */
 public class HotswapperCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HotswapperCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapperCommand.class);
 
     // HotSwapperJpda will connect to JPDA on first hotswap command and remain connected.
     // The HotSwapperJpda class from javaassist is copied to the plugin, because it needs to reside

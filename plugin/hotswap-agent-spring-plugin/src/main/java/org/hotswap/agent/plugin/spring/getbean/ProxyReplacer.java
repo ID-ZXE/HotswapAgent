@@ -31,7 +31,7 @@ import org.hotswap.agent.plugin.spring.SpringPlugin;
  * @author Erki Ehtla
  */
 public class ProxyReplacer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyReplacer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyReplacer.class);
     private static Class<?> infrastructureProxyClass;
     /**
      * Name of the Spring beanFactory method, which returns a bean

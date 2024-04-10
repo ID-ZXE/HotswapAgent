@@ -36,7 +36,7 @@ import io.undertow.server.handlers.resource.ResourceManager;
  */
 public class PrefixingResourceManager implements ResourceManager {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PrefixingResourceManager.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PrefixingResourceManager.class);
 
     private List<ResourceManager> delegates;
 

@@ -33,7 +33,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ProxyClassLoadingDelegate {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyClassLoadingDelegate.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyClassLoadingDelegate.class);
 
     private static final ThreadLocal<Boolean> MAGIC_IN_PROGRESS = new ThreadLocal<Boolean>() {
         @Override

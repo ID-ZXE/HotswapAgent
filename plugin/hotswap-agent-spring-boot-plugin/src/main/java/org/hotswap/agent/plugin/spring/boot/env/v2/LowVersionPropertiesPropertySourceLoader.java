@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class LowVersionPropertiesPropertySourceLoader extends BasePropertiesPropertySourceLoader<Map<String, ?>> {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LowVersionPropertiesPropertySourceLoader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(LowVersionPropertiesPropertySourceLoader.class);
 
     private PropertiesPropertySourceLoader propertiesPropertySourceLoader;
     private HotswapSpringReloadMap hotswapSpringReloadMap;

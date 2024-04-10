@@ -27,7 +27,7 @@ import org.hotswap.agent.logging.AgentLogger;
  * @author Jiri Bubnik
  */
 public class CommandExecutor extends Thread {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CommandExecutor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CommandExecutor.class);
 
     final Command command;
 

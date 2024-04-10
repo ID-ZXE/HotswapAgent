@@ -34,7 +34,7 @@ import java.security.ProtectionDomain;
 
 public class PropertySourceLoaderTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertySourceLoaderTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertySourceLoaderTransformer.class);
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.boot.env.YamlPropertySourceLoader")
     public static void transformYamlPropertySourceLoader(CtClass clazz, ClassPool classPool) throws

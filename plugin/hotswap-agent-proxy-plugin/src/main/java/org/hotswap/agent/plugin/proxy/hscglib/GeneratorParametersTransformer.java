@@ -38,7 +38,7 @@ import org.hotswap.agent.util.classloader.ClassLoaderHelper;
  *
  */
 public class GeneratorParametersTransformer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(GeneratorParametersTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(GeneratorParametersTransformer.class);
     private static Map<ClassLoader, WeakReference<Map<String, Object>>> classLoaderMaps = new WeakHashMap<ClassLoader, WeakReference<Map<String, Object>>>();
 
     /**

@@ -25,7 +25,7 @@ import org.hotswap.agent.plugin.myfaces.MyFacesConstants;
  */
 public class ManagedBeanResolverTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ManagedBeanResolverTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ManagedBeanResolverTransformer.class);
 
     public static final String DIRTY_BEANS_FIELD = "DIRTY_BEANS";
 

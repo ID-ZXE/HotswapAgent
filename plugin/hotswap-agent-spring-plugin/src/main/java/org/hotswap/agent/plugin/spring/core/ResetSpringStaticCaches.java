@@ -36,7 +36,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Jiri Bubnik
  */
 public class ResetSpringStaticCaches {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ResetSpringStaticCaches.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResetSpringStaticCaches.class);
 
     /**
      * Spring bean by type cache.

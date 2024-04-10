@@ -1,5 +1,6 @@
 package org.hotswap.agent.handle;
 
+import org.hotswap.agent.HotswapApplication;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.util.ArrayList;
@@ -9,13 +10,13 @@ public class ResultHandler {
 
     private static List<Thread> threadList = new ArrayList<>();
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(LocalCompileHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
 
     public static void startResultThread() {
         new Thread(new ResultThread()).start();
     }
 
-    public static void cleanTheadList() {
+    public static synchronized void cleanTheadList() {
         threadList.clear();
     }
 
@@ -36,6 +37,7 @@ public class ResultHandler {
                     thread.join(60 * 1000);
                 }
                 cleanTheadList();
+                HotswapApplication.getInstance().markHotswapOver();
                 LOGGER.info("热部署结束 耗时:{}", System.currentTimeMillis() - start);
             } catch (Exception e) {
                 throw new RuntimeException(e);

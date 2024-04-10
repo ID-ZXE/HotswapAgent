@@ -34,7 +34,7 @@ import org.hotswap.agent.logging.AgentLogger;
  *
  */
 public class ProxyTransformationUtils {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyTransformationUtils.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyTransformationUtils.class);
     private static Map<ClassLoader, ClassPool> classPoolMap = new WeakHashMap<>(3);
 
     /**

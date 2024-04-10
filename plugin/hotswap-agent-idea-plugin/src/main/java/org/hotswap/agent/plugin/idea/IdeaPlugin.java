@@ -42,7 +42,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         expectedVersions = { "all" }
 )
 public class IdeaPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(IdeaPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(IdeaPlugin.class);
 
     private static boolean initialized = false;
 

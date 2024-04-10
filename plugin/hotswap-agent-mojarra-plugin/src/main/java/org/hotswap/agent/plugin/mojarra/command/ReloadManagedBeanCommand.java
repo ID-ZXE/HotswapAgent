@@ -22,7 +22,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ReloadManagedBeanCommand implements Command {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ReloadManagedBeanCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReloadManagedBeanCommand.class);
 
     private CtClass beanCtClass;
     private Class<?> beanClass;

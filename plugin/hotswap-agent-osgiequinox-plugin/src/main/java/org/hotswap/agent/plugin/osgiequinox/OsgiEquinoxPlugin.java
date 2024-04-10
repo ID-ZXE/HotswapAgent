@@ -63,7 +63,7 @@ import org.hotswap.agent.watch.Watcher;
         expectedVersions = {""})
 public class OsgiEquinoxPlugin {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(OsgiEquinoxPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(OsgiEquinoxPlugin.class);
 
     @Init
     Scheduler scheduler;

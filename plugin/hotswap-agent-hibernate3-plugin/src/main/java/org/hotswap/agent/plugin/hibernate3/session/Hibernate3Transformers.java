@@ -38,7 +38,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
 public class Hibernate3Transformers {
 
     /** The logger. */
-    private static AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3Transformers.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(Hibernate3Transformers.class);
 
     /**
      * Ensure org.hibernate.impl.SessionFactoryImpl is Proxyable

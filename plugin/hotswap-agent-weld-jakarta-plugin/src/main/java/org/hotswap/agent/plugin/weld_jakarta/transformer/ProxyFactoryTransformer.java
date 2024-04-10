@@ -43,7 +43,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class ProxyFactoryTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyFactoryTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyFactoryTransformer.class);
 
     /**
      * Patch ProxyFactory class.

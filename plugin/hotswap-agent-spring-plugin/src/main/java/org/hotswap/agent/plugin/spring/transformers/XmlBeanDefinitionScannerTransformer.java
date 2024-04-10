@@ -30,7 +30,7 @@ import org.hotswap.agent.plugin.spring.files.XmlBeanDefinitionScannerAgent;
  * <pre>&lt;context:component-scan base-package="org.hotswap.agent.plugin.spring.testBeans"/&gt;</pre>
  */
 public class XmlBeanDefinitionScannerTransformer {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(XmlBeanDefinitionScannerTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(XmlBeanDefinitionScannerTransformer.class);
 
     /**
      * Insert at the beginning of the method:

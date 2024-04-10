@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:xml-scan/scanContext.xml"})
 public class NewClassTest {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(NewClassTest.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(NewClassTest.class);
     @Autowired
     private AbstractApplicationContext applicationContext;
     @Test

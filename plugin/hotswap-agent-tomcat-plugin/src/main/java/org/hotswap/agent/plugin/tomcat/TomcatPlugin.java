@@ -51,7 +51,7 @@ import java.util.Set;
         supportClass = {WebappLoaderTransformer.class}
 )
 public class TomcatPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(TomcatPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(TomcatPlugin.class);
 
     // Supported class loaders extended from WebAppClassLoader
     private static final String TOMCAT_WEBAPP_CLASS_LOADER = "org.apache.catalina.loader.WebappClassLoader";

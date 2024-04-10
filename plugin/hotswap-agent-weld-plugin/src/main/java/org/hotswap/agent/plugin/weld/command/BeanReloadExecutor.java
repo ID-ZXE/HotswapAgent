@@ -66,7 +66,7 @@ import org.jboss.weld.util.Beans;
 
 public class BeanReloadExecutor {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(BeanReloadExecutor.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(BeanReloadExecutor.class);
 
     /**
      * Reload bean in existing bean manager.

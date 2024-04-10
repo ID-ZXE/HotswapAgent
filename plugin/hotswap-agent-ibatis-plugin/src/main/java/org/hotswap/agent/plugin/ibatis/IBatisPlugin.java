@@ -45,7 +45,7 @@ import org.hotswap.agent.plugin.ibatis.IBatisConfigurationHandler;
         expectedVersions = {"2.3.4" },
         supportClass = { IBatisTransformers.class })
 public class IBatisPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(IBatisPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(IBatisPlugin.class);
 
     @Init
     private Scheduler scheduler;

@@ -47,7 +47,7 @@ import org.hotswap.agent.watch.WatcherFactory;
  */
 @Plugin(name = "Proxy", description = "Redefines proxies", testedVersions = { "" }, expectedVersions = { "all" }, supportClass = RedefinitionScheduler.class)
 public class ProxyPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ProxyPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ProxyPlugin.class);
     static boolean isJava8OrNewer = WatcherFactory.JAVA_VERSION >= 18;
 
     /**

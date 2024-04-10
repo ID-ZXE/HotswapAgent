@@ -56,7 +56,7 @@ import org.hotswap.agent.util.scanner.ScannerVisitor;
  */
 public class ClassLoaderDefineClassPatcher {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ClassLoaderDefineClassPatcher.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ClassLoaderDefineClassPatcher.class);
 
     private static Map<String, List<byte[]>> pluginClassCache = new HashMap<>();
 

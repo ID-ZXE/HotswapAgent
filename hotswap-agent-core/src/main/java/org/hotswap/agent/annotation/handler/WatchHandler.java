@@ -39,7 +39,7 @@ import org.hotswap.agent.watch.WatchFileEvent;
  * @author Jiri Bubnik
  */
 public class WatchHandler<T extends Annotation> implements PluginHandler<T> {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(WatchHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(WatchHandler.class);
 
     protected PluginManager pluginManager;
 

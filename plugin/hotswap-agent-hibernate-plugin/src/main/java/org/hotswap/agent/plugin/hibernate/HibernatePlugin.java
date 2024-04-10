@@ -76,7 +76,7 @@ import org.hotswap.agent.util.AnnotationHelper;
         )
 public class HibernatePlugin {
     private static final String ENTITY_ANNOTATION = "javax.persistence.Entity";
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HibernatePlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HibernatePlugin.class);
 
     @Init
     Scheduler scheduler;

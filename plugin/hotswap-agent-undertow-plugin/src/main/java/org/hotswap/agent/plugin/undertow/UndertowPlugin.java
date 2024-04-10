@@ -45,7 +45,7 @@ import org.hotswap.agent.util.ReflectionHelper;
         supportClass={UndertowTransformer.class}
 )
 public class UndertowPlugin {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(UndertowPlugin.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(UndertowPlugin.class);
 
     // Undertow resource manager object to a application classloader
     static Map<Object, ClassLoader> registeredResourceManagersMap = new HashMap<>();

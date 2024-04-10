@@ -33,7 +33,7 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ViewConfigReloader {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigReloader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ViewConfigReloader.class);
 
     public static void reloadViewConfig(ClassLoader classLoader, Object viewConfigExtensionObj, List rootClassNameList) {
         try {

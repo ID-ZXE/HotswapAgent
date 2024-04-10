@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class ListPropertySourceReloader<T> implements HotswapSpringPropertiesReloader<List<Map<String, T>>> {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ListPropertySourceReloader.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ListPropertySourceReloader.class);
 
     protected final String name;
     protected final Resource resource;

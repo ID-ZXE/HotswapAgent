@@ -16,7 +16,7 @@ import org.hotswap.agent.util.PluginManagerInvoker;
  */
 public class CxfJAXRSTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CxfJAXRSTransformer.class);
 
     @OnClassLoadEvent(classNameRegexp = "org.apache.cxf.jaxrs.utils.ResourceUtils")
     public static void patchResourceUtils(CtClass ctClass, ClassPool classPool){

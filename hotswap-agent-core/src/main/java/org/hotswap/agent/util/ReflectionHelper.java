@@ -30,7 +30,7 @@ import org.hotswap.agent.logging.AgentLogger;
  * Convenience methods on java reflection API.
  */
 public class ReflectionHelper {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(ReflectionHelper.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReflectionHelper.class);
 
     /**
      * Convenience wrapper to reflection method invoke API. Invoke the method and hide checked exceptions.

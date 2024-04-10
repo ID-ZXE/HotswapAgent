@@ -48,7 +48,7 @@ import org.hotswap.agent.logging.AgentLogger;
  */
 public class HotswapTransformer implements ClassFileTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(HotswapTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapTransformer.class);
 
     /**
      * Exclude these classLoaders from initialization (system classloaders). Note that

@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * Add changed property to SpringChangedAgent.
  */
 public class PropertiesChangedCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertiesChangedCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertiesChangedCommand.class);
 
     ClassLoader appClassLoader;
 

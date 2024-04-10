@@ -44,7 +44,7 @@ import java.util.List;
  * @see org.hotswap.agent.annotation.Init
  */
 public class InitHandler implements PluginHandler<Init> {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(InitHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(InitHandler.class);
 
     protected PluginManager pluginManager;
 

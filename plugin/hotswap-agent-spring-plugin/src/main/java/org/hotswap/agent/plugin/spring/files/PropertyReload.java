@@ -52,7 +52,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class PropertyReload {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PropertyReload.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PropertyReload.class);
 
 
     public static void reloadPropertySource(DefaultListableBeanFactory beanFactory) {

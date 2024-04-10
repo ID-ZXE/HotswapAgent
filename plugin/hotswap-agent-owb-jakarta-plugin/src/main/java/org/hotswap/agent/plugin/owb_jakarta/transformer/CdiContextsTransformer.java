@@ -38,7 +38,7 @@ import org.hotswap.agent.plugin.owb_jakarta.beans.OwbHotswapContext;
  */
 public class CdiContextsTransformer {
 
-    private static AgentLogger LOGGER = AgentLogger.getLogger(CdiContextsTransformer.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(CdiContextsTransformer.class);
 
     @OnClassLoadEvent(classNameRegexp = "(org.apache.webbeans.context.AbstractContext)|" +
                                         "(org.apache.myfaces.flow.cdi.FlowScopedContextImpl)|" +

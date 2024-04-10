@@ -44,7 +44,7 @@ import org.hotswap.agent.watch.WatcherFactory;
  * @author Jiri Bubnik
  */
 public class PluginManager {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(PluginManager.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(PluginManager.class);
 
     public static final String PLUGIN_PACKAGE = "org.hotswap.agent.plugin";
 
@@ -277,6 +277,10 @@ public class PluginManager {
      * @see java.lang.instrument.Instrumentation#redefineClasses(java.lang.instrument.ClassDefinition...)
      */
     public void hotswap(Map<Class<?>, byte[]> reloadMap) {
+        if (reloadMap == null || reloadMap.isEmpty()) {
+            return;
+        }
+
         if (instrumentation == null) {
             throw new IllegalStateException("Plugin manager is not correctly initialized - no instrumentation available.");
         }
@@ -304,7 +308,7 @@ public class PluginManager {
             for (Map.Entry<Class<?>, byte[]> entry : reloadMap.entrySet()) {
                 String className = entry.getKey().getName();
                 try {
-                    Class<?> clazz = AllExtensionsManager.getClassLoader().loadClass(className);
+                    Class<?> clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(className);
                     StaticFieldHandler.executeStaticInitMethod(clazz);
                 } catch (Exception e) {
                     LOGGER.error("executeStaticInitMethod {} error", className, e);

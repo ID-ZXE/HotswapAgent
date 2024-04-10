@@ -30,7 +30,7 @@ import java.net.URL;
  * Add changed property to SpringChangedAgent.
  */
 public class YamlChangedCommand extends MergeableCommand {
-    private static AgentLogger LOGGER = AgentLogger.getLogger(YamlChangedCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(YamlChangedCommand.class);
 
     ClassLoader appClassLoader;
 
