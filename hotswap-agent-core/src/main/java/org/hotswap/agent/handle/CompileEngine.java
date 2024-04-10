@@ -47,11 +47,15 @@ public class CompileEngine {
 
         Map<String, byte[]> byteCodes = dynamicCompiler.buildByteCodes();
 
-
-        this.reloadMap = new HashMap<>();
+        // 全部写入文件系统
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
+        }
+
+        // load class
+        this.reloadMap = new HashMap<>();
+        for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             Class<?> clazz;
             try {
                 clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(entry.getKey());
