@@ -105,8 +105,6 @@ public class ContextualReloadHelper {
     /**
      * Will re-inject any managed beans in the target. Will not call any other life-cycle methods
      *
-     * @param ctx
-     * @param managedBean
      */
     @SuppressWarnings("unchecked")
     static void reinitialize(Context ctx, Contextual<Object> contextual) {
