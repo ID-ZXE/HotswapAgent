@@ -26,10 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.hotswap.agent.annotation.*;
 import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.ReflectionCommand;
@@ -38,6 +35,7 @@ import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.transformers.MyBatisTransformers;
 import org.hotswap.agent.util.XmlUtils;
+import org.springframework.stereotype.Repository;
 
 /**
  * Reload MyBatis configuration after entity create/change.
@@ -87,6 +85,15 @@ public class MyBatisPlugin {
         }
     }
 
+    @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.DEFINE})
+    public void registerNewClassListeners(Class<?> clazz) {
+        if (isMapper(clazz)) {
+            LOGGER.info("发现新增MyBatis Mapper 开始LOAD:{}", clazz.getName());
+            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshNewMapperClass", appClassLoader, clazz);
+            scheduler.scheduleCommand(command, 500);
+        }
+    }
+
     private static boolean isMybatisAnnotationMapper(Class<?> clazz) {
         if (clazz.isInterface()) {
             for (Method method : clazz.getMethods()) {
@@ -94,13 +101,22 @@ public class MyBatisPlugin {
                 Insert insert = method.getAnnotation(Insert.class);
                 Delete delete = method.getAnnotation(Delete.class);
                 Update update = method.getAnnotation(Update.class);
-                if (Objects.nonNull(select) || Objects.nonNull(insert)
-                        || Objects.nonNull(delete) || Objects.nonNull(update)) {
+                if (Objects.nonNull(select) || Objects.nonNull(insert) || Objects.nonNull(delete) || Objects.nonNull(update)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private static boolean isMapper(Class<?> clazz) {
+        if (clazz == null || !clazz.isInterface()) {
+            return false;
+        }
+        if (Objects.isNull(clazz.getAnnotation(Mapper.class)) && Objects.isNull(clazz.getAnnotation(Repository.class))) {
+            return false;
+        }
+        return true;
     }
 
 

@@ -19,6 +19,7 @@
 package org.hotswap.agent.plugin.mybatis;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.binding.MapperProxyFactory;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -26,16 +27,22 @@ import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
-import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
+import org.hotswap.agent.util.ReflectionHelper;
 import org.hotswap.agent.util.spring.util.CollectionUtils;
 import org.hotswap.agent.util.spring.util.ReflectionUtils;
 import org.mybatis.spring.mapper.ClassPathMapperScanner;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,6 +81,50 @@ public class MyBatisRefreshCommands {
             return;
         }
         mapperScanner = scanner;
+    }
+
+    public static void refreshNewMapperClass(Class<?> clazz) {
+        if (clazz == null || !clazz.isInterface()) {
+            return;
+        }
+        if (Objects.isNull(clazz.getAnnotation(Mapper.class))
+                && Objects.isNull(clazz.getAnnotation(Repository.class))) {
+            return;
+        }
+        if (null == mapperScanner) {
+            return;
+        }
+        try {
+            BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+            BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+            beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+
+            BeanNameGenerator beanNameGenerator = (BeanNameGenerator) ReflectionHelper.get(mapperScanner, "beanNameGenerator");
+            BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ReflectionHelper.get(mapperScanner, "registry");
+            String beanName = beanNameGenerator.generateBeanName(beanDefinition, registry);
+
+            BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(beanDefinition, beanName);
+            registerBeanDefinition(definitionHolder);
+        } catch (Exception e) {
+            LOGGER.error("Refresh Mybatis Bean err", e);
+        }
+    }
+
+    private static void registerBeanDefinition(BeanDefinitionHolder holder) {
+        if (null == mapperScanner) {
+            return;
+        }
+        try {
+            Set<BeanDefinitionHolder> holders = new HashSet<>();
+            holders.add(holder);
+            Method method = Class.forName("org.mybatis.spring.mapper.ClassPathMapperScanner").getDeclaredMethod("processBeanDefinitions", Set.class);
+            boolean isAccess = method.isAccessible();
+            method.setAccessible(true);
+            method.invoke(mapperScanner, holders);
+            method.setAccessible(isAccess);
+        } catch (Exception e) {
+            LOGGER.error("freshMyBatis err", e);
+        }
     }
 
     public static void refreshXMLMapper(String xmlPath) {
