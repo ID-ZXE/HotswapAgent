@@ -77,6 +77,7 @@ public class ResetBeanPostProcessorCaches {
             }
         }
         for (BeanPostProcessor bpp : beanFactory.getBeanPostProcessors()) {
+            resetProxyCreatorBeanPostProcessorCache(bpp, bpp.getClass());
             if (bpp instanceof AutowiredAnnotationBeanPostProcessor) {
                 resetAutowiredAnnotationBeanPostProcessorCache((AutowiredAnnotationBeanPostProcessor) bpp);
             } else if (bpp instanceof CommonAnnotationBeanPostProcessor) {
@@ -116,6 +117,7 @@ public class ResetBeanPostProcessorCaches {
 
     /**
      * deal injectionMetadataCache field of
+     *
      * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
      * @see org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
      */
@@ -128,10 +130,22 @@ public class ResetBeanPostProcessorCaches {
             injectionMetadataCache.clear();
             // noinspection unchecked
             LOGGER.trace("Cache cleared: AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor"
-                + " injectionMetadataCache");
+                    + " injectionMetadataCache");
         } catch (Exception e) {
             throw new IllegalStateException("Unable to clear "
-                + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
+                    + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
         }
     }
+
+    private static void resetProxyCreatorBeanPostProcessorCache(BeanPostProcessor bpp, Class<? extends BeanPostProcessor> clazz) {
+        try {
+            Field advisedBeans = clazz.getDeclaredField("advisedBeans");
+            advisedBeans.setAccessible(true);
+            Map cacheMap = (Map) advisedBeans.get(bpp);
+            cacheMap.clear();
+        } catch (Exception e) {
+            LOGGER.error("resetProxyCreatorBeanPostProcessorCache error", e);
+        }
+    }
+
 }
