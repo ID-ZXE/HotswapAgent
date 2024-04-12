@@ -71,27 +71,27 @@ public class HotswapperPlugin {
      */
     @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void watchReload(CtClass ctClass, ClassLoader appClassLoader, URL url) throws IOException, CannotCompileException {
-        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
-            LOGGER.trace("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
-            return;
-        }
-
-        LOGGER.debug("Class {} will be reloaded from URL {}", ctClass.getName(), url);
-
-        // search for a class to reload
-        Class clazz;
-        try {
-            clazz  = appClassLoader.loadClass(ctClass.getName());
-        } catch (ClassNotFoundException e) {
-            LOGGER.warning("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
-                    ctClass.getName(), appClassLoader);
-            return;
-        }
-
-        synchronized (reloadMap) {
-            reloadMap.put(clazz, ctClass.toBytecode());
-        }
-        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
+//        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
+//            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
+//            return;
+//        }
+//
+//        LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
+//
+//        // search for a class to reload
+//        Class clazz;
+//        try {
+//            clazz  = appClassLoader.loadClass(ctClass.getName());
+//        } catch (ClassNotFoundException e) {
+//            LOGGER.info("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
+//                    ctClass.getName(), appClassLoader);
+//            return;
+//        }
+//
+//        synchronized (reloadMap) {
+//            reloadMap.put(clazz, ctClass.toBytecode());
+//        }
+//        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
     }
 
     /**
@@ -127,21 +127,21 @@ public class HotswapperPlugin {
     public static void init(PluginConfiguration pluginConfiguration, ClassLoader appClassLoader) {
 
         if (appClassLoader == null) {
-            LOGGER.debug("Bootstrap class loader is null, hotswapper skipped.");
+            LOGGER.info("Bootstrap class loader is null, hotswapper skipped.");
             return;
         }
 
-        LOGGER.debug("Init plugin at classLoader {}", appClassLoader);
+        LOGGER.info("Init plugin at classLoader {}", appClassLoader);
 
         // init only if the classloader contains directly the property file (not in parent classloader)
         if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.containsPropertyFile()) {
-            LOGGER.debug("ClassLoader {} does not contain hotswap-agent.properties file, hotswapper skipped.", appClassLoader);
+            LOGGER.info("ClassLoader {} does not contain hotswap-agent.properties file, hotswapper skipped.", appClassLoader);
             return;
         }
 
         // and autoHotswap enabled
         if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.getPropertyBoolean("autoHotswap")) {
-            LOGGER.debug("ClassLoader {} has autoHotswap disabled, hotswapper skipped.", appClassLoader);
+            LOGGER.info("ClassLoader {} has autoHotswap disabled, hotswapper skipped.", appClassLoader);
             return;
         }
 
@@ -152,7 +152,7 @@ public class HotswapperPlugin {
         if (plugin != null) {
             plugin.initHotswapCommand(appClassLoader, port);
         } else {
-            LOGGER.debug("Hotswapper is disabled in {}", appClassLoader);
+            LOGGER.info("Hotswapper is disabled in {}", appClassLoader);
         }
     }
 }

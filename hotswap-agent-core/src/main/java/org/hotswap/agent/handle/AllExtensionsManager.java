@@ -1,5 +1,6 @@
 package org.hotswap.agent.handle;
 
+import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.io.InputStream;
@@ -24,6 +25,7 @@ public class AllExtensionsManager {
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
         setAppInfo();
+        PluginConfiguration.initExtraClassPath(AllExtensionsManager.getInstance().getClassLoader());
     }
 
     public ClassLoader getClassLoader() {

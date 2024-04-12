@@ -139,22 +139,11 @@ public class MyBatisTransformers {
 
     @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.reflection.Reflector")
     public static void patchReflector(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        String insertCode = "{"
-                + "java.lang.reflect.Method[] classMethods = $0.getClassMethods($0.type);"
-                + "$0.addGetMethods(classMethods);"
-                + "$0.addSetMethods(classMethods);"
-                + "$0.addFields($0.type);" + "$0.readablePropertyNames = $0.getMethods.keySet().toArray(new String[0]);"
-                + "$0.writablePropertyNames = $0.setMethods.keySet().toArray(new String[0]);"
-                + "int i = 0;" + "while (i < readablePropertyNames.length) "
-                + "{" + "String propName = readablePropertyNames[i];"
-                + "caseInsensitivePropertyMap.put(propName.toUpperCase(java.util.Locale.ENGLISH), propName);"
-                + "i++;"
-                + "}" + "int j = 0;" + "while (j < writablePropertyNames.length) "
-                + "{"
-                + "String propName = writablePropertyNames[j];"
-                + "caseInsensitivePropertyMap.put(propName.toUpperCase(java.util.Locale.ENGLISH), propName);"
-                + "j++;"
-                + "}" + "}";
+        String insertCode = "{_reload($0.type);}";
+        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("java.lang.Class")});
+        CtMethod reloadMethod = constructor.toMethod("_reload", ctClass);
+        ctClass.addMethod(reloadMethod);
+
         CtMethod getGetInvoker = ctClass.getDeclaredMethod("getGetInvoker");
         getGetInvoker.insertBefore(insertCode);
 

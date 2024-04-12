@@ -20,6 +20,8 @@ package org.hotswap.agent.plugin.spring.core;
 
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.ReflectionHelper;
+import org.hotswap.agent.util.spring.util.ObjectUtils;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
@@ -77,13 +79,26 @@ public class ResetBeanPostProcessorCaches {
             }
         }
         for (BeanPostProcessor bpp : beanFactory.getBeanPostProcessors()) {
-            resetProxyCreatorBeanPostProcessorCache(bpp, bpp.getClass());
             if (bpp instanceof AutowiredAnnotationBeanPostProcessor) {
                 resetAutowiredAnnotationBeanPostProcessorCache((AutowiredAnnotationBeanPostProcessor) bpp);
             } else if (bpp instanceof CommonAnnotationBeanPostProcessor) {
                 resetAnnotationBeanPostProcessorCache(bpp, CommonAnnotationBeanPostProcessor.class);
             } else if (bpp instanceof InitDestroyAnnotationBeanPostProcessor) {
                 resetInitDestroyAnnotationBeanPostProcessorCache((InitDestroyAnnotationBeanPostProcessor) bpp);
+            } else if (bpp instanceof AbstractAutoProxyCreator) {
+                Class<?> clazz = bpp.getClass();
+                for (int i = 0; i < 20; i++) {
+                    try {
+                        clazz.getDeclaredField("advisedBeans");
+                        break;
+                    } catch (Exception ignore) {
+                        if (clazz.getSuperclass() == null) {
+                            break;
+                        }
+                        clazz = clazz.getSuperclass();
+                    }
+                }
+                resetProxyCreatorBeanPostProcessorCache(bpp, clazz);
             }
         }
     }
@@ -129,22 +144,21 @@ public class ResetBeanPostProcessorCaches {
             Map<Class<?>, InjectionMetadata> injectionMetadataCache = (Map<Class<?>, InjectionMetadata>) field.get(object);
             injectionMetadataCache.clear();
             // noinspection unchecked
-            LOGGER.trace("Cache cleared: AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor"
-                    + " injectionMetadataCache");
+            LOGGER.trace("Cache cleared: AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor" + " injectionMetadataCache");
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to clear "
-                    + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
+            throw new IllegalStateException("Unable to clear " + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
         }
     }
 
-    private static void resetProxyCreatorBeanPostProcessorCache(BeanPostProcessor bpp, Class<? extends BeanPostProcessor> clazz) {
+    private static void resetProxyCreatorBeanPostProcessorCache(BeanPostProcessor bpp, Class<?> clazz) {
         try {
             Field advisedBeans = clazz.getDeclaredField("advisedBeans");
             advisedBeans.setAccessible(true);
             Map cacheMap = (Map) advisedBeans.get(bpp);
             cacheMap.clear();
+            LOGGER.info("resetProxyCreatorBeanPostProcessorCache BeanPostProcessor:{}", ObjectUtils.identityToString(bpp));
         } catch (Exception e) {
-            LOGGER.error("resetProxyCreatorBeanPostProcessorCache error", e);
+            LOGGER.error("resetProxyCreatorBeanPostProcessorCache BeanPostProcessor:{} error", e, ObjectUtils.identityToString(bpp));
         }
     }
 

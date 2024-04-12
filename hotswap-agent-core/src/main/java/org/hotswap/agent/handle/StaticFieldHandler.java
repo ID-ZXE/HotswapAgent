@@ -26,7 +26,7 @@ public class StaticFieldHandler {
 
     private static final String STATIC_FIELD_INIT_METHOD = "$$hotswap$$_get";
 
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(StaticFieldHandler.class);
 
     public static void generateStaticFieldInitMethod(List<File> javaList) {
         long start = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public class StaticFieldHandler {
                 String outputStr = new DefaultPrettyPrinter().print(result.getResult().get());
                 FileUtils.write(javaFile, outputStr, "UTF-8", false);
             } catch (Exception e) {
-                LOGGER.error("generateStaticFieldInitMethod {} error", javaFile.getName(), e);
+                LOGGER.error("generateStaticFieldInitMethod {} error", e, javaFile.getName());
             }
         }
         LOGGER.info("generateStaticFieldInitMethod cost:{}", System.currentTimeMillis() - start);
@@ -77,6 +77,9 @@ public class StaticFieldHandler {
 
     public static void executeStaticInitMethod(Class<?> clazz) {
         if (clazz.isEnum()) {
+            return;
+        }
+        if (clazz.getName().contains("$Proxy") || clazz.getName().contains("$$")) {
             return;
         }
 
@@ -105,10 +108,10 @@ public class StaticFieldHandler {
                     declaredField.set(null, null);
                     LOGGER.info("set {} {} = null", clazz.getSimpleName(), declaredField.getName());
                 } catch (Exception ex) {
-                    LOGGER.error("executeStaticInitMethod {} {} error", clazz.getSimpleName(), declaredField.getName(), e);
+                    LOGGER.error("executeStaticInitMethod {} {} error", e, clazz.getSimpleName(), declaredField.getName());
                 }
             } catch (Exception e) {
-                LOGGER.error("executeStaticInitMethod {} {} error", clazz.getSimpleName(), declaredField.getName(), e);
+                LOGGER.error("executeStaticInitMethod {} {} error", e, clazz.getSimpleName(), declaredField.getName());
             }
         }
         LOGGER.info("executeStaticInitMethod {} cost:{}", clazz.getSimpleName(), System.currentTimeMillis() - start);

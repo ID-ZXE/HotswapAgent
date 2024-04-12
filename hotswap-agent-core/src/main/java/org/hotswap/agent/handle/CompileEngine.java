@@ -99,7 +99,6 @@ public class CompileEngine {
         if (dynamicCompiler == null) {
             synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    PluginConfiguration.initExtraClassPath(AllExtensionsManager.getInstance().getClassLoader());
                     try {
                         File lombokJar = JarUtils.createLombokJar();
                         URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});

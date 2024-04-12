@@ -10,7 +10,7 @@ public class ResultHandler {
 
     private static final List<Thread> threadList = new ArrayList<>();
 
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResultHandler.class);
 
     public static void startResultThread() {
         new Thread(new ResultThread()).start();

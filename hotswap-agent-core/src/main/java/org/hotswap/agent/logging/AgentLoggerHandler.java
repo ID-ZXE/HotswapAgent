@@ -67,7 +67,7 @@ public class AgentLoggerHandler {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(level);
         stringBuffer.append(" (");
-        stringBuffer.append(clazz.getName());
+        stringBuffer.append(clazz.getSimpleName());
         stringBuffer.append(") - ");
         stringBuffer.append(messageWithArgs);
 
