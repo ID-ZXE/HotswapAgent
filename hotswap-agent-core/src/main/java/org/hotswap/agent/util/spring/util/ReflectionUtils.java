@@ -163,6 +163,17 @@ public abstract class ReflectionUtils {
         }
     }
 
+    public static <T> T getField(String fieldName, Object target) {
+        try {
+            Field field = findField(target.getClass(), fieldName);
+            field.setAccessible(true);
+            return (T) field.get(target);
+        } catch (IllegalAccessException ex) {
+            handleReflectionException(ex);
+            throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+    }
+
     /**
      * Attempt to find a {@link Method} on the supplied class with the supplied
      * name and no parameters. Searches all superclasses up to {@code Object}.

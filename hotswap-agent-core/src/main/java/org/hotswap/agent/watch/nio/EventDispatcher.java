@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.constants.HotswapConstants;
+import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.watch.WatchEventListener;
 import org.hotswap.agent.watch.WatchFileEvent;
@@ -132,7 +133,10 @@ public class EventDispatcher implements Runnable {
 
     private void reset() {
         try {
-            FileUtils.cleanDirectory(new File(HotswapConstants.SOURCE_FILE_PATH));
+            // 清除缓存
+            CompileEngine.getInstance().cleanCompileResult();
+            // 删除源码文件
+            // FileUtils.cleanDirectory(new File(HotswapConstants.SOURCE_FILE_PATH));
         } catch (Exception e) {
             LOGGER.error("reset failure", e);
         }

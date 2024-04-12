@@ -30,6 +30,7 @@ import org.hotswap.agent.javassist.CtNewMethod;
 import org.hotswap.agent.javassist.NotFoundException;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.MyBatisPlugin;
+import org.hotswap.agent.plugin.mybatis.MyBatisRefreshCommands;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
 import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
 import org.hotswap.agent.util.PluginManagerInvoker;
@@ -59,18 +60,8 @@ public class MyBatisTransformers {
         ctClass.addField(sourceFileField);
 
         CtMethod method = ctClass.getDeclaredMethod("createDocument");
-        method.insertBefore("{" +
-                "this." + SRC_FILE_NAME_FIELD + " = " + org.hotswap.agent.util.IOUtils.class.getName() + ".extractFileNameFromInputSource($1);" +
-            "}"
-        );
-        CtMethod newMethod = CtNewMethod.make(
-            "public boolean " + REFRESH_DOCUMENT_METHOD + "() {" +
-                "if(this." + SRC_FILE_NAME_FIELD + "!=null) {" +
-                    "this.document=createDocument(new org.xml.sax.InputSource(new java.io.FileReader(this." + SRC_FILE_NAME_FIELD + ")));" +
-                    "return true;" +
-                "}" +
-                "return false;" +
-            "}", ctClass);
+        method.insertBefore("{" + "this." + SRC_FILE_NAME_FIELD + " = " + org.hotswap.agent.util.IOUtils.class.getName() + ".extractFileNameFromInputSource($1);" + "}");
+        CtMethod newMethod = CtNewMethod.make("public boolean " + REFRESH_DOCUMENT_METHOD + "() {" + "if(this." + SRC_FILE_NAME_FIELD + "!=null) {" + "this.document=createDocument(new org.xml.sax.InputSource(new java.io.FileReader(this." + SRC_FILE_NAME_FIELD + ")));" + "return true;" + "}" + "return false;" + "}", ctClass);
         ctClass.addMethod(newMethod);
         LOGGER.debug("org.apache.ibatis.parsing.XPathParser patched.");
     }
@@ -87,25 +78,14 @@ public class MyBatisTransformers {
 
         StringBuilder src = new StringBuilder("{");
         src.append(PluginManagerInvoker.buildInitializePlugin(MyBatisPlugin.class));
-        src.append(PluginManagerInvoker.buildCallPluginMethod(MyBatisPlugin.class, "registerConfigurationFile",
-                XPathParserCaller.class.getName() + ".getSrcFileName(this.parser)", "java.lang.String", "this", "java.lang.Object"));
+        src.append(PluginManagerInvoker.buildCallPluginMethod(MyBatisPlugin.class, "registerConfigurationFile", XPathParserCaller.class.getName() + ".getSrcFileName(this.parser)", "java.lang.String", "this", "java.lang.Object"));
         src.append("this.configuration = " + ConfigurationProxy.class.getName() + ".getWrapper(this).proxy(this.configuration);");
         src.append("}");
 
-        CtClass[] constructorParams = new CtClass[] {
-            classPool.get("org.apache.ibatis.parsing.XPathParser"),
-            classPool.get("java.lang.String"),
-            classPool.get("java.util.Properties")
-        };
+        CtClass[] constructorParams = new CtClass[]{classPool.get("org.apache.ibatis.parsing.XPathParser"), classPool.get("java.lang.String"), classPool.get("java.util.Properties")};
 
         ctClass.getDeclaredConstructor(constructorParams).insertAfter(src.toString());
-        CtMethod newMethod = CtNewMethod.make(
-            "public void " + REFRESH_METHOD + "() {" +
-                "if(" + XPathParserCaller.class.getName() + ".refreshDocument(this.parser)) {" +
-                    "this.parsed=false;" +
-                    "parse();" +
-                "}" +
-            "}", ctClass);
+        CtMethod newMethod = CtNewMethod.make("public void " + REFRESH_METHOD + "() {" + "if(" + XPathParserCaller.class.getName() + ".refreshDocument(this.parser)) {" + "this.parsed=false;" + "parse();" + "}" + "}", ctClass);
         ctClass.addMethod(newMethod);
         LOGGER.debug("org.apache.ibatis.builder.xml.XMLConfigBuilder patched.");
     }
@@ -114,16 +94,10 @@ public class MyBatisTransformers {
     public static void patchXMLMapperBuilder(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
         StringBuilder src = new StringBuilder("{");
         src.append(PluginManagerInvoker.buildInitializePlugin(MyBatisPlugin.class));
-        src.append(PluginManagerInvoker.buildCallPluginMethod(MyBatisPlugin.class, "registerConfigurationFile",
-                XPathParserCaller.class.getName() + ".getSrcFileName(this.parser)", "java.lang.String", "this", "java.lang.Object"));
+        src.append(PluginManagerInvoker.buildCallPluginMethod(MyBatisPlugin.class, "registerConfigurationFile", XPathParserCaller.class.getName() + ".getSrcFileName(this.parser)", "java.lang.String", "this", "java.lang.Object"));
         src.append("}");
 
-        CtClass[] constructorParams = new CtClass[] {
-            classPool.get("org.apache.ibatis.parsing.XPathParser"),
-            classPool.get("org.apache.ibatis.session.Configuration"),
-            classPool.get("java.lang.String"),
-            classPool.get("java.util.Map")
-        };
+        CtClass[] constructorParams = new CtClass[]{classPool.get("org.apache.ibatis.parsing.XPathParser"), classPool.get("org.apache.ibatis.session.Configuration"), classPool.get("java.lang.String"), classPool.get("java.util.Map")};
 
         CtConstructor constructor = ctClass.getDeclaredConstructor(constructorParams);
         constructor.insertAfter(src.toString());
@@ -137,20 +111,11 @@ public class MyBatisTransformers {
         CtField factoryBeanField = new CtField(objClass, FACTORYBEAN_FIELD, ctClass);
         ctClass.addField(factoryBeanField);
 
-        CtMethod setMethod = CtNewMethod.make(
-                "public void " + FACTORYBEAN_SET_METHOD + "(Object factoryBean) {" +
-                        "this." + FACTORYBEAN_FIELD + " = factoryBean;" +
-                        "}", ctClass);
+        CtMethod setMethod = CtNewMethod.make("public void " + FACTORYBEAN_SET_METHOD + "(Object factoryBean) {" + "this." + FACTORYBEAN_FIELD + " = factoryBean;" + "}", ctClass);
         ctClass.addMethod(setMethod);
 
-        CtMethod buildMethod = ctClass.getDeclaredMethod("build",
-                new CtClass[] {classPool.get("org.apache.ibatis.session.Configuration")});
-        buildMethod.insertBefore("{" +
-                "if (this." + FACTORYBEAN_FIELD + " != null) {" +
-                "config = " + SqlSessionFactoryBeanCaller.class.getName() + ".proxyConfiguration(this." + FACTORYBEAN_FIELD + ", config);" +
-                "}" +
-                "}"
-        );
+        CtMethod buildMethod = ctClass.getDeclaredMethod("build", new CtClass[]{classPool.get("org.apache.ibatis.session.Configuration")});
+        buildMethod.insertBefore("{" + "if (this." + FACTORYBEAN_FIELD + " != null) {" + "config = " + SqlSessionFactoryBeanCaller.class.getName() + ".proxyConfiguration(this." + FACTORYBEAN_FIELD + ", config);" + "}" + "}");
         LOGGER.debug("org.apache.ibatis.session.SqlSessionFactoryBuilder patched.");
     }
 
@@ -162,25 +127,92 @@ public class MyBatisTransformers {
         ctClass.addField(sourceFileField);
 
         CtMethod method = ctClass.getDeclaredMethod("afterPropertiesSet");
-        method.insertAfter("{" +
-                "this." + INITIALIZED_FIELD + " = true;" +
-                "}"
-        );
+        method.insertAfter("{" + "this." + INITIALIZED_FIELD + " = true;" + "}");
 
-        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[] {});
-        constructor.insertAfter("{" +
-                SqlSessionFactoryBeanCaller.class.getName() + ".setFactoryBean(this.sqlSessionFactoryBuilder, this);" +
-                "}");
+        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{});
+        constructor.insertAfter("{" + SqlSessionFactoryBeanCaller.class.getName() + ".setFactoryBean(this.sqlSessionFactoryBuilder, this);" + "}");
 
-        CtMethod proxyMethod = CtNewMethod.make(
-                "public org.apache.ibatis.session.Configuration " + CONFIGURATION_PROXY_METHOD + "(org.apache.ibatis.session.Configuration configuration) {" +
-                        "if(this." + INITIALIZED_FIELD + ") {" +
-                        "return configuration;" +
-                        "} else {" +
-                        "return " + SpringMybatisConfigurationProxy.class.getName() + ".getWrapper(this).proxy(configuration);" +
-                        "}" +
-                        "}", ctClass);
+        CtMethod proxyMethod = CtNewMethod.make("public org.apache.ibatis.session.Configuration " + CONFIGURATION_PROXY_METHOD + "(org.apache.ibatis.session.Configuration configuration) {" + "if(this." + INITIALIZED_FIELD + ") {" + "return configuration;" + "} else {" + "return " + SpringMybatisConfigurationProxy.class.getName() + ".getWrapper(this).proxy(configuration);" + "}" + "}", ctClass);
         ctClass.addMethod(proxyMethod);
         LOGGER.debug("org.mybatis.spring.SqlSessionFactoryBean patched.");
     }
+
+    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.reflection.Reflector")
+    public static void patchReflector(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        String insertCode = "{"
+                + "java.lang.reflect.Method[] classMethods = $0.getClassMethods($0.type);"
+                + "$0.addGetMethods(classMethods);"
+                + "$0.addSetMethods(classMethods);"
+                + "$0.addFields($0.type);" + "$0.readablePropertyNames = $0.getMethods.keySet().toArray(new String[0]);"
+                + "$0.writablePropertyNames = $0.setMethods.keySet().toArray(new String[0]);"
+                + "int i = 0;" + "while (i < readablePropertyNames.length) "
+                + "{" + "String propName = readablePropertyNames[i];"
+                + "caseInsensitivePropertyMap.put(propName.toUpperCase(java.util.Locale.ENGLISH), propName);"
+                + "i++;"
+                + "}" + "int j = 0;" + "while (j < writablePropertyNames.length) "
+                + "{"
+                + "String propName = writablePropertyNames[j];"
+                + "caseInsensitivePropertyMap.put(propName.toUpperCase(java.util.Locale.ENGLISH), propName);"
+                + "j++;"
+                + "}" + "}";
+        CtMethod getGetInvoker = ctClass.getDeclaredMethod("getGetInvoker");
+        getGetInvoker.insertBefore(insertCode);
+
+        CtMethod getGetterType = ctClass.getDeclaredMethod("getGetterType");
+        getGetterType.insertBefore(insertCode);
+
+        CtMethod getSetInvoker = ctClass.getDeclaredMethod("getSetInvoker");
+        getSetInvoker.insertBefore(insertCode);
+
+        CtMethod getSetterType = ctClass.getDeclaredMethod("getSetterType");
+        getSetterType.insertBefore(insertCode);
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.session.Configuration\\$StrictMap")
+    public static void patchStrictMap(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod method = ctClass.getDeclaredMethod("put",
+                new CtClass[]{classPool.get(String.class.getName()), classPool.get(Object.class.getName())});
+        method.insertBefore("if(containsKey($1)){remove($1);}");
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.session.Configuration")
+    public static void patchConfiguration(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod addMappedStatementMethod = ctClass.getDeclaredMethod("addMappedStatement",
+                new CtClass[]{classPool.get("org.apache.ibatis.mapping.MappedStatement")});
+        addMappedStatementMethod.setBody("{if(mappedStatements.containsKey($1.getId()))"
+                + "{mappedStatements.remove($1.getId());}mappedStatements.put($1.getId(),$1);}");
+
+        CtMethod addParameterMapMethod = ctClass.getDeclaredMethod("addParameterMap",
+                new CtClass[]{classPool.get("org.apache.ibatis.mapping.ParameterMap")});
+        addParameterMapMethod.setBody("{if(parameterMaps.containsKey($1.getId()))"
+                + "{parameterMaps.remove($1.getId());}" + "parameterMaps.put($1.getId(),$1);}");
+
+        CtMethod addResultMapMethod = ctClass.getDeclaredMethod("addResultMap",
+                new CtClass[]{classPool.get("org.apache.ibatis.mapping.ResultMap")});
+        addResultMapMethod.setBody("{if(resultMaps.containsKey($1.getId()))"
+                + "{resultMaps.remove($1.getId());}" + "resultMaps.put($1.getId(),$1);"
+                + "checkLocallyForDiscriminatedNestedResultMaps($1);"
+                + "checkGloballyForDiscriminatedNestedResultMaps($1);}");
+
+        CtMethod addKeyGeneratorMethod = ctClass.getDeclaredMethod("addKeyGenerator",
+                new CtClass[]{classPool.get("java.lang.String"), classPool.get("org.apache.ibatis.executor.keygen.KeyGenerator")});
+
+        addKeyGeneratorMethod.setBody("{if(keyGenerators.containsKey($1))"
+                + "{keyGenerators.remove($1); }keyGenerators.put($1,$2);}");
+
+        CtMethod addCacheMethod = ctClass.getDeclaredMethod("addCache",
+                new CtClass[]{classPool.get("org.apache.ibatis.cache.Cache")});
+        addCacheMethod.setBody("{if(caches.containsKey($1.getId()))"
+                + "{caches.remove($1.getId()); }caches.put($1.getId(),$1);}");
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
+    public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")});
+        constructor.insertAfter("{" + MyBatisRefreshCommands.class.getName() + ".loadScanner(this);" + "}");
+
+        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
+        method.insertBefore("{if(true){return true;}}");
+    }
+
 }

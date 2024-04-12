@@ -20,7 +20,9 @@ package org.hotswap.agent.plugin.mybatis.proxy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
@@ -37,6 +39,10 @@ import org.hotswap.agent.util.ReflectionHelper;
  */
 public class ConfigurationProxy {
     private static Map<XMLConfigBuilder, ConfigurationProxy> proxiedConfigurations = new HashMap<>();
+
+    public static Collection<ConfigurationProxy> getAllConfigurationProxy() {
+        return proxiedConfigurations.values();
+    }
 
     public static ConfigurationProxy getWrapper(XMLConfigBuilder configBuilder) {
         if (!proxiedConfigurations.containsKey(configBuilder)) {
@@ -88,5 +94,9 @@ public class ConfigurationProxy {
             }
         }
         return proxyInstance;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

@@ -18,9 +18,28 @@
  */
 package org.hotswap.agent.plugin.mybatis;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.ibatis.binding.MapperProxyFactory;
+import org.apache.ibatis.binding.MapperRegistry;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
 import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
+import org.hotswap.agent.util.spring.util.CollectionUtils;
+import org.hotswap.agent.util.spring.util.ReflectionUtils;
+import org.mybatis.spring.mapper.ClassPathMapperScanner;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 /**
@@ -40,11 +59,128 @@ public class MyBatisRefreshCommands {
      */
     public static boolean reloadFlag = false;
 
-    public static void reloadConfiguration() {
-        LOGGER.debug("Refreshing MyBatis configuration.");
-        ConfigurationProxy.refreshProxiedConfigurations();
-        SpringMybatisConfigurationProxy.refreshProxiedConfigurations();
-        LOGGER.reload("MyBatis configuration refreshed.");
-        reloadFlag = false;
+//    public static void reloadConfiguration() {
+//        LOGGER.debug("Refreshing MyBatis configuration.");
+//        ConfigurationProxy.refreshProxiedConfigurations();
+//        SpringMybatisConfigurationProxy.refreshProxiedConfigurations();
+//        LOGGER.reload("MyBatis configuration refreshed.");
+//        reloadFlag = false;
+//    }
+
+    private static ClassPathMapperScanner mapperScanner;
+
+    public static void loadScanner(ClassPathMapperScanner scanner) {
+        if (null != mapperScanner) {
+            return;
+        }
+        mapperScanner = scanner;
     }
+
+    public static void refreshXMLMapper(String xmlPath) {
+        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
+        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
+            LOGGER.info("没有发现Configuration 停止更新MyBatis XML Mapper");
+            return;
+        }
+
+        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
+            reloadXMLMapper(xmlPath, configurationProxy.getConfiguration());
+        }
+    }
+
+    public static void refreshAnnotationMapper(Class<?> mapper) {
+        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
+        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
+            LOGGER.info("没有发现Configuration 停止更新MyBatis XML Mapper");
+            return;
+        }
+
+        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
+            reloadAnnotationMapper(mapper, configurationProxy.getConfiguration());
+        }
+    }
+
+    private static void reloadXMLMapper(String mapperFilePath, Configuration configuration) {
+        Path path = Paths.get(mapperFilePath);
+        if (!Files.exists(path)) {
+            LOGGER.info("mybatis reload mapper xml not exist {}", mapperFilePath);
+            return;
+        }
+
+        File file = path.toFile();
+        String xml;
+        try {
+            xml = FileUtils.readFileToString(file, "UTF-8");
+        } catch (Exception e) {
+            LOGGER.error("read xml file error", e);
+            return;
+        }
+
+        loadNewMapperFile(xml, configuration);
+    }
+
+    private static void loadNewMapperFile(String xml, Configuration configuration) {
+        try {
+            XPathParser context = new XPathParser(new ByteArrayInputStream(xml.getBytes()), true, configuration.getVariables(), new XMLMapperEntityResolver());
+            XNode contextNode = context.evalNode("/mapper");
+            if (null == contextNode) {
+                return;
+            }
+            String namespace = contextNode.getStringAttribute("namespace");
+            if (namespace == null || namespace.isEmpty()) {
+                LOGGER.error("Mapper's namespace cannot be empty");
+                return;
+            }
+
+
+            Set<?> loadedResources = ReflectionUtils.getField("loadedResources", configuration);
+            if (CollectionUtils.isEmpty(loadedResources)) {
+                LOGGER.info("loadedResources is empty");
+                return;
+            }
+            if (!loadedResources.contains(generateNamespace(namespace)) && !loadedResources.contains(generateInterfaceNamespace(namespace))) {
+                LOGGER.info("不是当前sqlSessionFactory的mapper文件:{}", namespace);
+                return;
+            }
+
+            loadedResources.remove(generateNamespace(namespace));
+            String xmlResource = generateNamespace(namespace);
+            XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(new ByteArrayInputStream(xml.getBytes()), configuration, xmlResource, configuration.getSqlFragments());
+            xmlMapperBuilder.parse();
+        } catch (Exception e) {
+            LOGGER.error("loadNewMapperFile error", e);
+        }
+    }
+
+    private static void reloadAnnotationMapper(Class<?> reloadMapper, Configuration configuration) {
+        try {
+            MapperRegistry mapperRegistry = ReflectionUtils.getField("mapperRegistry", configuration);
+            Map<Class<?>, MapperProxyFactory<?>> knownMappers = ReflectionUtils.getField("knownMappers", mapperRegistry);
+            // 删除已经注册的Mapper
+            knownMappers.remove(reloadMapper);
+
+            // 存储的key分为1.interface mapper 2.namespace:mapper 3. file [mapper.xml]
+            Set<String> loadedResources = ReflectionUtils.getField("loadedResources", configuration);
+            if (CollectionUtils.isEmpty(loadedResources) || !loadedResources.contains(generateInterfaceNamespace(reloadMapper.getName()))) {
+                LOGGER.info("not cur sql session factory:{}", reloadMapper.getName());
+                return;
+            }
+            loadedResources.remove(generateInterfaceNamespace(reloadMapper.getName()));
+
+            // 重新加载按注解方式实现的 mybatis
+            mapperRegistry.addMapper(reloadMapper);
+            LOGGER.info("reload annotation mapper:{}", reloadMapper.getName());
+        } catch (Exception ex) {
+            LOGGER.info("reloadAnnotationMapper error:{}", reloadMapper.getName(), ex);
+        }
+    }
+
+    private static String generateNamespace(String namespace) {
+        return "namespace:" + namespace;
+    }
+
+    private static String generateInterfaceNamespace(String interfaceName) {
+        return "interface " + interfaceName;
+    }
+
 }

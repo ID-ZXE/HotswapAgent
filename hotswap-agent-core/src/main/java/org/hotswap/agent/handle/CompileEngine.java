@@ -73,6 +73,9 @@ public class CompileEngine {
     }
 
     public void cleanCompileResult() {
+        if (Objects.isNull(this.reloadMap)) {
+            return;
+        }
         this.reloadMap.clear();
     }
 

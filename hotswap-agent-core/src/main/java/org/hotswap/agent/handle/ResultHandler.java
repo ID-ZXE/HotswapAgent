@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ResultHandler {
 
-    private static List<Thread> threadList = new ArrayList<>();
+    private static final List<Thread> threadList = new ArrayList<>();
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(CompileEngine.class);
 
@@ -37,10 +37,11 @@ public class ResultHandler {
                     thread.join(60 * 1000);
                 }
                 cleanTheadList();
-                HotswapApplication.getInstance().markHotswapOver();
                 LOGGER.info("热部署结束 耗时:{}", System.currentTimeMillis() - start);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                LOGGER.info("ResultHandler has error", e);
+            } finally {
+                HotswapApplication.getInstance().markHotswapOver();
             }
         }
 

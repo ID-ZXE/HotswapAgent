@@ -299,7 +299,7 @@ public class SpringPlugin {
                 "return enhancer;" +
                 "}");
 
-        LOGGER.debug("org.springframework.aop.framework.CglibAopProxy - cglib Enhancer cache disabled");
+        LOGGER.info("org.springframework.aop.framework.CglibAopProxy - cglib Enhancer cache disabled");
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.sringframework.transaction.interceptor.AbstractFallbackTransactionAttributeSource")

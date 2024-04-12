@@ -297,9 +297,9 @@ public class SpringBeanReload {
 
             // 7. invoke the Bean lifecycle steps
             // 7.1 invoke BeanFactoryPostProcessor
-            if (!ignoreinvokeBeanFactoryPostProcessors()) {
+            // if (!ignoreinvokeBeanFactoryPostProcessors()) {
                 invokeBeanFactoryPostProcessors(beanFactory);
-            }
+            // }
 
             addBeanPostProcessors(beanFactory);
             // 7.2 process @Value and @Autowired of singleton beans excluding destroyed beans

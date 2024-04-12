@@ -18,33 +18,33 @@
  */
 package org.hotswap.agent.plugin.mybatis;
 
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-import org.hotswap.agent.annotation.FileEvent;
-import org.hotswap.agent.annotation.Init;
-import org.hotswap.agent.annotation.OnResourceFileEvent;
-import org.hotswap.agent.annotation.Plugin;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import org.hotswap.agent.annotation.*;
 import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.ReflectionCommand;
 import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.transformers.MyBatisTransformers;
+import org.hotswap.agent.util.XmlUtils;
 
 /**
  * Reload MyBatis configuration after entity create/change.
  *
  * @author Vladimir Dvorak
  */
-@Plugin(name = "MyBatis",
-        description = "Reload MyBatis configuration after configuration create/change.",
-        testedVersions = {"All between 3.5.9"},
-        expectedVersions = {"3.5.9"},
-        supportClass = {MyBatisTransformers.class})
+@Plugin(name = "MyBatis", description = "Reload MyBatis configuration after configuration create/change.", testedVersions = {"All between 3.5.9"}, expectedVersions = {"3.5.9"}, supportClass = {MyBatisTransformers.class})
 public class MyBatisPlugin {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisPlugin.class);
 
@@ -55,9 +55,6 @@ public class MyBatisPlugin {
     ClassLoader appClassLoader;
 
     Map<String, Object> configurationMap = new HashMap<>();
-
-    Command reloadConfigurationCommand =
-            new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "reloadConfiguration");
 
     @Init
     public void init(PluginConfiguration pluginConfiguration) {
@@ -71,17 +68,40 @@ public class MyBatisPlugin {
         }
     }
 
-    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY})
+    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void registerResourceListeners(URL url) throws URISyntaxException {
-        if (configurationMap.containsKey(Paths.get(url.toURI()).toFile().getAbsolutePath())) {
-            refresh(500);
+        String absolutePath = Paths.get(url.toURI()).toFile().getAbsolutePath();
+        if (XmlUtils.isMyBatisXML(absolutePath)) {
+            LOGGER.info("发现MyBatis XML Mapper变更 开始RELOAD:{}", absolutePath);
+            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshXMLMapper", appClassLoader, absolutePath);
+            scheduler.scheduleCommand(command, 500);
         }
     }
 
-    // reload the configuration - schedule a command to run in the application classloader and merge
-    // duplicate commands.
-    private void refresh(int timeout) {
-        scheduler.scheduleCommand(reloadConfigurationCommand, timeout);
+    @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.REDEFINE})
+    public void registerClassListeners(Class<?> clazz) {
+        if (isMybatisAnnotationMapper(clazz)) {
+            LOGGER.info("发现MyBatis Annotation Mapper变更 开始RELOAD:{}", clazz.getName());
+            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshAnnotationMapper", appClassLoader, clazz);
+            scheduler.scheduleCommand(command, 500);
+        }
     }
+
+    private static boolean isMybatisAnnotationMapper(Class<?> clazz) {
+        if (clazz.isInterface()) {
+            for (Method method : clazz.getMethods()) {
+                Select select = method.getAnnotation(Select.class);
+                Insert insert = method.getAnnotation(Insert.class);
+                Delete delete = method.getAnnotation(Delete.class);
+                Update update = method.getAnnotation(Update.class);
+                if (Objects.nonNull(select) || Objects.nonNull(insert)
+                        || Objects.nonNull(delete) || Objects.nonNull(update)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
 }
