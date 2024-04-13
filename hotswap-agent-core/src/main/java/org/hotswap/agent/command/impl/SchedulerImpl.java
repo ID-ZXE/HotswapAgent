@@ -22,7 +22,7 @@ import org.hotswap.agent.annotation.handler.WatchEventCommand;
 import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.MergeableCommand;
 import org.hotswap.agent.command.Scheduler;
-import org.hotswap.agent.handle.ResultHandler;
+import org.hotswap.agent.manager.ResultManager;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.util.*;
@@ -136,7 +136,7 @@ public class SchedulerImpl implements Scheduler {
                 LOGGER.error("thead:{} has ex ", t.getName(), e);
             }
         });
-        ResultHandler.addToResulThread(commandExecutor);
+        ResultManager.addToResulManager(commandExecutor);
         commandExecutor.start();
     }
 

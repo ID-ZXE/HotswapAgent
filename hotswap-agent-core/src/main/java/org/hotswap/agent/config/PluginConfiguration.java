@@ -27,8 +27,7 @@ import java.util.regex.Pattern;
 
 import org.hotswap.agent.HotswapAgent;
 import org.hotswap.agent.annotation.Plugin;
-import org.hotswap.agent.constants.HotswapConstants;
-import org.hotswap.agent.handle.AllExtensionsManager;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.HotswapProperties;
 import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;

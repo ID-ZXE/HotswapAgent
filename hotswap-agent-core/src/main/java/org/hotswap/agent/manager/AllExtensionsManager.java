@@ -1,10 +1,16 @@
-package org.hotswap.agent.handle;
+package org.hotswap.agent.manager;
 
 import org.hotswap.agent.config.PluginConfiguration;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
+
+import static org.hotswap.agent.util.JarUtils.createLombokJar;
 
 public class AllExtensionsManager {
 
@@ -13,8 +19,6 @@ public class AllExtensionsManager {
     private static final AllExtensionsManager INSTANCE = new AllExtensionsManager();
 
     private ClassLoader classLoader;
-
-    private ClassLoader compilerClassLoader;
 
     private String app;
 
@@ -28,18 +32,17 @@ public class AllExtensionsManager {
         this.classLoader = classLoader;
         setAppInfo();
         PluginConfiguration.initExtraClassPath(AllExtensionsManager.getInstance().getClassLoader());
-    }
-
-    public void setCompilerClassLoader(ClassLoader classLoader) {
-        this.compilerClassLoader = classLoader;
+        try {
+            createLombokJar();
+            File lombokJar = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");
+            URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
+        } catch (Exception e) {
+            LOGGER.error("createLombokJar error", e);
+        }
     }
 
     public ClassLoader getClassLoader() {
         return this.classLoader;
-    }
-
-    public ClassLoader getCompilerClassLoader() {
-        return compilerClassLoader;
     }
 
     public void setAppInfo() {

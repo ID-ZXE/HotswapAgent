@@ -1,4 +1,4 @@
-package org.hotswap.agent.handle;
+package org.hotswap.agent.manager;
 
 import org.hotswap.agent.HotswapApplication;
 import org.hotswap.agent.logging.AgentLogger;
@@ -6,13 +6,13 @@ import org.hotswap.agent.logging.AgentLogger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResultHandler {
+public class ResultManager {
 
     private static final List<Thread> threadList = new ArrayList<>();
 
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResultHandler.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(ResultManager.class);
 
-    public static void startResultThread() {
+    public static void start() {
         new Thread(new ResultThread()).start();
     }
 
@@ -20,7 +20,7 @@ public class ResultHandler {
         threadList.clear();
     }
 
-    public static synchronized void addToResulThread(Thread thread) {
+    public static synchronized void addToResulManager(Thread thread) {
         threadList.add(thread);
     }
 
@@ -39,7 +39,7 @@ public class ResultHandler {
                 cleanTheadList();
                 LOGGER.info("热部署结束 耗时:{}", System.currentTimeMillis() - start);
             } catch (Exception e) {
-                LOGGER.info("ResultHandler has error", e);
+                LOGGER.info("ResultManager has error", e);
             } finally {
                 HotswapApplication.getInstance().markHotswapOver();
             }

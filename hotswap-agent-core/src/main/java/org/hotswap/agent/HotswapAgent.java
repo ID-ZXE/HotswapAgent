@@ -19,7 +19,6 @@
 package org.hotswap.agent;
 
 import org.hotswap.agent.constants.HotswapConstants;
-import org.hotswap.agent.handle.EmbedHttpServer;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.config.PluginManager;
@@ -79,7 +78,7 @@ public class HotswapAgent {
         AbstractNIO2Watcher abstractNIO2Watcher = (AbstractNIO2Watcher) PluginManager.getInstance().getWatcher();
         HotswapApplication.getInstance().setDispatcher(abstractNIO2Watcher.getDispatcher());
         // 远程编译器初始化
-        EmbedHttpServer.start();
+        HotswapApplication.getInstance().start();
         LOGGER.debug("Hotswap agent initialized.");
     }
 

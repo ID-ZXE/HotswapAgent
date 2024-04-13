@@ -1,6 +1,6 @@
 package org.hotswap.agent.handler;
 
-import org.hotswap.agent.handle.AllExtensionsManager;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.handle.CompileEngine;
 import org.junit.Test;
 

@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class StaticFieldHandler {
 
@@ -75,7 +74,7 @@ public class StaticFieldHandler {
         LOGGER.info("generateStaticFieldInitMethod cost:{}", System.currentTimeMillis() - start);
     }
 
-    public static void executeStaticInitMethod(Class<?> clazz) {
+    public static void executeStaticFieldInitMethod(Class<?> clazz) {
         if (clazz.isEnum()) {
             return;
         }

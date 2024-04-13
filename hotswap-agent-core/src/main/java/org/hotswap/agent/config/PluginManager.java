@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.command.impl.SchedulerImpl;
-import org.hotswap.agent.handle.AllExtensionsManager;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.handle.StaticFieldHandler;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.util.HotswapTransformer;
@@ -309,7 +309,7 @@ public class PluginManager {
                 String className = entry.getKey().getName();
                 try {
                     Class<?> clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(className);
-                    StaticFieldHandler.executeStaticInitMethod(clazz);
+                    StaticFieldHandler.executeStaticFieldInitMethod(clazz);
                 } catch (Exception e) {
                     LOGGER.error("executeStaticInitMethod {} error", className, e);
                 }

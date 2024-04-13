@@ -28,7 +28,6 @@ import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.ReflectionCommand;
 import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.config.PluginConfiguration;
-import org.hotswap.agent.handle.AllExtensionsManager;
 import org.hotswap.agent.javassist.CannotCompileException;
 import org.hotswap.agent.javassist.CtClass;
 import org.hotswap.agent.logging.AgentLogger;
@@ -39,7 +38,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Hotswap class changes directly via JPDA API.
@@ -126,15 +124,9 @@ public class HotswapperPlugin {
      */
     @Init
     public static void init(PluginConfiguration pluginConfiguration, ClassLoader appClassLoader) {
-
         if (appClassLoader == null) {
             LOGGER.info("Bootstrap class loader is null, hotswapper skipped.");
             return;
-        }
-
-        if (Objects.equals(appClassLoader.getParent(), AllExtensionsManager.getInstance().getClassLoader())) {
-            AllExtensionsManager.getInstance().setCompilerClassLoader(appClassLoader);
-            LOGGER.info("find compiler class loader {}", appClassLoader);
         }
 
         LOGGER.info("Init plugin at classLoader {}", appClassLoader);

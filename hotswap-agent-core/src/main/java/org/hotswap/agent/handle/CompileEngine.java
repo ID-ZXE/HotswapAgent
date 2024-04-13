@@ -1,18 +1,13 @@
 package org.hotswap.agent.handle;
 
 import com.taobao.arthas.compiler.DynamicCompiler;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.config.PluginConfiguration;
-import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.util.JarUtils;
-import org.hotswap.agent.util.classloader.URLClassPathHelper;
+import org.hotswap.agent.manager.AllExtensionsManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class CompileEngine {
@@ -30,6 +25,7 @@ public class CompileEngine {
     }
 
     public void compile() throws Exception {
+        // LombokHandler.deLombok(getJavaFile());
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         compile(getCompiler());
     }
@@ -99,17 +95,17 @@ public class CompileEngine {
         if (dynamicCompiler == null) {
             synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    try {
-                        File lombokJar = JarUtils.createLombokJar();
-                        URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
-                    } catch (Exception e) {
-                        LOGGER.error("createLombokJar error", e);
-                    }
-                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getCompilerClassLoader());
+                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
                 }
             }
         }
         return dynamicCompiler;
+    }
+
+    public void setCompiler(ClassLoader classLoader) {
+        synchronized (CompileEngine.class) {
+            dynamicCompiler = new DynamicCompiler(classLoader);
+        }
     }
 
 }
