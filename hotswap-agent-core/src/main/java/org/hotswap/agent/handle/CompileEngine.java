@@ -105,7 +105,7 @@ public class CompileEngine {
                     } catch (Exception e) {
                         LOGGER.error("createLombokJar error", e);
                     }
-                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
+                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getCompilerClassLoader());
                 }
             }
         }
