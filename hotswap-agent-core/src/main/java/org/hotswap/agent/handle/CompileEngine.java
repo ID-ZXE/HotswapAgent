@@ -25,7 +25,7 @@ public class CompileEngine {
     }
 
     public void compile() throws Exception {
-        // LombokHandler.deLombok(getJavaFile());
+        LombokHandler.deLombok(getJavaFile());
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         compile(getCompiler());
     }
@@ -95,7 +95,7 @@ public class CompileEngine {
         if (dynamicCompiler == null) {
             synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getCompilerClassLoader();
+                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getClassLoader();
                     LOGGER.info("compiler class loader:{}", compilerClassLoader);
                     dynamicCompiler = new DynamicCompiler(compilerClassLoader);
                 }

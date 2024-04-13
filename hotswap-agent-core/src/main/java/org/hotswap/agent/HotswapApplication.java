@@ -91,7 +91,7 @@ public class HotswapApplication {
         // 启动监控线程
         ResultManager.start();
         // hotswap
-        // PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
+        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
         dispatcher.openChannel();
         // 等待执行结束
         boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
