@@ -49,6 +49,7 @@
         <module>plugin/hotswap-agent-freemarker-plugin</module>
         <module>plugin/hotswap-agent-undertow-plugin</module>
         <module>plugin/hotswap-agent-mybatis-plugin</module>
+        <module>plugin/hotswap-agent-dubbo-plugins</module>
 <!--        <module>plugin/hotswap-agent-ibatis-plugin</module>-->
         <module>plugin/hotswap-agent-jackson-plugin</module>
 <!--        <module>plugin/hotswap-agent-idea-plugin</module>-->
@@ -59,6 +60,14 @@
 <!--        <module>plugin/hotswap-agent-hibernate-jakarta-plugin</module>-->
         <module>hotswap-agent</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.hotswapagent</groupId>
+            <artifactId>hotswap-agent-core</artifactId>
+            <version>1.4.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <licenses>
         <license>

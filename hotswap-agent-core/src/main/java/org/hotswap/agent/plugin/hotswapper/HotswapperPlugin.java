@@ -31,13 +31,16 @@ import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.javassist.CannotCompileException;
 import org.hotswap.agent.javassist.CtClass;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.PluginManagerInvoker;
+import org.hotswap.agent.util.classloader.ClassLoaderHelper;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Hotswap class changes directly via JPDA API.
@@ -70,27 +73,27 @@ public class HotswapperPlugin {
      */
     @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void watchReload(CtClass ctClass, ClassLoader appClassLoader, URL url) throws IOException, CannotCompileException {
-//        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
-//            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
-//            return;
-//        }
-//
-//        LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
-//
-//        // search for a class to reload
-//        Class clazz;
-//        try {
-//            clazz  = appClassLoader.loadClass(ctClass.getName());
-//        } catch (ClassNotFoundException e) {
-//            LOGGER.info("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
-//                    ctClass.getName(), appClassLoader);
-//            return;
-//        }
-//
-//        synchronized (reloadMap) {
-//            reloadMap.put(clazz, ctClass.toBytecode());
-//        }
-//        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
+        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
+            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
+            return;
+        }
+
+        LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
+
+        // search for a class to reload
+        Class clazz;
+        try {
+            clazz = appClassLoader.loadClass(ctClass.getName());
+        } catch (ClassNotFoundException e) {
+            LOGGER.info("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
+                    ctClass.getName(), appClassLoader);
+            return;
+        }
+
+        synchronized (reloadMap) {
+            reloadMap.put(clazz, ctClass.toBytecode());
+        }
+        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
     }
 
     /**
@@ -130,6 +133,10 @@ public class HotswapperPlugin {
         }
 
         LOGGER.info("Init plugin at classLoader {}", appClassLoader);
+
+        if (Objects.equals(appClassLoader.getParent(), AllExtensionsManager.getInstance().getClassLoader())) {
+            AllExtensionsManager.getInstance().setCompilerClassLoader(appClassLoader);
+        }
 
         // init only if the classloader contains directly the property file (not in parent classloader)
         if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.containsPropertyFile()) {

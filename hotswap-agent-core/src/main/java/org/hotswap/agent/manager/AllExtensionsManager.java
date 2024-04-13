@@ -20,6 +20,8 @@ public class AllExtensionsManager {
 
     private ClassLoader classLoader;
 
+    private ClassLoader compilerClassLoader;
+
     private String app;
 
     private String profile;
@@ -41,8 +43,16 @@ public class AllExtensionsManager {
         }
     }
 
+    public void setCompilerClassLoader(ClassLoader classLoader) {
+        this.compilerClassLoader = classLoader;
+    }
+
     public ClassLoader getClassLoader() {
         return this.classLoader;
+    }
+
+    public ClassLoader getCompilerClassLoader() {
+        return compilerClassLoader;
     }
 
     public void setAppInfo() {

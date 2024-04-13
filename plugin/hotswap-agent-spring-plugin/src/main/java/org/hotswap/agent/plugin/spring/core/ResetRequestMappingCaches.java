@@ -45,8 +45,11 @@ public class ResetRequestMappingCaches {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(ResetRequestMappingCaches.class);
 
     public static List<HandlerMapping> handlerMappings;
+
     public static Set<String> beansToProcess;
+
     public static Set<String> newBeanNames;
+
     public static DefaultListableBeanFactory beanFactory;
 
     private static Class<?> getHandlerMethodMappingClassOrNull() {

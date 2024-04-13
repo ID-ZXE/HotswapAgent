@@ -95,17 +95,13 @@ public class CompileEngine {
         if (dynamicCompiler == null) {
             synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
+                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getCompilerClassLoader();
+                    LOGGER.info("compiler class loader:{}", compilerClassLoader);
+                    dynamicCompiler = new DynamicCompiler(compilerClassLoader);
                 }
             }
         }
         return dynamicCompiler;
-    }
-
-    public void setCompiler(ClassLoader classLoader) {
-        synchronized (CompileEngine.class) {
-            dynamicCompiler = new DynamicCompiler(classLoader);
-        }
     }
 
 }
