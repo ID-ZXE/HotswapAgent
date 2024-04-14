@@ -93,7 +93,6 @@ public class HotswapAgent {
         try {
             AbstractNIO2Watcher watcher = (AbstractNIO2Watcher) PluginManager.getInstance().getWatcher();
             watcher.addDirectory(extraClasspathDir.toPath());
-            CompileEngine.getInstance().setWatcher(watcher);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

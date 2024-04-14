@@ -41,12 +41,7 @@ import org.hotswap.agent.javassist.CtMethod;
 import org.hotswap.agent.javassist.NotFoundException;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.spring.core.BeanDefinitionProcessor;
-import org.hotswap.agent.plugin.spring.reload.ClassChangedCommand;
-import org.hotswap.agent.plugin.spring.reload.PropertiesChangedCommand;
-import org.hotswap.agent.plugin.spring.reload.SpringChangedReloadCommand;
-import org.hotswap.agent.plugin.spring.reload.SpringReloadConfig;
-import org.hotswap.agent.plugin.spring.reload.XmlsChangedCommand;
-import org.hotswap.agent.plugin.spring.reload.YamlChangedCommand;
+import org.hotswap.agent.plugin.spring.reload.*;
 import org.hotswap.agent.plugin.spring.scanner.SpringBeanWatchEventListener;
 import org.hotswap.agent.plugin.spring.transformers.BeanFactoryTransformer;
 import org.hotswap.agent.plugin.spring.transformers.ClassPathBeanDefinitionScannerTransformer;
@@ -68,17 +63,7 @@ import org.hotswap.agent.watch.Watcher;
  *
  * @author Jiri Bubnik
  */
-@Plugin(name = "Spring", description = "Reload Spring configuration after class definition/change.",
-        testedVersions = {"All between 3.0.1 - 5.2.2"}, expectedVersions = {"3x", "4x", "5x"},
-        supportClass = {ClassPathBeanDefinitionScannerTransformer.class,
-                ProxyReplacerTransformer.class,
-                ConfigurationClassPostProcessorTransformer.class,
-                ResourcePropertySourceTransformer.class,
-                PlaceholderConfigurerSupportTransformer.class,
-                XmlBeanDefinitionScannerTransformer.class,
-                PostProcessorRegistrationDelegateTransformer.class,
-                BeanFactoryTransformer.class,
-                InitDestroyAnnotationBeanPostProcessorTransformer.class})
+@Plugin(name = "Spring", description = "Reload Spring configuration after class definition/change.", testedVersions = {"All between 3.0.1 - 5.2.2"}, expectedVersions = {"3x", "4x", "5x"}, supportClass = {ClassPathBeanDefinitionScannerTransformer.class, ProxyReplacerTransformer.class, ConfigurationClassPostProcessorTransformer.class, ResourcePropertySourceTransformer.class, PlaceholderConfigurerSupportTransformer.class, XmlBeanDefinitionScannerTransformer.class, PostProcessorRegistrationDelegateTransformer.class, BeanFactoryTransformer.class, InitDestroyAnnotationBeanPostProcessorTransformer.class})
 public class SpringPlugin {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringPlugin.class);
 
@@ -129,9 +114,7 @@ public class SpringPlugin {
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.web.servlet.DispatcherServlet")
     public static void registryHandlerMappings(ClassLoader appClassLoader, CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        CtMethod method = ctClass.getDeclaredMethod("initHandlerMappings", new CtClass[]{
-                classPool.get("org.springframework.context.ApplicationContext")
-        });
+        CtMethod method = ctClass.getDeclaredMethod("initHandlerMappings", new CtClass[]{classPool.get("org.springframework.context.ApplicationContext")});
         method.insertAfter("org.hotswap.agent.plugin.spring.core.ResetRequestMappingCaches.setHandlerMappings(this.handlerMappings);");
         LOGGER.info("registry handler mappings");
     }
@@ -180,8 +163,7 @@ public class SpringPlugin {
         // Force load/initialize the ClassPathBeanRefreshCommand class into the JVM to work around an issue where instances
         // of this class sometimes remain locked during the agent's transform() call. This behavior suggests a potential
         // bug in JVMTI or its handling of debugger locks.
-        hotswapTransformer.registerTransformer(appClassLoader, getClassNameRegExp(basePackage),
-                new SpringBeanClassFileTransformer(appClassLoader, scheduler, basePackage));
+        hotswapTransformer.registerTransformer(appClassLoader, getClassNameRegExp(basePackage), new SpringBeanClassFileTransformer(appClassLoader, scheduler, basePackage));
     }
 
     /**
@@ -210,11 +192,9 @@ public class SpringPlugin {
             URL basePackageURL = resourceUrls.nextElement();
 
             if (!IOUtils.isFileURL(basePackageURL)) {
-                LOGGER.debug("Spring basePackage '{}' - unable to watch files on URL '{}' for changes (JAR file?), limited hotswap reload support. " +
-                        "Use extraClassPath configuration to locate class file on filesystem.", basePackage, basePackageURL);
+                LOGGER.debug("Spring basePackage '{}' - unable to watch files on URL '{}' for changes (JAR file?), limited hotswap reload support. " + "Use extraClassPath configuration to locate class file on filesystem.", basePackage, basePackageURL);
             } else {
-                watcher.addEventListener(appClassLoader, basePackageURL,
-                        new SpringBeanWatchEventListener(scheduler, appClassLoader, basePackage));
+                watcher.addEventListener(appClassLoader, basePackageURL, new SpringBeanWatchEventListener(scheduler, appClassLoader, basePackage));
             }
         }
     }
@@ -256,8 +236,7 @@ public class SpringPlugin {
         src.append("setCacheBeanMetadata(false);");
         // init a spring plugin with every appclassloader
         src.append(PluginManagerInvoker.buildInitializePlugin(SpringPlugin.class));
-        src.append(PluginManagerInvoker.buildCallPluginMethod(SpringPlugin.class, "init",
-                "org.springframework.core.SpringVersion.getVersion()", String.class.getName()));
+        src.append(PluginManagerInvoker.buildCallPluginMethod(SpringPlugin.class, "init", "org.springframework.core.SpringVersion.getVersion()", String.class.getName()));
         src.append("}");
 
         for (CtConstructor constructor : clazz.getDeclaredConstructors()) {
@@ -277,9 +256,7 @@ public class SpringPlugin {
         //   The waring is because I am not sure what is going on here.
 
         CtMethod method = clazz.getDeclaredMethod("freezeConfiguration");
-        method.insertBefore(
-                "org.hotswap.agent.plugin.spring.core.ResetSpringStaticCaches.resetBeanNamesByType(this); " +
-                        "setAllowRawInjectionDespiteWrapping(true); ");
+        method.insertBefore("org.hotswap.agent.plugin.spring.core.ResetSpringStaticCaches.resetBeanNamesByType(this); " + "setAllowRawInjectionDespiteWrapping(true); ");
 
         // Patch registerBeanDefinition so that XmlBeanDefinitionScannerAgent has chance to keep track of all beans
         // defined from the XML configuration.
@@ -293,11 +270,7 @@ public class SpringPlugin {
     @OnClassLoadEvent(classNameRegexp = "org.springframework.aop.framework.CglibAopProxy")
     public static void cglibAopProxyDisableCache(CtClass ctClass) throws NotFoundException, CannotCompileException {
         CtMethod method = ctClass.getDeclaredMethod("createEnhancer");
-        method.setBody("{" +
-                "org.springframework.cglib.proxy.Enhancer enhancer = new org.springframework.cglib.proxy.Enhancer();" +
-                "enhancer.setUseCache(false);" +
-                "return enhancer;" +
-                "}");
+        method.setBody("{" + "org.springframework.cglib.proxy.Enhancer enhancer = new org.springframework.cglib.proxy.Enhancer();" + "enhancer.setUseCache(false);" + "return enhancer;" + "}");
 
         LOGGER.info("org.springframework.aop.framework.CglibAopProxy - cglib Enhancer cache disabled");
     }
@@ -307,11 +280,30 @@ public class SpringPlugin {
         CtClass ctClass1 = classPool.getCtClass("java.lang.reflect.Method");
         CtClass ctClass2 = classPool.getCtClass("java.lang.Class");
         CtMethod method = clazz.getDeclaredMethod("getCacheKey", new CtClass[]{ctClass1, ctClass2});
-        method.insertBefore("try {\n" +
-                "attributeCache.clear();" +
-                "\t\t} catch (java.lang.Exception e) {\n" +
-                "\t\t\te.printStackTrace( );\n" +
-                "\t\t}");
+        method.insertBefore("try {\n" + "attributeCache.clear();" + "\t\t} catch (java.lang.Exception e) {\n" + "\t\t\te.printStackTrace( );\n" + "\t\t}");
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
+    public static void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        StringBuilder src = new StringBuilder("{");
+        src.append("{if(" + SpringBeanReload.class.getName() + ".BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.contains($1))" +
+                "{System.out.println($1 + \" checkCandidate return true\");return false;}}");
+        src.append("}");
+        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
+        method.insertBefore(src.toString());
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
+    public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+//        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")});
+//        constructor.insertAfter("{" + MyBatisRefreshCommands.class.getName() + ".loadScanner(this);" + "}");
+
+        StringBuilder src = new StringBuilder("{");
+        src.append("{if(" + SpringBeanReload.class.getName() + ".BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.contains($1))" +
+                "{System.out.println($1 + \" checkCandidate return true\");return false;}}");
+        src.append("}");
+        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
+        method.insertBefore(src.toString());
     }
 
 

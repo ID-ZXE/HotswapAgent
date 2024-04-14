@@ -14,18 +14,12 @@ public class DubboReferenceAnnotationProcessor {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(DubboReferenceAnnotationProcessor.class);
 
-    public static Set<String> beansToProcess;
-
-    public static Set<String> newBeanNames;
-
     public static DefaultListableBeanFactory beanFactory;
 
-    public static void reset(DefaultListableBeanFactory beanFactory,
-                             Set<String> beansToProcess,
-                             Set<String> newBeanNames) {
-        ResetRequestMappingCaches.beansToProcess = beansToProcess;
-        ResetRequestMappingCaches.newBeanNames = newBeanNames;
-        ResetRequestMappingCaches.beanFactory = beanFactory;
+    public static void reset(DefaultListableBeanFactory beanFactory, Set<String> beansToProcess, Set<String> newBeanNames) {
+        Set<String> allBeans = new HashSet<>();
+        allBeans.addAll(beansToProcess);
+        allBeans.addAll(newBeanNames);
 
         try {
             Map<String, ReferenceAnnotationBeanPostProcessor> postProcessors = beanFactory.getBeansOfType(ReferenceAnnotationBeanPostProcessor.class);
@@ -33,9 +27,6 @@ public class DubboReferenceAnnotationProcessor {
                 LOGGER.debug("ReferenceAnnotationBeanPostProcessor not exist");
                 return;
             }
-            Set<String> allBeans = new HashSet<>();
-            allBeans.addAll(ResetRequestMappingCaches.beansToProcess);
-            allBeans.addAll(ResetRequestMappingCaches.newBeanNames);
 
             ReferenceAnnotationBeanPostProcessor postProcessor = postProcessors.values().iterator().next();
             resetAnnotationBeanPostProcessorCache(postProcessor);
@@ -58,11 +49,9 @@ public class DubboReferenceAnnotationProcessor {
             field.setAccessible(true);
             Map injectionMetadataCache = (Map) field.get(object);
             injectionMetadataCache.clear();
-            LOGGER.trace("Cache cleared: AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor"
-                    + " injectionMetadataCache");
+            LOGGER.trace("Cache cleared: AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor" + " injectionMetadataCache");
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to clear "
-                    + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
+            throw new IllegalStateException("Unable to clear " + "AutowiredAnnotationBeanPostProcessor/CommonAnnotationBeanPostProcessor injectionMetadataCache", e);
         }
     }
 

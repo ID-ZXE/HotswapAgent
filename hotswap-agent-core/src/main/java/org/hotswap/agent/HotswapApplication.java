@@ -2,6 +2,7 @@ package org.hotswap.agent;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.ResultManager;
@@ -84,6 +85,8 @@ public class HotswapApplication {
     public void openChannel() throws Exception {
         // 启动监控线程
         ResultManager.start();
+        // hotswap
+        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
         dispatcher.openChannel();
         // 等待执行结束
         boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);

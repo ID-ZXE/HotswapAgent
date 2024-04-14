@@ -39,7 +39,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -80,6 +79,7 @@ public class SpringBeanReload {
     private final BeanNameGenerator beanNameGenerator;
     private final BeanFactoryAssistant beanFactoryAssistant;
 
+    public static final Set<String> BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR = new HashSet<>();
 
     public SpringBeanReload(DefaultListableBeanFactory beanFactory) {
         this.beanFactoryAssistant = new BeanFactoryAssistant(beanFactory);
@@ -436,7 +436,7 @@ public class SpringBeanReload {
             destroyClasses.add(ClassUtils.getUserClass(clazz).getName());
             String[] names = beanFactory.getBeanNamesForType(clazz);
             if (names != null && names.length > 0) {
-                LOGGER.trace("the bean of class {} has the bean names {}", clazz.getName(), Arrays.asList(names));
+                LOGGER.info("the bean of class {} has the bean names {}", clazz.getName(), Arrays.asList(names));
                 beansToProcess.addAll(Arrays.asList(names));
                 // 3.1 when the bean is @Configuration, it should be recreated.
                 reloadBeans.accept(reloadAnnotatedBeanDefinitions(clazz, names));
@@ -476,7 +476,7 @@ public class SpringBeanReload {
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
             String factoryBeanName = beanDefinition.getFactoryBeanName();
             if (factoryBeanName != null && configurationBeansToReload.contains(factoryBeanName)) {
-                LOGGER.debug("the bean '{}' will be recreating because the factory bean '{}' is changed", beanName, factoryBeanName);
+                LOGGER.info("the bean '{}' will be recreating because the factory bean '{}' is changed", beanName, factoryBeanName);
                 beanFactory.removeBeanDefinition(beanName);
             }
         }
@@ -621,6 +621,9 @@ public class SpringBeanReload {
             return;
         }
         String[] dependentBeans = beanFactory.getDependentBeans(beanName);
+        if(dependentBeans != null && dependentBeans.length != 0) {
+            BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.addAll(Arrays.asList(dependentBeans));
+        }
         LOGGER.info("the bean '{}' is destroyed, and it is depended by {}", beanName, Arrays.toString(dependentBeans));
         doDestroyBean(beanName);
     }
@@ -656,7 +659,8 @@ public class SpringBeanReload {
         return false;
     }
 
-    private static void invokeBeanFactoryPostProcessors(DefaultListableBeanFactory factory) {
+    private void invokeBeanFactoryPostProcessors(DefaultListableBeanFactory factory) {
+        SpringBeanReload.BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.addAll(beansToProcess);
         try {
             LOGGER.debug("try to invoke PostProcessorRegistrationDelegate");
             invokePostProcessorRegistrationDelegate(factory);
@@ -669,6 +673,8 @@ public class SpringBeanReload {
         } catch (Exception e) {
             LOGGER.error("Failed to invoke PostProcessorRegistrationDelegate", e);
             throw new RuntimeException(e);
+        } finally {
+            SpringBeanReload.BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.clear();
         }
     }
 

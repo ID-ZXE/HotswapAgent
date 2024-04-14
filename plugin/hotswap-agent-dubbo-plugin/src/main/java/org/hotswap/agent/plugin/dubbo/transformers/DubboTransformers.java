@@ -10,11 +10,11 @@ public class DubboTransformers {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(DubboTransformers.class);
 
-    @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
+    // @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
     public static void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
         StringBuilder src = new StringBuilder("{");
         src.append(PluginManagerInvoker.buildInitializePlugin(DubboPlugin.class));
-        src.append("{if(true){return true;}}");
+        // src.append("{if(true){return true;}}");
         src.append("}");
 
         CtMethod method = ctClass.getDeclaredMethod("checkCandidate");

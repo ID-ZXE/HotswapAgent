@@ -71,12 +71,12 @@ public class HotswapperPlugin {
     /**
      * For each changed class create a reload command.
      */
-    @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
+    // @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void watchReload(CtClass ctClass, ClassLoader appClassLoader, URL url) throws IOException, CannotCompileException {
-//        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
-//            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
-//            return;
-//        }
+        if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
+            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
+            return;
+        }
 
         LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
 

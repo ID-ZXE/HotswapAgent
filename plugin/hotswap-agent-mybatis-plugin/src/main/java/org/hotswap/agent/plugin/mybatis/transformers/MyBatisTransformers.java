@@ -195,13 +195,4 @@ public class MyBatisTransformers {
                 + "{caches.remove($1.getId()); }caches.put($1.getId(),$1);}");
     }
 
-    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
-    public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")});
-        constructor.insertAfter("{" + MyBatisRefreshCommands.class.getName() + ".loadScanner(this);" + "}");
-
-        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
-        method.insertBefore("{if(true){return true;}}");
-    }
-
 }

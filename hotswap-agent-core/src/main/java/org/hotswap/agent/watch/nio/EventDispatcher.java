@@ -133,8 +133,6 @@ public class EventDispatcher implements Runnable {
 
     private void reset() {
         try {
-            // 清除缓存
-            CompileEngine.getInstance().cleanCompileResult();
             // 删除源码文件
             // FileUtils.cleanDirectory(new File(HotswapConstants.SOURCE_FILE_PATH));
         } catch (Exception e) {

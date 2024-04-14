@@ -5,14 +5,11 @@ import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
-import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CompileEngine {
 
@@ -20,11 +17,7 @@ public class CompileEngine {
 
     private static final CompileEngine INSTANCE = new CompileEngine();
 
-    private volatile DynamicCompiler dynamicCompiler;
-
     private volatile Map<Class<?>, byte[]> reloadMap = null;
-
-    private AbstractNIO2Watcher watcher;
 
     public static CompileEngine getInstance() {
         return INSTANCE;
@@ -33,12 +26,15 @@ public class CompileEngine {
     public void compile() throws Exception {
         LombokHandler.deLombok(getJavaFile());
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
-        compile(getCompiler());
+        doCompile();
     }
 
-    private void compile(DynamicCompiler dynamicCompiler) throws Exception {
+    private void doCompile() throws Exception {
+        DynamicCompiler dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
         long start = System.currentTimeMillis();
-        for (File file : getJavaFile()) {
+        List<File> javaFile = getJavaFile();
+        LOGGER.info("compile {}", javaFile.stream().map(File::getName).collect(Collectors.joining(",")));
+        for (File file : javaFile) {
             String sourceCode = FileUtils.readFileToString(file, "UTF-8");
             String name = file.getName();
             if (name.endsWith(".java")) {
@@ -52,29 +48,26 @@ public class CompileEngine {
         // 全部写入文件系统
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
-            // 主动监控
-            Path destinationPath = Paths.get(byteCodeFile.getAbsolutePath());
-            if (!Files.exists(destinationPath.getParent())) {
-                Path directories = Files.createDirectories(destinationPath.getParent());
-                watcher.addDirectory(directories);
-            }
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
         }
 
         // load class
         this.reloadMap = new HashMap<>();
+        for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
+            Class<?> clazz;
+            try {
+                clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(entry.getKey());
+            } catch (ClassNotFoundException e) {
+                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.", entry.getKey(), AllExtensionsManager.getInstance().getClassLoader());
+                throw new RuntimeException(e);
+            }
+            this.reloadMap.put(clazz, entry.getValue());
+        }
         LOGGER.info("远程编译结束 耗时:{}", System.currentTimeMillis() - start);
     }
 
     public Map<Class<?>, byte[]> getCompileResult() {
         return this.reloadMap;
-    }
-
-    public void cleanCompileResult() {
-        if (Objects.isNull(this.reloadMap)) {
-            return;
-        }
-        this.reloadMap.clear();
     }
 
     public void cleanOldClassFile() {
@@ -93,20 +86,4 @@ public class CompileEngine {
         return new ArrayList<>(fileCollection);
     }
 
-    private DynamicCompiler getCompiler() {
-        if (dynamicCompiler == null) {
-            synchronized (CompileEngine.class) {
-                if (dynamicCompiler == null) {
-                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getCompilerClassLoader();
-                    LOGGER.info("compiler class loader:{}", compilerClassLoader);
-                    dynamicCompiler = new DynamicCompiler(compilerClassLoader);
-                }
-            }
-        }
-        return dynamicCompiler;
-    }
-
-    public void setWatcher(AbstractNIO2Watcher watcher) {
-        this.watcher = watcher;
-    }
 }
