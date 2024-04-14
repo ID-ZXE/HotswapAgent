@@ -5,9 +5,13 @@ import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class CompileEngine {
@@ -19,6 +23,8 @@ public class CompileEngine {
     private volatile DynamicCompiler dynamicCompiler;
 
     private volatile Map<Class<?>, byte[]> reloadMap = null;
+
+    private AbstractNIO2Watcher watcher;
 
     public static CompileEngine getInstance() {
         return INSTANCE;
@@ -46,22 +52,18 @@ public class CompileEngine {
         // 全部写入文件系统
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
             File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
+            // 主动监控
+            Path destinationPath = Paths.get(byteCodeFile.getAbsolutePath());
+            if (!Files.exists(destinationPath.getParent())) {
+                Path directories = Files.createDirectories(destinationPath.getParent());
+                watcher.addDirectory(directories);
+            }
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
         }
 
         // load class
         this.reloadMap = new HashMap<>();
-        for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
-            Class<?> clazz;
-            try {
-                clazz = AllExtensionsManager.getInstance().getClassLoader().loadClass(entry.getKey());
-            } catch (ClassNotFoundException e) {
-                LOGGER.error("hotswap tries to reload class {}, which is not known to application classLoader {}.", entry.getKey(), AllExtensionsManager.getInstance().getClassLoader());
-                throw new RuntimeException(e);
-            }
-            this.reloadMap.put(clazz, entry.getValue());
-        }
-        LOGGER.info("compile cost {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("远程编译结束 耗时:{}", System.currentTimeMillis() - start);
     }
 
     public Map<Class<?>, byte[]> getCompileResult() {
@@ -95,7 +97,7 @@ public class CompileEngine {
         if (dynamicCompiler == null) {
             synchronized (CompileEngine.class) {
                 if (dynamicCompiler == null) {
-                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getClassLoader();
+                    ClassLoader compilerClassLoader = AllExtensionsManager.getInstance().getCompilerClassLoader();
                     LOGGER.info("compiler class loader:{}", compilerClassLoader);
                     dynamicCompiler = new DynamicCompiler(compilerClassLoader);
                 }
@@ -104,4 +106,7 @@ public class CompileEngine {
         return dynamicCompiler;
     }
 
+    public void setWatcher(AbstractNIO2Watcher watcher) {
+        this.watcher = watcher;
+    }
 }

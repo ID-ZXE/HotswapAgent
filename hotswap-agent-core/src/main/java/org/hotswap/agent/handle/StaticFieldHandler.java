@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class StaticFieldHandler {
 
@@ -29,47 +30,57 @@ public class StaticFieldHandler {
 
     public static void generateStaticFieldInitMethod(List<File> javaList) {
         long start = System.currentTimeMillis();
+        CountDownLatch latch = new CountDownLatch(javaList.size());
         for (File javaFile : javaList) {
-            try {
-                JavaParser javaParser = new JavaParser();
-                //对文件进行解析操作，读入内存
-                ParseResult<CompilationUnit> result = javaParser.parse(javaFile);
-                if (!result.getResult().isPresent()) {
-                    return;
-                }
-                CompilationUnit cu = result.getResult().get();
-                for (Node childNode : cu.getChildNodes()) {
-                    if (childNode instanceof ClassOrInterfaceDeclaration) {
-                        ClassOrInterfaceDeclaration classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) childNode;
-                        List<VariableDeclarator> variables = classOrInterfaceDeclaration.findAll(VariableDeclarator.class);
+            new Thread(() -> {
+                try {
+                    JavaParser javaParser = new JavaParser();
+                    //对文件进行解析操作，读入内存
+                    ParseResult<CompilationUnit> result = javaParser.parse(javaFile);
+                    if (!result.getResult().isPresent()) {
+                        return;
+                    }
+                    CompilationUnit cu = result.getResult().get();
+                    for (Node childNode : cu.getChildNodes()) {
+                        if (childNode instanceof ClassOrInterfaceDeclaration) {
+                            ClassOrInterfaceDeclaration classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) childNode;
+                            List<VariableDeclarator> variables = classOrInterfaceDeclaration.findAll(VariableDeclarator.class);
 
-                        for (VariableDeclarator variable : variables) {
-                            if (variable.getParentNode().toString().contains("static")) {
-                                variable.getInitializer().ifPresent(init -> {
-                                    String body = variable.getInitializer().get().toString();
+                            for (VariableDeclarator variable : variables) {
+                                if (variable.getParentNode().toString().contains("static")) {
+                                    variable.getInitializer().ifPresent(init -> {
+                                        String body = variable.getInitializer().get().toString();
 
-                                    MethodDeclaration indexMethod = classOrInterfaceDeclaration.addMethod(STATIC_FIELD_INIT_METHOD + variable.getNameAsString(), com.github.javaparser.ast.Modifier.Keyword.PRIVATE, com.github.javaparser.ast.Modifier.Keyword.STATIC);
-                                    indexMethod.setType(StaticJavaParser.parseType(variable.getTypeAsString()));
-                                    BlockStmt blockStmt = StaticJavaParser.parseBlock("{ return " + body + "; }");
-                                    indexMethod.setBody(blockStmt);
-                                    variable.removeInitializer();
-                                });
+                                        MethodDeclaration indexMethod = classOrInterfaceDeclaration.addMethod(STATIC_FIELD_INIT_METHOD + variable.getNameAsString(), com.github.javaparser.ast.Modifier.Keyword.PRIVATE, com.github.javaparser.ast.Modifier.Keyword.STATIC);
+                                        indexMethod.setType(StaticJavaParser.parseType(variable.getTypeAsString()));
+                                        BlockStmt blockStmt = StaticJavaParser.parseBlock("{ return " + body + "; }");
+                                        indexMethod.setBody(blockStmt);
+                                        variable.removeInitializer();
+                                    });
+                                }
                             }
-                        }
 
-                        List<FieldDeclaration> fields = classOrInterfaceDeclaration.getFields();
-                        for (FieldDeclaration field : fields) {
-                            if (field.isFinal()) {
-                                field.removeModifier(com.github.javaparser.ast.Modifier.Keyword.FINAL);
+                            List<FieldDeclaration> fields = classOrInterfaceDeclaration.getFields();
+                            for (FieldDeclaration field : fields) {
+                                if (field.isFinal()) {
+                                    field.removeModifier(com.github.javaparser.ast.Modifier.Keyword.FINAL);
+                                }
                             }
                         }
                     }
+                    String outputStr = new DefaultPrettyPrinter().print(result.getResult().get());
+                    FileUtils.write(javaFile, outputStr, "UTF-8", false);
+                } catch (Exception e) {
+                    LOGGER.error("generateStaticFieldInitMethod {} error", e, javaFile.getName());
+                } finally {
+                    latch.countDown();
                 }
-                String outputStr = new DefaultPrettyPrinter().print(result.getResult().get());
-                FileUtils.write(javaFile, outputStr, "UTF-8", false);
-            } catch (Exception e) {
-                LOGGER.error("generateStaticFieldInitMethod {} error", e, javaFile.getName());
-            }
+            }).start();
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error("generateStaticFieldInitMethod await error", e);
         }
         LOGGER.info("generateStaticFieldInitMethod cost:{}", System.currentTimeMillis() - start);
     }

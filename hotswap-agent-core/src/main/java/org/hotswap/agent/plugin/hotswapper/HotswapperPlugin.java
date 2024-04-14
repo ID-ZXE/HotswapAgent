@@ -77,23 +77,23 @@ public class HotswapperPlugin {
 //            LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
 //            return;
 //        }
-//
-//        LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
-//
-//        // search for a class to reload
-//        Class clazz;
-//        try {
-//            clazz = appClassLoader.loadClass(ctClass.getName());
-//        } catch (ClassNotFoundException e) {
-//            LOGGER.info("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
-//                    ctClass.getName(), appClassLoader);
-//            return;
-//        }
-//
-//        synchronized (reloadMap) {
-//            reloadMap.put(clazz, ctClass.toBytecode());
-//        }
-//        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
+
+        LOGGER.info("Class {} will be reloaded from URL {}", ctClass.getName(), url);
+
+        // search for a class to reload
+        Class clazz;
+        try {
+            clazz = appClassLoader.loadClass(ctClass.getName());
+        } catch (ClassNotFoundException e) {
+            LOGGER.info("Hotswapper tries to reload class {}, which is not known to application classLoader {}.",
+                    ctClass.getName(), appClassLoader);
+            return;
+        }
+
+        synchronized (reloadMap) {
+            reloadMap.put(clazz, ctClass.toBytecode());
+        }
+        scheduler.scheduleCommand(hotswapCommand, 100, Scheduler.DuplicateSheduleBehaviour.SKIP);
     }
 
     /**
@@ -104,10 +104,10 @@ public class HotswapperPlugin {
      * @param port           attach the hotswapper
      */
     public void initHotswapCommand(ClassLoader appClassLoader, String port) {
-        if (port != null && port.length() > 0) {
-            hotswapCommand = new ReflectionCommand(this, HotswapperCommand.class.getName(), "hotswap", appClassLoader,
-                    port, reloadMap);
-        } else {
+//        if (port != null && port.length() > 0) {
+//            hotswapCommand = new ReflectionCommand(this, HotswapperCommand.class.getName(), "hotswap", appClassLoader,
+//                    port, reloadMap);
+//        } else {
             hotswapCommand = new Command() {
                 @Override
                 public void executeCommand() {
@@ -119,7 +119,7 @@ public class HotswapperPlugin {
                     return "pluginManager.hotswap(" + Arrays.toString(reloadMap.keySet().toArray()) + ")";
                 }
             };
-        }
+//        }
     }
 
     /**

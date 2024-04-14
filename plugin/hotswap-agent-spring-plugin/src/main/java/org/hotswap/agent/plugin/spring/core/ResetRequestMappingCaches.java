@@ -31,6 +31,7 @@ import org.hotswap.agent.util.spring.util.CollectionUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.HandlerMethod;
@@ -133,7 +134,7 @@ public class ResetRequestMappingCaches {
     }
 
     private static void processMappings(Class<?> abstractHandlerMethodMapping, Object handlerMapping) throws Exception {
-        LOGGER.trace("clearing HandlerMapping for {}", handlerMapping.getClass());
+        LOGGER.info("clearing HandlerMapping for {}", handlerMapping.getClass());
         try {
             Field f = abstractHandlerMethodMapping.getDeclaredField("handlerMethods");
             f.setAccessible(true);
@@ -151,8 +152,8 @@ public class ResetRequestMappingCaches {
             if (handlerMapping instanceof InitializingBean) {
                 ((InitializingBean) handlerMapping).afterPropertiesSet();
             }
-        } catch (NoSuchFieldException nsfe) {
-            LOGGER.trace("Probably using Spring 4.2+", nsfe.getMessage());
+        } catch (NoSuchFieldException ignore) {
+            LOGGER.trace("Probably using Spring 4.2+", ignore.getMessage());
             Method m = abstractHandlerMethodMapping.getDeclaredMethod("getHandlerMethods");
             Class<?>[] parameterTypes = new Class[1];
             parameterTypes[0] = Object.class;
@@ -162,7 +163,7 @@ public class ResetRequestMappingCaches {
             for (Object key : keys) {
                 HandlerMethod handlerMethod = (HandlerMethod) unmodifiableHandlerMethods.get(key);
                 if (ResetRequestMappingCaches.beansToProcess.contains(handlerMethod.getBean().toString())) {
-                    LOGGER.trace("Unregistering handler method {}", key);
+                    LOGGER.info("Unregistering handler method {}", key);
                     // Uninstall mapping
                     u.invoke(handlerMapping, key);
                 }
@@ -192,6 +193,11 @@ public class ResetRequestMappingCaches {
     }
 
     private static boolean isMvcHandler(Class<?> beanClass) {
+        if (AnnotatedElementUtils.hasAnnotation(beanClass, Controller.class) ||
+                AnnotatedElementUtils.hasAnnotation(beanClass, RequestMapping.class)) {
+            return true;
+        }
+
         // Determine whether there is @Controller annotation or its derived annotation on the class
         if (beanClass.isAnnotationPresent(Controller.class) || beanClass.isAnnotationPresent(RestController.class)) {
             return true;
@@ -215,6 +221,11 @@ public class ResetRequestMappingCaches {
         }
 
         return false;
+    }
+
+    protected static boolean isHandler(Class<?> beanType) {
+        return (AnnotatedElementUtils.hasAnnotation(beanType, Controller.class) ||
+                AnnotatedElementUtils.hasAnnotation(beanType, RequestMapping.class));
     }
 
     /**

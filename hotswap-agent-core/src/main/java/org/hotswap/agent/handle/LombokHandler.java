@@ -7,6 +7,8 @@ import org.hotswap.agent.logging.AgentLogger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +27,12 @@ public class LombokHandler {
         for (File javaFile : javaFileList) {
             new Thread(() -> {
                 try {
+                    byte[] bytes = Files.readAllBytes(javaFile.toPath());
+                    String content = new String(bytes, StandardCharsets.UTF_8);
+                    if (content.contains("lombok")) {
+                        return;
+                    }
+
                     File jar = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");
                     String command = String.format(DE_LOMBOK_COMMAND, jar.getAbsolutePath(), javaFile.getAbsolutePath());
                     LOGGER.info("execute command:{}", command);

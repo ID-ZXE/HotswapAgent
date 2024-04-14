@@ -621,7 +621,7 @@ public class SpringBeanReload {
             return;
         }
         String[] dependentBeans = beanFactory.getDependentBeans(beanName);
-        LOGGER.debug("the bean '{}' is destroyed, and it is depended by {}", beanName, Arrays.toString(dependentBeans));
+        LOGGER.info("the bean '{}' is destroyed, and it is depended by {}", beanName, Arrays.toString(dependentBeans));
         doDestroyBean(beanName);
     }
 

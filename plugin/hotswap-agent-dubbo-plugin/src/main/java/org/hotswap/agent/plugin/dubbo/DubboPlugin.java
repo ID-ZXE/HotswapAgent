@@ -12,7 +12,7 @@ import org.hotswap.agent.logging.AgentLogger;
 /**
  * Reload Dubbo
  */
-@Plugin(name = "Dubbo", description = "Reload Dubbo", testedVersions = {"2.7.6"})
+@Plugin(name = "Dubbo", description = "Reload Dubbo", testedVersions = {"2.7.6"}, expectedVersions = {"2.7.6"})
 public class DubboPlugin {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(DubboPlugin.class);
@@ -29,9 +29,10 @@ public class DubboPlugin {
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
-    public static void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+    public void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
         CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
         method.insertBefore("{if(true){return true;}}");
+        LOGGER.info("patchDubboClassPathBeanDefinitionScanner success");
     }
 
 }

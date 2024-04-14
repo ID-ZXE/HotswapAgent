@@ -2,10 +2,9 @@ package org.hotswap.agent;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.handle.CompileEngine;
-import org.hotswap.agent.manager.ResultManager;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.ResultManager;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
 import java.io.IOException;
@@ -35,7 +34,6 @@ public class HotswapApplication {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(10888), 0);
             httpServer.createContext("/hotswap/dispatch", exchange -> {
                 try {
-                    HotswapApplication.getInstance().dispatchFile();
                     response(exchange, "ok");
                 } catch (Exception e) {
                     response(exchange, "error");
@@ -52,10 +50,13 @@ public class HotswapApplication {
                 }
             });
 
-            httpServer.createContext("/hotswap/openChannel", exchange -> {
+            httpServer.createContext("/hotswap/reload", exchange -> {
                 try {
-                    HotswapApplication.getInstance().openChannel();
-                    response(exchange, "ok");
+                    long start = System.currentTimeMillis();
+                    CompileEngine.getInstance().compile();
+                    openChannel();
+                    long cost = System.currentTimeMillis() - start;
+                    response(exchange, String.format("reload cost %s ms", cost));
                 } catch (Exception e) {
                     response(exchange, "error");
                     LOGGER.error("HotswapApplication handle request failure!!!", e);
@@ -78,20 +79,11 @@ public class HotswapApplication {
     }
 
     /**
-     * 分发文件
-     */
-    public void dispatchFile() throws Exception {
-        CompileEngine.getInstance().compile();
-    }
-
-    /**
      * 开始热部署
      */
     public void openChannel() throws Exception {
         // 启动监控线程
         ResultManager.start();
-        // hotswap
-        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
         dispatcher.openChannel();
         // 等待执行结束
         boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);

@@ -34,13 +34,13 @@ public class AllExtensionsManager {
         this.classLoader = classLoader;
         setAppInfo();
         PluginConfiguration.initExtraClassPath(AllExtensionsManager.getInstance().getClassLoader());
-        try {
-            createLombokJar();
-            File lombokJar = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");
-            URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
-        } catch (Exception e) {
-            LOGGER.error("createLombokJar error", e);
-        }
+        createLombokJar();
+//        try {
+//            File lombokJar = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");
+//            URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), new URL[]{lombokJar.toURI().toURL()});
+//        } catch (Exception e) {
+//            LOGGER.error("createLombokJar error", e);
+//        }
     }
 
     public void setCompilerClassLoader(ClassLoader classLoader) {
