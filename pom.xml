@@ -60,6 +60,7 @@
 <!--        <module>plugin/hotswap-agent-hibernate-jakarta-plugin</module>-->
         <module>hotswap-agent</module>
     </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.hotswapagent</groupId>
