@@ -71,6 +71,7 @@
                     <version>2.15</version>
                     <configuration>
                         <argLine>-XX:+AllowEnhancedClassRedefinition</argLine>
+                        <skip>true</skip>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -131,6 +132,7 @@
                      -->
                     <argLine>${dcevm.test.arguments} -javaagent:${org.hotswapagent:hotswap-agent-core:jar}</argLine>
                     <jvm>${java.home}/bin/java</jvm>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>

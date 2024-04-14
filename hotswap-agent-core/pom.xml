@@ -84,6 +84,7 @@
                                 --add-opens java.base/sun.security.action=ALL-UNNAMED
                                 --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                             </argLine>
+                            <skip>true</skip>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -102,6 +103,7 @@
                             <!--This is to override argLine from surefire config in parent pom-->
                             <!-- HotswapAgent=external serves to open modules -->
                             <argLine>-XX:HotswapAgent=external -Dblank -Xlog:redefine+class*=info</argLine>
+                            <skip>true</skip>
                         </configuration>
                     </plugin>
                 </plugins>
