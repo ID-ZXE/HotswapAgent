@@ -8,11 +8,15 @@ import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.javassist.*;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.plugin.dubbo.transformers.DubboTransformers;
 
 /**
  * Reload Dubbo
  */
-@Plugin(name = "Dubbo", description = "Reload Dubbo", testedVersions = {"2.7.6"}, expectedVersions = {"2.7.6"})
+@Plugin(name = "Dubbo", description = "Reload Dubbo",
+        testedVersions = {"2.7.6"},
+        expectedVersions = {"2.7.6"},
+        supportClass = {DubboTransformers.class})
 public class DubboPlugin {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(DubboPlugin.class);
@@ -26,13 +30,6 @@ public class DubboPlugin {
     @Init
     public void init(PluginConfiguration pluginConfiguration) {
         LOGGER.info("Dubbo plugin initialized.");
-    }
-
-    @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
-    public void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
-        method.insertBefore("{if(true){return true;}}");
-        LOGGER.info("patchDubboClassPathBeanDefinitionScanner success");
     }
 
 }
