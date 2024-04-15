@@ -18,6 +18,7 @@
  */
 package org.hotswap.agent.plugin.spring.reload;
 
+import org.apache.dubbo.config.annotation.Service;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.spring.core.*;
 import org.hotswap.agent.plugin.spring.files.PropertyReload;
@@ -621,7 +622,7 @@ public class SpringBeanReload {
             return;
         }
         String[] dependentBeans = beanFactory.getDependentBeans(beanName);
-        if(dependentBeans != null && dependentBeans.length != 0) {
+        if (dependentBeans != null && dependentBeans.length != 0) {
             BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.addAll(Arrays.asList(dependentBeans));
         }
         LOGGER.info("the bean '{}' is destroyed, and it is depended by {}", beanName, Arrays.toString(dependentBeans));
@@ -634,6 +635,12 @@ public class SpringBeanReload {
         Object singletonObject = beanFactory.getSingleton(beanName);
         if (singletonObject != null) {
             destroyClasses.add(ClassUtils.getUserClass(singletonObject).getName());
+        }
+        // dubbo不进行销毁
+        if (singletonObject != null &&
+                Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
+            LOGGER.info("Dubbo Service:{} 不执行重建", beanName);
+            return;
         }
         BeanFactoryProcessor.destroySingleton(beanFactory, beanName);
 //        dependentBeanMap.put(beanName, new HashSet<>(Arrays.asList(dependentBeans)));
