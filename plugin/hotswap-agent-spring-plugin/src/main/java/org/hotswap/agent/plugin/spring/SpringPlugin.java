@@ -43,15 +43,7 @@ import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.spring.core.BeanDefinitionProcessor;
 import org.hotswap.agent.plugin.spring.reload.*;
 import org.hotswap.agent.plugin.spring.scanner.SpringBeanWatchEventListener;
-import org.hotswap.agent.plugin.spring.transformers.BeanFactoryTransformer;
-import org.hotswap.agent.plugin.spring.transformers.ClassPathBeanDefinitionScannerTransformer;
-import org.hotswap.agent.plugin.spring.transformers.ConfigurationClassPostProcessorTransformer;
-import org.hotswap.agent.plugin.spring.transformers.InitDestroyAnnotationBeanPostProcessorTransformer;
-import org.hotswap.agent.plugin.spring.transformers.PlaceholderConfigurerSupportTransformer;
-import org.hotswap.agent.plugin.spring.transformers.PostProcessorRegistrationDelegateTransformer;
-import org.hotswap.agent.plugin.spring.transformers.ProxyReplacerTransformer;
-import org.hotswap.agent.plugin.spring.transformers.ResourcePropertySourceTransformer;
-import org.hotswap.agent.plugin.spring.transformers.XmlBeanDefinitionScannerTransformer;
+import org.hotswap.agent.plugin.spring.transformers.*;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.IOUtils;
 import org.hotswap.agent.util.PluginManagerInvoker;
@@ -63,7 +55,20 @@ import org.hotswap.agent.watch.Watcher;
  *
  * @author Jiri Bubnik
  */
-@Plugin(name = "Spring", description = "Reload Spring configuration after class definition/change.", testedVersions = {"All between 3.0.1 - 5.2.2"}, expectedVersions = {"3x", "4x", "5x"}, supportClass = {ClassPathBeanDefinitionScannerTransformer.class, ProxyReplacerTransformer.class, ConfigurationClassPostProcessorTransformer.class, ResourcePropertySourceTransformer.class, PlaceholderConfigurerSupportTransformer.class, XmlBeanDefinitionScannerTransformer.class, PostProcessorRegistrationDelegateTransformer.class, BeanFactoryTransformer.class, InitDestroyAnnotationBeanPostProcessorTransformer.class})
+@Plugin(name = "Spring",
+        description = "Reload Spring configuration after class definition/change.",
+        testedVersions = {"All between 3.0.1 - 5.2.2"},
+        expectedVersions = {"3x", "4x", "5x"},
+        supportClass = {ClassPathBeanDefinitionScannerTransformer.class,
+                ProxyReplacerTransformer.class,
+                ConfigurationClassPostProcessorTransformer.class,
+                ResourcePropertySourceTransformer.class,
+                PlaceholderConfigurerSupportTransformer.class,
+                XmlBeanDefinitionScannerTransformer.class,
+                PostProcessorRegistrationDelegateTransformer.class,
+                BeanFactoryTransformer.class,
+                InitDestroyAnnotationBeanPostProcessorTransformer.class,
+                DubboTransformer.class})
 public class SpringPlugin {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringPlugin.class);
 
