@@ -93,7 +93,7 @@ public class SchedulerImpl implements Scheduler {
                 Command command = entry.getKey();
 
                 // if timeout
-                 // if (config.getTime() < currentTime) {
+                if (config.getTime() < currentTime) {
                     // command is currently running
                     if (runningCommands.contains(command)) {
                         if (config.getBehaviour().equals(DuplicateSheduleBehaviour.SKIP)) {
@@ -107,7 +107,7 @@ public class SchedulerImpl implements Scheduler {
                         executeCommand(command);
                         it.remove();
                     }
-                //}
+                }
             }
         }
 

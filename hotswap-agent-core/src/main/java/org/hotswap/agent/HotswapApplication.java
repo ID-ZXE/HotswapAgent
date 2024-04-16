@@ -35,6 +35,24 @@ public class HotswapApplication {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(10888), 0);
             httpServer.createContext("/hotswap/dispatch", exchange -> {
                 try {
+                    CompileEngine.getInstance().compile();
+                    PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
+                    response(exchange, "ok");
+                } catch (Exception e) {
+                    response(exchange, "error");
+                    LOGGER.error("HotswapApplication handle request failure!!!", e);
+                }
+            });
+
+            httpServer.createContext("/hotswap/openChannel", exchange -> {
+                try {
+                    dispatcher.openChannel();
+                    // 等待执行结束
+                    boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
+                    if (timeout) {
+                        LOGGER.info("hotswap timeout");
+                        dispatcher.release();
+                    }
                     response(exchange, "ok");
                 } catch (Exception e) {
                     response(exchange, "error");
@@ -85,9 +103,9 @@ public class HotswapApplication {
     public void openChannel() throws Exception {
         // 启动监控线程
         ResultManager.start();
+        dispatcher.openChannel();
         // hotswap
         PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
-        dispatcher.openChannel();
         // 等待执行结束
         boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
         if (timeout) {

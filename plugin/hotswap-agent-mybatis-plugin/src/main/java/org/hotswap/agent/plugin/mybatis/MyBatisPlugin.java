@@ -18,6 +18,7 @@
  */
 package org.hotswap.agent.plugin.mybatis;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -77,8 +78,8 @@ public class MyBatisPlugin {
     }
 
     @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.REDEFINE})
-    public void registerClassListeners(Class<?> clazz) {
-        if (isMybatisAnnotationMapper(clazz)) {
+    public void registerClassListeners(ClassLoader classLoader, Class<?> clazz) {
+        if (isMybatisAnnotationMapper(classLoader, clazz)) {
             LOGGER.info("发现MyBatis Annotation Mapper变更 开始RELOAD:{}", clazz.getName());
             Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshAnnotationMapper", appClassLoader, clazz);
             scheduler.scheduleCommand(command, 500);
@@ -94,17 +95,29 @@ public class MyBatisPlugin {
         }
     }
 
-    private static boolean isMybatisAnnotationMapper(Class<?> clazz) {
-        if (clazz.isInterface()) {
-            for (Method method : clazz.getMethods()) {
-                Select select = method.getAnnotation(Select.class);
-                Insert insert = method.getAnnotation(Insert.class);
-                Delete delete = method.getAnnotation(Delete.class);
-                Update update = method.getAnnotation(Update.class);
-                if (Objects.nonNull(select) || Objects.nonNull(insert) || Objects.nonNull(delete) || Objects.nonNull(update)) {
-                    return true;
+    private static boolean isMybatisAnnotationMapper(ClassLoader classLoader, Class<?> clazz) {
+        try {
+            if (clazz.isInterface()) {
+                for (Method method : clazz.getMethods()) {
+                    Annotation[] annotations = method.getAnnotations();
+                    for (Annotation annotation : annotations) {
+                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Select"))) {
+                            return true;
+                        }
+                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Update"))) {
+                            return true;
+                        }
+                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Delete"))) {
+                            return true;
+                        }
+                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Insert"))) {
+                            return true;
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            return false;
         }
         return false;
     }

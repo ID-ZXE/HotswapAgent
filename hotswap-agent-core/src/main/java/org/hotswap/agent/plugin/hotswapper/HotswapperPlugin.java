@@ -71,7 +71,7 @@ public class HotswapperPlugin {
     /**
      * For each changed class create a reload command.
      */
-    // @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
+    @OnClassFileEvent(classNameRegexp = ".*", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void watchReload(CtClass ctClass, ClassLoader appClassLoader, URL url) throws IOException, CannotCompileException {
         if (!ClassLoaderHelper.isClassLoaded(appClassLoader, ctClass.getName())) {
             LOGGER.info("Class {} not loaded yet, no need for autoHotswap, skipped URL {}", ctClass.getName(), url);
@@ -108,17 +108,17 @@ public class HotswapperPlugin {
 //            hotswapCommand = new ReflectionCommand(this, HotswapperCommand.class.getName(), "hotswap", appClassLoader,
 //                    port, reloadMap);
 //        } else {
-            hotswapCommand = new Command() {
-                @Override
-                public void executeCommand() {
-                    pluginManager.hotswap(reloadMap);
-                }
+        hotswapCommand = new Command() {
+            @Override
+            public void executeCommand() {
+                pluginManager.hotswap(reloadMap);
+            }
 
-                @Override
-                public String toString() {
-                    return "pluginManager.hotswap(" + Arrays.toString(reloadMap.keySet().toArray()) + ")";
-                }
-            };
+            @Override
+            public String toString() {
+                return "pluginManager.hotswap(" + Arrays.toString(reloadMap.keySet().toArray()) + ")";
+            }
+        };
 //        }
     }
 
