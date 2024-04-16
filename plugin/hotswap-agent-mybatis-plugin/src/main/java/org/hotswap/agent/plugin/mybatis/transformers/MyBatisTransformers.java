@@ -19,6 +19,7 @@
 package org.hotswap.agent.plugin.mybatis.transformers;
 
 import org.apache.ibatis.javassist.bytecode.AccessFlag;
+import org.hotswap.agent.annotation.LoadEvent;
 import org.hotswap.agent.annotation.OnClassLoadEvent;
 import org.hotswap.agent.javassist.CannotCompileException;
 import org.hotswap.agent.javassist.ClassPool;
@@ -30,7 +31,6 @@ import org.hotswap.agent.javassist.CtNewMethod;
 import org.hotswap.agent.javassist.NotFoundException;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.MyBatisPlugin;
-import org.hotswap.agent.plugin.mybatis.MyBatisRefreshCommands;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
 import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
 import org.hotswap.agent.util.PluginManagerInvoker;
@@ -219,6 +219,31 @@ public class MyBatisTransformers {
         );
 
         LOGGER.debug("org.apache.ibatis.type.TypeAliasRegistry updateRegisterAlias updated.");
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "com.baomidou.mybatisplus.core.MybatisConfiguration",
+            events = {LoadEvent.DEFINE}
+    )
+    public static void transformPlusConfiguration(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod removeMappedStatementMethod = CtNewMethod.make(
+                "public void $$removeMappedStatement(String statementName)" +
+                        "{if(mappedStatements.containsKey(statementName))" +
+                        "{mappedStatements.remove(statementName);}}", ctClass);
+        ctClass.addMethod(removeMappedStatementMethod);
+        ctClass.getDeclaredMethod("addMappedStatement",
+                new CtClass[]{classPool.get("org.apache.ibatis.mapping.MappedStatement")})
+                .insertBefore("$$removeMappedStatement($1.getId());");
+    }
+
+    @OnClassLoadEvent(
+            classNameRegexp = "com.baomidou.mybatisplus.core.MybatisConfiguration\\$StrictMap",
+            events = {LoadEvent.DEFINE}
+    )
+    public static void patchPlusStrictMap(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod method = ctClass.getDeclaredMethod("put",
+                new CtClass[]{classPool.get(String.class.getName()),
+                        classPool.get(Object.class.getName())});
+        method.insertBefore("if(containsKey($1)){remove($1);}");
     }
 
 }
