@@ -1,10 +1,5 @@
 package com.taobao.arthas.compiler;
 
-import com.taobao.arthas.compiler.CustomJavaFileObject;
-import com.taobao.arthas.compiler.DynamicClassLoader;
-import com.taobao.arthas.compiler.MemoryByteCode;
-import com.taobao.arthas.compiler.PackageInternalsFinder;
-
 import javax.tools.*;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -18,20 +18,21 @@
  */
 package org.hotswap.agent.config;
 
+import org.hotswap.agent.HotswapAgent;
+import org.hotswap.agent.annotation.Plugin;
+import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.util.HotswapProperties;
+import org.hotswap.agent.util.JarUtils;
+import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
+import org.hotswap.agent.util.classloader.URLClassPathHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import org.hotswap.agent.HotswapAgent;
-import org.hotswap.agent.annotation.Plugin;
-import org.hotswap.agent.manager.AllExtensionsManager;
-import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.util.HotswapProperties;
-import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
-import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
 /**
  * Plugin configuration.

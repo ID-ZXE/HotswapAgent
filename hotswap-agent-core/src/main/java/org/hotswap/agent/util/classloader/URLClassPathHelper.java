@@ -149,7 +149,7 @@ public class URLClassPathHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static URL[] getOrigClassPath(ClassLoader classLoader, Field ucpField) throws IllegalAccessException,
+    public static URL[] getOrigClassPath(ClassLoader classLoader, Field ucpField) throws IllegalAccessException,
             NoSuchFieldException {
         URL[] origClassPath = null;
         Object urlClassPath = ucpField.get(classLoader);
@@ -185,7 +185,7 @@ public class URLClassPathHelper {
      *     --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
      * </pre>
      */
-    private static Field getUcpField(ClassLoader classLoader) throws NoSuchFieldException {
+    public static Field getUcpField(ClassLoader classLoader) throws NoSuchFieldException {
         if (classLoader instanceof URLClassLoader) {
             return URLClassLoader.class.getDeclaredField("ucp");
         }

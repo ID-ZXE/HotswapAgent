@@ -20,26 +20,27 @@ package com.taobao.arthas.compiler;
  * #L%
  */
 
-import com.taobao.arthas.compiler.MemoryByteCode;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class DynamicClassLoader extends ClassLoader {
-    private final Map<String, com.taobao.arthas.compiler.MemoryByteCode> byteCodes = new HashMap<String, com.taobao.arthas.compiler.MemoryByteCode>();
+public class DynamicClassLoader extends URLClassLoader {
+    private final Map<String, MemoryByteCode> byteCodes = new HashMap<>();
 
-    public DynamicClassLoader(ClassLoader classLoader) {
-        super(classLoader);
+    public DynamicClassLoader(URL[] urls, ClassLoader classLoader) {
+        super(urls, classLoader);
     }
 
-    public void registerCompiledSource(com.taobao.arthas.compiler.MemoryByteCode byteCode) {
+    public void registerCompiledSource(MemoryByteCode byteCode) {
         byteCodes.put(byteCode.getClassName(), byteCode);
     }
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        com.taobao.arthas.compiler.MemoryByteCode byteCode = byteCodes.get(name);
+        MemoryByteCode byteCode = byteCodes.get(name);
         if (byteCode == null) {
             return super.findClass(name);
         }
@@ -48,15 +49,15 @@ public class DynamicClassLoader extends ClassLoader {
     }
 
     public Map<String, Class<?>> getClasses() throws ClassNotFoundException {
-        Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
-        for (com.taobao.arthas.compiler.MemoryByteCode byteCode : byteCodes.values()) {
+        Map<String, Class<?>> classes = new HashMap<>();
+        for (MemoryByteCode byteCode : byteCodes.values()) {
             classes.put(byteCode.getClassName(), findClass(byteCode.getClassName()));
         }
         return classes;
     }
 
     public Map<String, byte[]> getByteCodes() {
-        Map<String, byte[]> result = new HashMap<String, byte[]>(byteCodes.size());
+        Map<String, byte[]> result = new HashMap<>(byteCodes.size());
         for (Entry<String, MemoryByteCode> entry : byteCodes.entrySet()) {
             result.put(entry.getKey(), entry.getValue().getByteCode());
         }

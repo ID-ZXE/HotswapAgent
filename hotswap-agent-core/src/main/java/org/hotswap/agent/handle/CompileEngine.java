@@ -23,14 +23,17 @@ public class CompileEngine {
         return INSTANCE;
     }
 
+    private DynamicCompiler dynamicCompiler;
+
     public void compile() throws Exception {
-        LombokHandler.deLombok(getJavaFile());
+        if (dynamicCompiler == null) {
+            dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
+        }
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         doCompile();
     }
 
     private void doCompile() throws Exception {
-        DynamicCompiler dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
         long start = System.currentTimeMillis();
         List<File> javaFile = getJavaFile();
         LOGGER.info("compile {}", javaFile.stream().map(File::getName).collect(Collectors.joining(",")));

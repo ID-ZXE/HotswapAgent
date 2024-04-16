@@ -29,7 +29,6 @@ public class AllExtensionsManager {
         this.classLoader = classLoader;
         LOGGER.info("ClassLoader 初始化 {}", classLoader);
         setAppInfo();
-        createLombokJar();
 
 //        try {
 //            File lombokJar = new File(HotswapConstants.EXT_CLASS_PATH, "lombok.jar");

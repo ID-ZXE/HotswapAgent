@@ -118,33 +118,33 @@ public class HotswapperPlugin {
      */
     @Init
     public static void init(PluginConfiguration pluginConfiguration, ClassLoader appClassLoader) {
-        if (appClassLoader == null) {
-            LOGGER.info("Bootstrap class loader is null, hotswapper skipped.");
-            return;
-        }
-
-        LOGGER.info("Init plugin at classLoader {}", appClassLoader);
-
-        // init only if the classloader contains directly the property file (not in parent classloader)
-        if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.containsPropertyFile()) {
-            LOGGER.info("ClassLoader {} does not contain hotswap-agent.properties file, hotswapper skipped.", appClassLoader);
-            return;
-        }
-
-        // and autoHotswap enabled
-        if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.getPropertyBoolean("autoHotswap")) {
-            LOGGER.info("ClassLoader {} has autoHotswap disabled, hotswapper skipped.", appClassLoader);
-            return;
-        }
-
-
-        String port = pluginConfiguration.getProperty("autoHotswap.port");
-
-        HotswapperPlugin plugin = PluginManagerInvoker.callInitializePlugin(HotswapperPlugin.class, appClassLoader);
-        if (plugin != null) {
-            plugin.initHotswapCommand(appClassLoader, port);
-        } else {
-            LOGGER.info("Hotswapper is disabled in {}", appClassLoader);
-        }
+//        if (appClassLoader == null) {
+//            LOGGER.info("Bootstrap class loader is null, hotswapper skipped.");
+//            return;
+//        }
+//
+//        LOGGER.info("Init plugin at classLoader {}", appClassLoader);
+//
+//        // init only if the classloader contains directly the property file (not in parent classloader)
+//        if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.containsPropertyFile()) {
+//            LOGGER.info("ClassLoader {} does not contain hotswap-agent.properties file, hotswapper skipped.", appClassLoader);
+//            return;
+//        }
+//
+//        // and autoHotswap enabled
+//        if (!HotswapAgent.isAutoHotswap() && !pluginConfiguration.getPropertyBoolean("autoHotswap")) {
+//            LOGGER.info("ClassLoader {} has autoHotswap disabled, hotswapper skipped.", appClassLoader);
+//            return;
+//        }
+//
+//
+//        String port = pluginConfiguration.getProperty("autoHotswap.port");
+//
+//        HotswapperPlugin plugin = PluginManagerInvoker.callInitializePlugin(HotswapperPlugin.class, appClassLoader);
+//        if (plugin != null) {
+//            plugin.initHotswapCommand(appClassLoader, port);
+//        } else {
+//            LOGGER.info("Hotswapper is disabled in {}", appClassLoader);
+//        }
     }
 }
