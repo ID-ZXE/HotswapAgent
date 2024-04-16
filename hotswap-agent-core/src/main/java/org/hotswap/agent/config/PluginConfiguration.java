@@ -33,8 +33,6 @@ import org.hotswap.agent.util.HotswapProperties;
 import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
 import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
-import static org.hotswap.agent.constants.HotswapConstants.EXT_CLASS_PATH;
-
 /**
  * Plugin configuration.
  * <p/>
@@ -106,9 +104,7 @@ public class PluginConfiguration {
         }
 
         if (parent == null) {
-            configurationURL = classLoader == null
-                    ? ClassLoader.getSystemResource(PLUGIN_CONFIGURATION)
-                    : classLoader.getResource(PLUGIN_CONFIGURATION);
+            configurationURL = classLoader == null ? ClassLoader.getSystemResource(PLUGIN_CONFIGURATION) : classLoader.getResource(PLUGIN_CONFIGURATION);
 
             try {
                 if (configurationURL != null) {
@@ -144,13 +140,10 @@ public class PluginConfiguration {
                     boolean found = false;
 
                     ClassLoader parentClassLoader = parent.getClassLoader();
-                    Enumeration<URL> parentUrls = parentClassLoader == null
-                            ? ClassLoader.getSystemResources(PLUGIN_CONFIGURATION)
-                            : parentClassLoader.getResources(PLUGIN_CONFIGURATION);
+                    Enumeration<URL> parentUrls = parentClassLoader == null ? ClassLoader.getSystemResources(PLUGIN_CONFIGURATION) : parentClassLoader.getResources(PLUGIN_CONFIGURATION);
 
                     while (parentUrls.hasMoreElements()) {
-                        if (url.equals(parentUrls.nextElement()))
-                            found = true;
+                        if (url.equals(parentUrls.nextElement())) found = true;
                     }
 
                     if (!found) {
@@ -164,16 +157,14 @@ public class PluginConfiguration {
 
             if (configurationURL == null) {
                 configurationURL = parent.configurationURL;
-                LOGGER.debug("Classloader does not contain 'hotswap-agent.properties', using parent file '{}'"
-                        , parent.configurationURL);
+                LOGGER.debug("Classloader does not contain 'hotswap-agent.properties', using parent file '{}'", parent.configurationURL);
 
             } else {
                 LOGGER.debug("Classloader contains 'hotswap-agent.properties' at location '{}'", configurationURL);
                 containsPropertyFileDirectly = true;
             }
             try {
-                if (configurationURL != null)
-                    properties.load(configurationURL.openStream());
+                if (configurationURL != null) properties.load(configurationURL.openStream());
             } catch (Exception e) {
                 LOGGER.error("Error while loading 'hotswap-agent.properties' from URL " + configurationURL, e);
             }
@@ -205,50 +196,25 @@ public class PluginConfiguration {
     }
 
     private void checkProperties() {
-        if (properties != null && properties.containsKey(INCLUDED_CLASS_LOADERS_KEY) &&
-                properties.containsKey(EXCLUDED_CLASS_LOADERS_KEY)) {
-            throw new IllegalArgumentException("includedClassLoaderPatterns, excludedClassLoaderPatterns in" +
-                    "hotswap-agent.properties are exclusive to each other. You cannot configure both options");
+        if (properties != null && properties.containsKey(INCLUDED_CLASS_LOADERS_KEY) && properties.containsKey(EXCLUDED_CLASS_LOADERS_KEY)) {
+            throw new IllegalArgumentException("includedClassLoaderPatterns, excludedClassLoaderPatterns in" + "hotswap-agent.properties are exclusive to each other. You cannot configure both options");
         }
     }
 
     private void initExtraClassPath() {
         URL[] extraClassPath = getExtraClasspath();
-        if (AllExtensionsManager.getInstance().getClassLoader() == null) {
-            return;
-        }
-        // 非指定classloader 不进行增强
-        if (!Objects.equals(classLoader, AllExtensionsManager.getInstance().getClassLoader())) {
-            return;
-        }
-
         if (extraClassPath.length > 0 && !checkExcluded()) {
             if (classLoader instanceof HotswapAgentClassLoaderExt) {
                 ((HotswapAgentClassLoaderExt) classLoader).$$ha$setExtraClassPath(extraClassPath);
             } else if (URLClassPathHelper.isApplicable(classLoader)) {
-                URLClassPathHelper.prependClassPath(classLoader, extraClassPath);
+                if (AllExtensionsManager.getInstance().getClassLoader() != null && !AllExtensionsManager.getInstance().hasPrependClassPath()) {
+                    LOGGER.info("扩展ClassPath {}", Arrays.toString(extraClassPath));
+                    AllExtensionsManager.getInstance().setHasPrependClassPath(true);
+                    URLClassPathHelper.prependClassPath(AllExtensionsManager.getInstance().getClassLoader(), extraClassPath);
+                }
             } else {
-                LOGGER.debug("Unable to set extraClasspath to {} on classLoader {}. Only classLoader with 'ucp' " +
-                        "field present is supported.\n*** extraClasspath configuration property will not be " +
-                        "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
+                LOGGER.debug("Unable to set extraClasspath to {} on classLoader {}. Only classLoader with 'ucp' " + "field present is supported.\n*** extraClasspath configuration property will not be " + "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
             }
-        }
-    }
-
-    public static void initExtraClassPath(ClassLoader classLoader) {
-        try {
-            URL[] extraClassPath = new URL[]{new File(EXT_CLASS_PATH).toURI().toURL()};
-            if (classLoader instanceof HotswapAgentClassLoaderExt) {
-                ((HotswapAgentClassLoaderExt) classLoader).$$ha$setExtraClassPath(extraClassPath);
-            } else if (URLClassPathHelper.isApplicable(classLoader)) {
-                URLClassPathHelper.prependClassPath(classLoader, extraClassPath);
-            } else {
-                LOGGER.info("Unable to set extraClasspath to {} on classLoader {}. Only classLoader with 'ucp' " +
-                        "field present is supported.\n*** extraClasspath configuration property will not be " +
-                        "handled on JVM level ***", Arrays.toString(extraClassPath), classLoader);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -258,8 +224,7 @@ public class PluginConfiguration {
             for (String pattern : properties.getProperty(INCLUDED_CLASS_LOADERS_KEY).split(",")) {
                 includedClassLoaderPatterns.add(Pattern.compile(pattern));
             }
-            PluginManager.getInstance().getHotswapTransformer()
-                    .setIncludedClassLoaderPatterns(includedClassLoaderPatterns);
+            PluginManager.getInstance().getHotswapTransformer().setIncludedClassLoaderPatterns(includedClassLoaderPatterns);
         }
     }
 
@@ -270,8 +235,7 @@ public class PluginConfiguration {
                 excludedClassLoaderPatterns.add(Pattern.compile(pattern));
             }
             // FIXME: this is wrong since there is single HotswapTransformer versus multiple PluginConfigurations.
-            PluginManager.getInstance().getHotswapTransformer()
-                    .setExcludedClassLoaderPatterns(excludedClassLoaderPatterns);
+            PluginManager.getInstance().getHotswapTransformer().setExcludedClassLoaderPatterns(excludedClassLoaderPatterns);
         }
     }
 
@@ -302,12 +266,9 @@ public class PluginConfiguration {
      * @return the property value or null if not defined
      */
     public String getProperty(String property) {
-        if (properties.containsKey(property))
-            return properties.getProperty(property);
-        else if (parent != null)
-            return parent.getProperty(property);
-        else
-            return null;
+        if (properties.containsKey(property)) return properties.getProperty(property);
+        else if (parent != null) return parent.getProperty(property);
+        else return null;
     }
 
     /**
@@ -329,12 +290,9 @@ public class PluginConfiguration {
      * @return the property value or null if not defined
      */
     public boolean getPropertyBoolean(String property) {
-        if (properties.containsKey(property))
-            return Boolean.valueOf(properties.getProperty(property));
-        else if (parent != null)
-            return parent.getPropertyBoolean(property);
-        else
-            return false;
+        if (properties.containsKey(property)) return Boolean.valueOf(properties.getProperty(property));
+        else if (parent != null) return parent.getPropertyBoolean(property);
+        else return false;
     }
 
     /**
@@ -422,8 +380,7 @@ public class PluginConfiguration {
             return new URL(resource);
         } catch (MalformedURLException e) {
             // try to locate a file
-            if (resource.startsWith("./"))
-                resource = resource.substring(2);
+            if (resource.startsWith("./")) resource = resource.substring(2);
 
             File file = new File(resource).getCanonicalFile();
             return file.toURI().toURL();

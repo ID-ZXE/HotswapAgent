@@ -195,4 +195,30 @@ public class MyBatisTransformers {
                 + "{caches.remove($1.getId()); }caches.put($1.getId(),$1);}");
     }
 
+    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.type.TypeAliasRegistry")
+    public static void patchTypeAliasRegistry(CtClass ctClass, ClassPool classPool)
+            throws NotFoundException, CannotCompileException {
+        CtMethod registerAlias = ctClass.getDeclaredMethod("registerAlias", new CtClass[]{
+                classPool.get(String.class.getName()),
+                classPool.get(Class.class.getName())
+        });
+
+        CtField typeAliasesField = ctClass.getField("typeAliases");
+        if (typeAliasesField == null) {
+            typeAliasesField = ctClass.getField("TYPE ALIASES");
+        }
+        String typeAliasesName = typeAliasesField.getName();
+
+        registerAlias.setBody("{"
+                + "if ($1 == null) {"
+                + "   throw new org.apache.ibatis.type.TypeException(\"the parameter alias cannot be null\");"
+                + "}"
+                + "String key = $1.toLowerCase(java.util.Locale.ENGLISH);"
+                + typeAliasesName + ".put(key, $2);"
+                + "}"
+        );
+
+        LOGGER.debug("org.apache.ibatis.type.TypeAliasRegistry updateRegisterAlias updated.");
+    }
+
 }

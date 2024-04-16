@@ -44,6 +44,8 @@ import org.hotswap.agent.plugin.spring.core.BeanDefinitionProcessor;
 import org.hotswap.agent.plugin.spring.reload.*;
 import org.hotswap.agent.plugin.spring.scanner.SpringBeanWatchEventListener;
 import org.hotswap.agent.plugin.spring.transformers.*;
+import org.hotswap.agent.plugin.spring.transformers.support.DubboSupport;
+import org.hotswap.agent.plugin.spring.transformers.support.MybatisSupport;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.IOUtils;
 import org.hotswap.agent.util.PluginManagerInvoker;
@@ -290,25 +292,20 @@ public class SpringPlugin {
 
     @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.config.spring.context.annotation.DubboClassPathBeanDefinitionScanner")
     public static void patchDubboClassPathBeanDefinitionScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        StringBuilder src = new StringBuilder("{");
-        src.append("{if(" + SpringBeanReload.class.getName() + ".BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.contains($1))" +
-                "{System.out.println($1 + \" checkCandidate return true\");return false;}}");
-        src.append("}");
+        String src = "{" + "{if(" + DubboSupport.class.getName() + ".CONFLICT_DUBBO_BEANS.contains($1))" +
+                "{System.out.println($1 + \"Dubbo doScan $1 checkCandidate return true\");return true;}}" +
+                "}";
         CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
-        method.insertBefore(src.toString());
+        method.insertBefore(src);
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
     public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-//        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")});
-//        constructor.insertAfter("{" + MyBatisRefreshCommands.class.getName() + ".loadScanner(this);" + "}");
-
-        StringBuilder src = new StringBuilder("{");
-        src.append("{if(" + SpringBeanReload.class.getName() + ".BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.contains($1))" +
-                "{System.out.println($1 + \" checkCandidate return true\");return false;}}");
-        src.append("}");
+        String src = "{" + "{if(" + MybatisSupport.class.getName() + ".CONFLICT_MAPPER_BEANS.contains($1))" +
+                "{System.out.println($1 + \"MyBatis $1 checkCandidate return true\");return true;}}" +
+                "}";
         CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
-        method.insertBefore(src.toString());
+        method.insertBefore(src);
     }
 
 

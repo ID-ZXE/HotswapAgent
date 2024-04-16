@@ -77,7 +77,7 @@ public class HotswapAgent {
         watchExtraClasspath();
         AbstractNIO2Watcher abstractNIO2Watcher = (AbstractNIO2Watcher) PluginManager.getInstance().getWatcher();
         HotswapApplication.getInstance().setDispatcher(abstractNIO2Watcher.getDispatcher());
-        // 远程编译器初始化
+        // 初始化
         HotswapApplication.getInstance().start();
         LOGGER.debug("Hotswap agent initialized.");
     }

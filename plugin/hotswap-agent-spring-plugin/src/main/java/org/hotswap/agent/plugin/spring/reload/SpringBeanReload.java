@@ -26,6 +26,8 @@ import org.hotswap.agent.plugin.spring.files.XmlBeanDefinitionScannerAgent;
 import org.hotswap.agent.plugin.spring.getbean.ProxyReplacer;
 import org.hotswap.agent.plugin.spring.listener.SpringEventSource;
 import org.hotswap.agent.plugin.spring.transformers.api.BeanFactoryLifecycle;
+import org.hotswap.agent.plugin.spring.transformers.support.DubboSupport;
+import org.hotswap.agent.plugin.spring.transformers.support.MybatisSupport;
 import org.hotswap.agent.plugin.spring.utils.ResourceUtils;
 import org.hotswap.agent.util.AnnotationHelper;
 import org.hotswap.agent.util.spring.util.ClassUtils;
@@ -36,8 +38,6 @@ import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefiniti
 import org.springframework.beans.factory.config.*;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -299,6 +299,9 @@ public class SpringBeanReload {
 
             // 7. invoke the Bean lifecycle steps
             // 7.1 invoke BeanFactoryPostProcessor
+
+            // 处理checkCandidate问题
+            processCheckCandidateProblem();
             invokeBeanFactoryPostProcessors(beanFactory);
             addBeanPostProcessors(beanFactory);
             // 7.2 process @Value and @Autowired of singleton beans excluding destroyed beans
@@ -321,13 +324,9 @@ public class SpringBeanReload {
         clearLocalCache();
     }
 
-    private boolean ignoreinvokeBeanFactoryPostProcessors() {
-        Map<String, ConfigurableEnvironment> beansOfType = beanFactory.getBeansOfType(ConfigurableEnvironment.class);
-        if (CollectionUtils.isEmpty(beansOfType)) {
-            LOGGER.info("beanFactory : {} have no contain ConfigurableEnvironment", ObjectUtils.identityToString(beanFactory));
-            return true;
-        }
-        return false;
+    private void processCheckCandidateProblem() {
+        DubboSupport.CONFLICT_DUBBO_BEANS.addAll(beansToProcess);
+        MybatisSupport.CONFLICT_MAPPER_BEANS.addAll(beansToProcess);
     }
 
     private boolean preCheckReload() {
