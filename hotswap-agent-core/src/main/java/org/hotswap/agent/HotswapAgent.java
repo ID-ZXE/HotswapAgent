@@ -22,6 +22,7 @@ import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.config.PluginManager;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.Version;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
 
@@ -69,7 +70,9 @@ public class HotswapAgent {
     public static void premain(String args, Instrumentation inst) {
         LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
         // 清空class文件夹
+        AllExtensionsManager.getInstance().initProperties();
         CompileEngine.getInstance().cleanOldClassFile();
+
         parseArgs(args);
         fixJboss7Modules();
         PluginManager.getInstance().init(inst);
@@ -83,7 +86,7 @@ public class HotswapAgent {
     }
 
     public static void watchExtraClasspath() {
-        File extraClasspathDir = new File(HotswapConstants.EXT_CLASS_PATH);
+        File extraClasspathDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
         if (!extraClasspathDir.exists()) {
             boolean mkdirs = extraClasspathDir.mkdirs();
             if (!mkdirs) {
@@ -128,7 +131,6 @@ public class HotswapAgent {
     public static String getExternalPropertiesFile() {
         return propertiesFilePath;
     }
-
 
     /**
      * Checks if the plugin is disabled (by name).

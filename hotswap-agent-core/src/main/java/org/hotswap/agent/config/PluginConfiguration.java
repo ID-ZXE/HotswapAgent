@@ -23,7 +23,6 @@ import org.hotswap.agent.annotation.Plugin;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.HotswapProperties;
-import org.hotswap.agent.util.JarUtils;
 import org.hotswap.agent.util.classloader.HotswapAgentClassLoaderExt;
 import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
@@ -44,7 +43,7 @@ import java.util.regex.Pattern;
 public class PluginConfiguration {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(PluginConfiguration.class);
 
-    private static final String PLUGIN_CONFIGURATION = "hotswap-agent.properties";
+    public static final String PLUGIN_CONFIGURATION = "hotswap-agent.properties";
 
     /**
      * The Constant INCLUDED_CLASS_LOADERS_KEY. allowed list

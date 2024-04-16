@@ -50,7 +50,7 @@ public class CompileEngine {
 
         // 全部写入文件系统
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {
-            File byteCodeFile = new File(HotswapConstants.EXT_CLASS_PATH, entry.getKey().replace('.', '/').concat(".class"));
+            File byteCodeFile = new File(AllExtensionsManager.getInstance().getExtraClassPath(), entry.getKey().replace('.', '/').concat(".class"));
             FileUtils.writeByteArrayToFile(byteCodeFile, entry.getValue(), false);
         }
 
@@ -76,7 +76,7 @@ public class CompileEngine {
     public void cleanOldClassFile() {
         LOGGER.info("clean old class file");
         try {
-            File classDir = new File(HotswapConstants.EXT_CLASS_PATH);
+            File classDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
             FileUtils.cleanDirectory(classDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -84,7 +84,7 @@ public class CompileEngine {
     }
 
     public List<File> getJavaFile() {
-        File dir = new File(HotswapConstants.SOURCE_FILE_PATH);
+        File dir = new File(AllExtensionsManager.getInstance().getSourceDirPath());
         Collection<File> fileCollection = FileUtils.listFiles(dir, new String[]{"java"}, true);
         return new ArrayList<>(fileCollection);
     }

@@ -4,7 +4,6 @@ import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
-import org.hotswap.agent.util.JarUtils;
 import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
 import javax.tools.*;
@@ -53,7 +52,7 @@ public class DynamicCompiler {
 
     private List<URL> getCustomJarUrl() {
         List<URL> result = new ArrayList<>();
-        File lombokJar = new File(HotswapConstants.BASE_PATH, "lombok.jar");
+        File lombokJar = new File(AllExtensionsManager.getInstance().getBaseDirPath(), "lombok.jar");
         try {
             result.add(lombokJar.toURI().toURL());
         } catch (Exception e) {
