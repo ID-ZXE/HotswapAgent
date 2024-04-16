@@ -80,8 +80,6 @@ public class SpringBeanReload {
     private final BeanNameGenerator beanNameGenerator;
     private final BeanFactoryAssistant beanFactoryAssistant;
 
-    public static final Set<String> BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR = new HashSet<>();
-
     public SpringBeanReload(DefaultListableBeanFactory beanFactory) {
         this.beanFactoryAssistant = new BeanFactoryAssistant(beanFactory);
         beanNameGenerator = new AnnotationBeanNameGenerator();
@@ -621,9 +619,6 @@ public class SpringBeanReload {
             return;
         }
         String[] dependentBeans = beanFactory.getDependentBeans(beanName);
-        if (dependentBeans != null && dependentBeans.length != 0) {
-            BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.addAll(Arrays.asList(dependentBeans));
-        }
         LOGGER.info("the bean '{}' is destroyed, and it is depended by {}", beanName, Arrays.toString(dependentBeans));
         doDestroyBean(beanName);
     }
@@ -666,7 +661,6 @@ public class SpringBeanReload {
     }
 
     private void invokeBeanFactoryPostProcessors(DefaultListableBeanFactory factory) {
-        SpringBeanReload.BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.addAll(beansToProcess);
         try {
             LOGGER.debug("try to invoke PostProcessorRegistrationDelegate");
             invokePostProcessorRegistrationDelegate(factory);
@@ -679,8 +673,6 @@ public class SpringBeanReload {
         } catch (Exception e) {
             LOGGER.error("Failed to invoke PostProcessorRegistrationDelegate", e);
             throw new RuntimeException(e);
-        } finally {
-            SpringBeanReload.BEANS_TO_PROCESS_4_BEAN_POST_PROCESSOR.clear();
         }
     }
 

@@ -163,14 +163,14 @@
                                     <pattern>javaparser-core</pattern>
                                     <shadedPattern>org.hotswap.agent.javaparser</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>arthas-memorycompiler</pattern>
-                                    <shadedPattern>org.hotswap.agent.compiler</shadedPattern>
-                                </relocation>
+<!--                                <relocation>-->
+<!--                                    <pattern>arthas-memorycompiler</pattern>-->
+<!--                                    <shadedPattern>org.hotswap.agent.compiler</shadedPattern>-->
+<!--                                </relocation>-->
                             </relocations>
                             <artifactSet>
                                 <includes>
-                                    <include>com.taobao.arthas:arthas-memorycompiler</include>
+<!--                                    <include>com.taobao.arthas:arthas-memorycompiler</include>-->
                                     <include>commons-io:commons-io</include>
                                     <include>com.github.javaparser:javaparser-core</include>
                                 </includes>
@@ -192,11 +192,11 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>com.taobao.arthas</groupId>
-            <artifactId>arthas-memorycompiler</artifactId>
-            <version>3.6.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.taobao.arthas</groupId>-->
+<!--            <artifactId>arthas-memorycompiler</artifactId>-->
+<!--            <version>3.6.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
