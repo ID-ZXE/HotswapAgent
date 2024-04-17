@@ -17,17 +17,20 @@ public abstract class AbstractHttpHandler implements HttpHandler {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(AbstractHttpHandler.class);
 
+    protected String params;
+
+    protected String body;
+
+    protected URI requestURI;
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         long start = System.currentTimeMillis();
-        URI requestURI = null;
-        String params = null;
-        String body = null;
         Object result = null;
         try {
-            requestURI = exchange.getRequestURI();
-            params = requestURI.getQuery();
-            body = readBody(exchange);
+            this.requestURI = exchange.getRequestURI();
+            this.params = requestURI.getQuery();
+            this.body = readBody(exchange);
             result = execute();
             responseJson(exchange, JsonUtils.toString(result));
         } catch (Exception e) {
