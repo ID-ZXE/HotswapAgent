@@ -72,7 +72,7 @@ public class ResetRequestMappingCaches {
 
         // Determine whether it is a spring mvc controller bean change
         if (!needReloadSpringMVC()) {
-            LOGGER.trace("Spring: spring mvc no changes");
+            LOGGER.trace("Spring MVC spring mvc no changes");
             return;
         }
 
@@ -99,7 +99,7 @@ public class ResetRequestMappingCaches {
         for (String beanName : allBeans) {
             Class<?> beanClass = ResetRequestMappingCaches.beanFactory.getType(beanName);
             if (beanClass == null) {
-                LOGGER.trace("Spring: bean {} not found", beanName);
+                LOGGER.trace("Spring MVC bean {} not found", beanName);
                 continue;
             }
             if (isMvcHandler(beanClass)) {
@@ -114,7 +114,7 @@ public class ResetRequestMappingCaches {
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, c, true, false);
 
         if (mappings.isEmpty()) {
-            LOGGER.trace("Spring: no HandlerMappings found");
+            LOGGER.trace("SpringMVC No HandlerMappings Found");
         }
 
         for (Entry<String, ?> e : mappings.entrySet()) {
@@ -163,6 +163,10 @@ public class ResetRequestMappingCaches {
             for (Object key : keys) {
                 HandlerMethod handlerMethod = (HandlerMethod) unmodifiableHandlerMethods.get(key);
                 if (ResetRequestMappingCaches.beansToProcess.contains(handlerMethod.getBean().toString())) {
+                    if (!handlerMapping.getClass().getSimpleName().equals("RequestMappingHandlerMapping")) {
+                        continue;
+                    }
+
                     LOGGER.info("Unregistering handler method {}", key);
                     // Uninstall mapping
                     u.invoke(handlerMapping, key);
@@ -180,11 +184,16 @@ public class ResetRequestMappingCaches {
         for (String beanName : beanNames) {
             Class<?> beanClass = ResetRequestMappingCaches.beanFactory.getType(beanName);
             if (beanClass == null) {
-                LOGGER.warning("Spring: bean {} not found", beanName);
+                LOGGER.warning("bean {} not found", beanName);
                 continue;
             }
+
+            if (!handlerMapping.getClass().getSimpleName().equals("RequestMappingHandlerMapping")) {
+                continue;
+            }
+
             if (isMvcHandler(beanClass)) {
-                LOGGER.info("Spring: registering handler bean {}", beanName);
+                LOGGER.info("registering handler bean {}", beanName);
                 Method detectHandlerMethods = abstractHandlerMethodMapping.getDeclaredMethod("detectHandlerMethods", Object.class);
                 detectHandlerMethods.setAccessible(true);
                 detectHandlerMethods.invoke(handlerMapping, beanName);
@@ -223,7 +232,7 @@ public class ResetRequestMappingCaches {
         return false;
     }
 
-    protected static boolean isHandler(Class<?> beanType) {
+    private static boolean isHandler(Class<?> beanType) {
         return (AnnotatedElementUtils.hasAnnotation(beanType, Controller.class) ||
                 AnnotatedElementUtils.hasAnnotation(beanType, RequestMapping.class));
     }

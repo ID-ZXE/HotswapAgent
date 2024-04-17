@@ -137,25 +137,25 @@ public class MyBatisTransformers {
         LOGGER.debug("org.mybatis.spring.SqlSessionFactoryBean patched.");
     }
 
-    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.reflection.Reflector")
-    public static void patchReflector(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        String insertCode = "{_reload($0.type);}";
-        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("java.lang.Class")});
-        CtMethod reloadMethod = constructor.toMethod("_reload", ctClass);
-        ctClass.addMethod(reloadMethod);
-
-        CtMethod getGetInvoker = ctClass.getDeclaredMethod("getGetInvoker");
-        getGetInvoker.insertBefore(insertCode);
-
-        CtMethod getGetterType = ctClass.getDeclaredMethod("getGetterType");
-        getGetterType.insertBefore(insertCode);
-
-        CtMethod getSetInvoker = ctClass.getDeclaredMethod("getSetInvoker");
-        getSetInvoker.insertBefore(insertCode);
-
-        CtMethod getSetterType = ctClass.getDeclaredMethod("getSetterType");
-        getSetterType.insertBefore(insertCode);
-    }
+//    @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.reflection.Reflector")
+//    public static void patchReflector(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+//        String insertCode = "{_reload($0.type);}";
+//        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("java.lang.Class")});
+//        CtMethod reloadMethod = constructor.toMethod("_reload", ctClass);
+//        ctClass.addMethod(reloadMethod);
+//
+//        CtMethod getGetInvoker = ctClass.getDeclaredMethod("getGetInvoker");
+//        getGetInvoker.insertBefore(insertCode);
+//
+//        CtMethod getGetterType = ctClass.getDeclaredMethod("getGetterType");
+//        getGetterType.insertBefore(insertCode);
+//
+//        CtMethod getSetInvoker = ctClass.getDeclaredMethod("getSetInvoker");
+//        getSetInvoker.insertBefore(insertCode);
+//
+//        CtMethod getSetterType = ctClass.getDeclaredMethod("getSetterType");
+//        getSetterType.insertBefore(insertCode);
+//    }
 
     @OnClassLoadEvent(classNameRegexp = "org.apache.ibatis.session.Configuration\\$StrictMap")
     public static void patchStrictMap(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
@@ -203,9 +203,11 @@ public class MyBatisTransformers {
                 classPool.get(Class.class.getName())
         });
 
-        CtField typeAliasesField = ctClass.getField("typeAliases");
-        if (typeAliasesField == null) {
-            typeAliasesField = ctClass.getField("TYPE ALIASES");
+        CtField typeAliasesField;
+        try {
+            typeAliasesField = ctClass.getField("typeAliases");
+        } catch (Exception ignore) {
+            typeAliasesField = ctClass.getField("TYPE_ALIASES");
         }
         String typeAliasesName = typeAliasesField.getName();
 
@@ -231,7 +233,7 @@ public class MyBatisTransformers {
                         "{mappedStatements.remove(statementName);}}", ctClass);
         ctClass.addMethod(removeMappedStatementMethod);
         ctClass.getDeclaredMethod("addMappedStatement",
-                new CtClass[]{classPool.get("org.apache.ibatis.mapping.MappedStatement")})
+                        new CtClass[]{classPool.get("org.apache.ibatis.mapping.MappedStatement")})
                 .insertBefore("$$removeMappedStatement($1.getId());");
     }
 
