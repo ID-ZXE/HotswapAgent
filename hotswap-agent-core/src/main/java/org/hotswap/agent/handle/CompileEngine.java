@@ -1,8 +1,7 @@
 package org.hotswap.agent.handle;
 
-import com.taobao.arthas.compiler.DynamicCompiler;
+import org.hotswap.agent.compiler.DynamicCompiler;
 import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 
@@ -23,17 +22,14 @@ public class CompileEngine {
         return INSTANCE;
     }
 
-    private DynamicCompiler dynamicCompiler;
-
     public void compile() throws Exception {
-        if (dynamicCompiler == null) {
-            dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
-        }
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         doCompile();
     }
 
     private void doCompile() throws Exception {
+        // 需要每次创建一个新的DynamicCompiler
+        DynamicCompiler dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
         long start = System.currentTimeMillis();
         List<File> javaFile = getJavaFile();
         LOGGER.info("compile {}", javaFile.stream().map(File::getName).collect(Collectors.joining(",")));

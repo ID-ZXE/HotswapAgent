@@ -1,4 +1,4 @@
-package com.taobao.arthas.compiler;
+package org.hotswap.agent.compiler;
 
 import javax.tools.*;
 import java.io.IOException;

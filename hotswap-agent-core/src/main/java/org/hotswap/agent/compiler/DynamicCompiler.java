@@ -1,6 +1,5 @@
-package com.taobao.arthas.compiler;
+package org.hotswap.agent.compiler;
 
-import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
@@ -15,7 +14,7 @@ import java.util.*;
 public class DynamicCompiler {
     private final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
     private final StandardJavaFileManager standardFileManager;
-    private final List<String> options = new ArrayList<String>();
+    private final List<String> options = new ArrayList<>();
     private final DynamicClassLoader dynamicClassLoader;
 
     private final Collection<JavaFileObject> compilationUnits = new ArrayList<JavaFileObject>();
@@ -35,9 +34,7 @@ public class DynamicCompiler {
         options.add("-Xlint:unchecked");
         options.add("-g");
 
-
         List<URL> urlList = new ArrayList<>();
-
 
         //添加自定义jar资源
         urlList.addAll(getCustomJarUrl());
@@ -46,7 +43,6 @@ public class DynamicCompiler {
 
         // 向上查找父类
         ClassLoader appClassLoader = classLoader.getParent();
-
         dynamicClassLoader = new DynamicClassLoader(urlList.toArray(new URL[0]), appClassLoader);
     }
 
@@ -90,7 +86,7 @@ public class DynamicCompiler {
         errors.clear();
         warnings.clear();
 
-        JavaFileManager fileManager = new com.taobao.arthas.compiler.DynamicJavaFileManager(standardFileManager, dynamicClassLoader);
+        JavaFileManager fileManager = new DynamicJavaFileManager(standardFileManager, dynamicClassLoader);
 
         DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<JavaFileObject>();
         JavaCompiler.CompilationTask task = javaCompiler.getTask(null, fileManager, collector, options, null,
