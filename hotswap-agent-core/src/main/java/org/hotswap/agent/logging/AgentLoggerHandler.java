@@ -18,6 +18,8 @@
  */
 package org.hotswap.agent.logging;
 
+import org.hotswap.agent.manager.AllExtensionsManager;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -48,8 +50,11 @@ public class AgentLoggerHandler {
     // print a message to System.out and optionally to custom stream
     protected void printMessage(String message) {
         String threadName = Thread.currentThread().getName();
-        String log = "HOTSWAP AGENT: " + threadName + " " + sdf.format(new Date()) + " " + message;
-        System.out.println(log);
+        String log = "YYR AGENT: " + threadName + " " + sdf.format(new Date()) + " " + message;
+        // 是否输出到console
+        if (AllExtensionsManager.getInstance().getLogToConsole()) {
+            System.out.println(log);
+        }
         if (outputStream != null)
             outputStream.println(log);
     }

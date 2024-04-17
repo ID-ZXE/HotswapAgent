@@ -100,4 +100,12 @@ public class AllExtensionsManager {
         return COMMON_PROPERTIES.getProperty(HotswapConstants.BASE_DIR_KEY);
     }
 
+    public Boolean getLogToConsole() {
+        try {
+            return Boolean.parseBoolean(COMMON_PROPERTIES.getProperty(HotswapConstants.LOG_TO_CONSOLE_KEY));
+        } catch (Exception ignore) {
+            return false;
+        }
+    }
+
 }

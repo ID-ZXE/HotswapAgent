@@ -52,7 +52,7 @@ public class DynamicCompiler {
         try {
             result.add(lombokJar.toURI().toURL());
         } catch (Exception e) {
-            LOGGER.error("lombok jar add to classpath failure", e);
+            LOGGER.error("custom jar add to classpath failure", e);
         }
         return result;
     }

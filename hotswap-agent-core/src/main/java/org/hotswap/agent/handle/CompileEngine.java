@@ -4,9 +4,11 @@ import org.hotswap.agent.compiler.DynamicCompiler;
 import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.util.classloader.URLClassPathHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,16 +20,34 @@ public class CompileEngine {
 
     private volatile Map<Class<?>, byte[]> reloadMap = null;
 
+    private static volatile boolean addedToolsJar = false;
+
     public static CompileEngine getInstance() {
         return INSTANCE;
     }
 
-    public void compile() throws Exception {
+    public long compile() throws Exception {
+        long start = System.currentTimeMillis();
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         doCompile();
+        return System.currentTimeMillis() - start;
+    }
+
+    private void addToolsJar() {
+        if (addedToolsJar) {
+            return;
+        }
+        addedToolsJar = true;
+        try {
+            File toolsJar = new File(AllExtensionsManager.getInstance().getBaseDirPath(), "tools.jar");
+            ClassLoader appClassLoader = AllExtensionsManager.getInstance().getClassLoader().getParent();
+            URLClassPathHelper.prependClassPath(appClassLoader, new URL[]{toolsJar.toURI().toURL()});
+        } catch (Exception ignore) {
+        }
     }
 
     private void doCompile() throws Exception {
+        addToolsJar();
         // 需要每次创建一个新的DynamicCompiler
         DynamicCompiler dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());
         long start = System.currentTimeMillis();
@@ -70,10 +90,21 @@ public class CompileEngine {
     }
 
     public void cleanOldClassFile() {
-        LOGGER.info("clean old class file");
+        File classPathDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
+        if (!classPathDir.exists()) {
+            LOGGER.info("创建extClassPath目录:{}", AllExtensionsManager.getInstance().getExtraClassPath());
+            boolean mkdirs = classPathDir.mkdirs();
+        }
+        File sourceDir = new File(AllExtensionsManager.getInstance().getSourceDirPath());
+        if (!sourceDir.exists()) {
+            LOGGER.info("创建source目录:{}", AllExtensionsManager.getInstance().getSourceDirPath());
+            boolean mkdirs = sourceDir.mkdirs();
+        }
+
         try {
             File classDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
             FileUtils.cleanDirectory(classDir);
+            LOGGER.info("clean old class file");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

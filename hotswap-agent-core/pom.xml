@@ -163,11 +163,31 @@
                                     <pattern>javaparser-core</pattern>
                                     <shadedPattern>org.hotswap.agent.javaparser</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>jackson-databind</pattern>
+                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jackson-core</pattern>
+                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jackson-annotations</pattern>
+                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>okhttp</pattern>
+                                    <shadedPattern>org.hotswap.agent.okhttp</shadedPattern>
+                                </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
                                     <include>commons-io:commons-io</include>
                                     <include>com.github.javaparser:javaparser-core</include>
+                                    <include>com.fasterxml.jackson.core:jackson-databind</include>
+                                    <include>com.fasterxml.jackson.core:jackson-core</include>
+                                    <include>com.fasterxml.jackson.core:jackson-annotations</include>
+                                    <include>com.squareup.okhttp3:okhttp</include>
                                 </includes>
                             </artifactSet>
                             <shadeSourcesContent>true</shadeSourcesContent>
@@ -187,6 +207,28 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.14.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.14.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

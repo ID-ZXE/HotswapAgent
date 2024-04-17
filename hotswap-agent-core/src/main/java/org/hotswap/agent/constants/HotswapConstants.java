@@ -11,5 +11,7 @@ public final class HotswapConstants {
 
     public static final String SOURCE_DIR_KEY = "sourceDir";
 
+    public static final String LOG_TO_CONSOLE_KEY = "ENABLE.LOGGER.Console";
+
 
 }
