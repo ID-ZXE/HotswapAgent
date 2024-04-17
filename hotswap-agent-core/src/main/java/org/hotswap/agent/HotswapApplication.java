@@ -69,6 +69,7 @@ public class HotswapApplication {
                 }
             });
 
+            // 单线程
             httpServer.setExecutor(Executors.newSingleThreadExecutor());
             httpServer.start();
         } catch (Exception e) {
@@ -79,7 +80,7 @@ public class HotswapApplication {
     /**
      * 开始热部署
      */
-    public long openChannel() throws Exception {
+    public synchronized long openChannel() throws Exception {
         long start = System.currentTimeMillis();
         // 启动监控线程
         ResultManager.start();
@@ -98,7 +99,7 @@ public class HotswapApplication {
     /**
      * 热部署结束
      */
-    public void markHotswapOver() {
+    public synchronized void markHotswapOver() {
         dispatcher.release();
         dispatcher.getCountDownLatch().countDown();
     }

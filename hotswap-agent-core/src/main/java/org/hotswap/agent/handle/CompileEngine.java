@@ -26,7 +26,7 @@ public class CompileEngine {
         return INSTANCE;
     }
 
-    public long compile() throws Exception {
+    public synchronized long compile() throws Exception {
         long start = System.currentTimeMillis();
         StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
         doCompile();
