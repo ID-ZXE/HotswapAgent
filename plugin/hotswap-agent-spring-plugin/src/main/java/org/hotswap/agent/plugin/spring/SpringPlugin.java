@@ -126,12 +126,12 @@ public class SpringPlugin {
         LOGGER.info("registry handler mappings");
     }
 
-    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY, FileEvent.CREATE})
-    public void registerResourceListeners(URL url) {
-        scheduler.scheduleCommand(new XmlsChangedCommand(appClassLoader, url, scheduler));
-        LOGGER.info("Scheduling Spring reload for XML '{}'", url);
-        scheduler.scheduleCommand(new SpringChangedReloadCommand(appClassLoader), SpringReloadConfig.reloadDelayMillis);
-    }
+//    @OnResourceFileEvent(path = "/", filter = ".*.xml", events = {FileEvent.MODIFY, FileEvent.CREATE})
+//    public void registerResourceListeners(URL url) {
+//        scheduler.scheduleCommand(new XmlsChangedCommand(appClassLoader, url, scheduler));
+//        LOGGER.info("Scheduling Spring reload for XML '{}'", url);
+//        scheduler.scheduleCommand(new SpringChangedReloadCommand(appClassLoader), SpringReloadConfig.reloadDelayMillis);
+//    }
 
     @OnResourceFileEvent(path = "/", filter = ".*.properties", events = {FileEvent.MODIFY, FileEvent.CREATE})
     public void registerPropertiesListeners(URL url) {
@@ -314,6 +314,7 @@ public class SpringPlugin {
         CtMethod method = ctClass.getDeclaredMethod("getMergedLocalBeanDefinition",
                 new CtClass[]{classPool.get("java.lang.String")});
 
+        // $_代表this引用
         // true 表示处理的是一个 finally 块，确保即使有返回语句，插入的代码也会执行
         method.insertAfter("{"
                 + "if ($_!=null) {"

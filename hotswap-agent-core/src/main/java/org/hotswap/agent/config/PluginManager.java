@@ -294,13 +294,13 @@ public class PluginManager {
                 definitions[i++] = new ClassDefinition(entry.getKey(), entry.getValue());
             }
             try {
-                LOGGER.reload("Reloading classes {} (autoHotswap)", Arrays.toString(classNames));
+                LOGGER.reload("重新载入类 {} ", Arrays.toString(classNames));
                 synchronized (hotswapLock) {
                     instrumentation.redefineClasses(definitions);
                 }
-                LOGGER.debug("... reloaded classes {} (autoHotswap)", Arrays.toString(classNames));
+                LOGGER.debug("... reloaded classes {}", Arrays.toString(classNames));
             } catch (Exception e) {
-                LOGGER.debug("... Fail to reload classes {} (autoHotswap), msg is {}", Arrays.toString(classNames), e);
+                LOGGER.debug("... Fail to reload classes {} , msg is {}", Arrays.toString(classNames), e);
                 throw new IllegalStateException("Unable to redefine classes", e);
             }
 

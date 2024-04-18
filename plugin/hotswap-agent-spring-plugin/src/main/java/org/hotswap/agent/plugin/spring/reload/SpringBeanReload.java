@@ -340,10 +340,10 @@ public class SpringBeanReload {
                     String[] names = beanFactory.getBeanNamesForType(clazz);
                     // if the class is not spring bean or Factory Class, remove it
                     if ((names == null || names.length == 0) && !isFactoryMethod(clazz)) {
-                        LOGGER.trace("the class '{}' is not spring bean or factory class", clazz.getName());
+                        LOGGER.info("the class '{}' is not spring bean or factory class", clazz.getName());
                         iterator.remove();
                     } else {
-                        LOGGER.debug("the class '{}' is spring bean or factory class", clazz.getName());
+                        LOGGER.info("the class '{}' is spring bean or factory class", clazz.getName());
                     }
                 }
             }
