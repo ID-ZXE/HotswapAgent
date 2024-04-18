@@ -308,5 +308,18 @@ public class SpringPlugin {
         method.insertBefore(src);
     }
 
+    // todo 验证有效性
+    @OnClassLoadEvent(classNameRegexp = "org.springframework.beans.factory.support.AbstractBeanFactory")
+    public static void patchPredictBeanType(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod method = ctClass.getDeclaredMethod("getMergedLocalBeanDefinition",
+                new CtClass[]{classPool.get("java.lang.String")});
+
+        // true 表示处理的是一个 finally 块，确保即使有返回语句，插入的代码也会执行
+        method.insertAfter("{"
+                + "if ($_!=null) {"
+                + "    isFactoryBean($1, $_);"
+                + "}"
+                + "}", true);
+    }
 
 }
