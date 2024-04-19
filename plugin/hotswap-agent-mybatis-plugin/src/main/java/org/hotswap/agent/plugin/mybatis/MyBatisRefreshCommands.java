@@ -26,6 +26,8 @@ import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
@@ -42,11 +44,13 @@ import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -83,12 +87,31 @@ public class MyBatisRefreshCommands {
         mapperScanner = scanner;
     }
 
+    public static void refreshModelField(Class<?> clazz) {
+        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
+        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
+            LOGGER.info("没有发现Configuration 停止更新Model Field缓存");
+            return;
+        }
+        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
+            try {
+                //移除实体类对应的映射器缓存
+                DefaultReflectorFactory reflectorFactory = (DefaultReflectorFactory) configurationProxy.getConfiguration().getReflectorFactory();
+                Field reflectorMapField = DefaultReflectorFactory.class.getDeclaredField("reflectorMap");
+                reflectorMapField.setAccessible(true);
+                @SuppressWarnings("unchecked") ConcurrentMap<Class<?>, Reflector> reflectorMap = (ConcurrentMap<Class<?>, Reflector>) reflectorMapField.get(reflectorFactory);
+                reflectorMap.remove(clazz);
+            } catch (Exception e) {
+                LOGGER.error("移除MyBatis Model Field 缓存失败", e);
+            }
+        }
+    }
+
     public static void refreshNewMapperClass(Class<?> clazz) {
         if (clazz == null || !clazz.isInterface()) {
             return;
         }
-        if (Objects.isNull(clazz.getAnnotation(Mapper.class))
-                && Objects.isNull(clazz.getAnnotation(Repository.class))) {
+        if (Objects.isNull(clazz.getAnnotation(Mapper.class)) && Objects.isNull(clazz.getAnnotation(Repository.class))) {
             return;
         }
         if (null == mapperScanner) {

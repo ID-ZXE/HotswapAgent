@@ -83,6 +83,9 @@ public class MyBatisPlugin {
             LOGGER.info("发现MyBatis Annotation Mapper变更 开始RELOAD:{}", clazz.getName());
             Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshAnnotationMapper", appClassLoader, clazz);
             scheduler.scheduleCommand(command, 500);
+        } else {
+            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshModelField", appClassLoader, clazz);
+            scheduler.scheduleCommand(command, 500);
         }
     }
 
