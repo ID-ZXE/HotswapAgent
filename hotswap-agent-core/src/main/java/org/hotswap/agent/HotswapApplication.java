@@ -3,13 +3,22 @@ package org.hotswap.agent;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.hotswap.agent.config.PluginManager;
+import org.hotswap.agent.handle.CompileEngine;
+import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.manager.ResultManager;
+import org.hotswap.agent.servlet.ReloadClassServlet;
 import org.hotswap.agent.servlet.ReloadJarServlet;
 import org.hotswap.agent.servlet.ReloadServlet;
 import org.hotswap.agent.servlet.UploadReloadFileServlet;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
+import java.util.concurrent.TimeUnit;
+
 public class HotswapApplication {
+
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapApplication.class);
 
     private EventDispatcher dispatcher;
 
@@ -32,13 +41,30 @@ public class HotswapApplication {
             server.setHandler(context);
 
             context.addServlet(new ServletHolder(new UploadReloadFileServlet()), "/uploadReloadFile");
+            context.addServlet(new ServletHolder(new ReloadClassServlet()), "/reloadClass");
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
-            context.addServlet(new ServletHolder(new ReloadServlet(dispatcher)), "/reload");
+            context.addServlet(new ServletHolder(new ReloadServlet()), "/reload");
 
             server.start();
         } catch (Exception e) {
             throw new RuntimeException("yyr-agent inner jetty server start failure", e);
         }
+    }
+
+    public long openChannel() throws Exception {
+        long start = System.currentTimeMillis();
+        // 启动监控线程
+        ResultManager.start();
+        dispatcher.openChannel();
+        // hotswap
+        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
+        // 等待执行结束
+        boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
+        if (timeout) {
+            LOGGER.info("hotswap timeout");
+            dispatcher.release();
+        }
+        return System.currentTimeMillis() - start;
     }
 
     /**

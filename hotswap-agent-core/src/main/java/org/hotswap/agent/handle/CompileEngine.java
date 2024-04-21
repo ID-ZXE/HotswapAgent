@@ -90,6 +90,11 @@ public class CompileEngine {
     }
 
     public void cleanOldClassFile() {
+        File basePathDir = new File(AllExtensionsManager.getInstance().getBaseDirPath());
+        if (!basePathDir.exists()) {
+            LOGGER.info("创建base目录:{}", AllExtensionsManager.getInstance().getBaseDirPath());
+            boolean mkdirs = basePathDir.mkdirs();
+        }
         File classPathDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
         if (!classPathDir.exists()) {
             LOGGER.info("创建extClassPath目录:{}", AllExtensionsManager.getInstance().getExtraClassPath());
@@ -100,10 +105,16 @@ public class CompileEngine {
             LOGGER.info("创建source目录:{}", AllExtensionsManager.getInstance().getSourceDirPath());
             boolean mkdirs = sourceDir.mkdirs();
         }
+        File jarDir = new File(AllExtensionsManager.getInstance().getJarDirPath());
+        if (!jarDir.exists()) {
+            LOGGER.info("创建jar目录:{}", AllExtensionsManager.getInstance().getJarDirPath());
+            boolean mkdirs = sourceDir.mkdirs();
+        }
 
         try {
-            File classDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
-            FileUtils.cleanDirectory(classDir);
+            FileUtils.cleanDirectory(classPathDir);
+            FileUtils.cleanDirectory(sourceDir);
+            FileUtils.cleanDirectory(jarDir);
             LOGGER.info("clean old class file");
         } catch (IOException e) {
             throw new RuntimeException(e);

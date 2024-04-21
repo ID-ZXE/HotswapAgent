@@ -1,7 +1,6 @@
 package org.hotswap.agent.servlet;
 
 
-import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.spring.util.StringUtils;
 
@@ -14,8 +13,6 @@ import java.io.*;
 @MultipartConfig
 @WebServlet(urlPatterns = "/reloadJar", name = "reloadJar")
 public class ReloadJarServlet extends AbstractHttpServlet {
-
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReloadJarServlet.class);
 
     public static final String MULTIPART_CONFIG_ELEMENT = "org.eclipse.jetty.multipartConfig";
 
