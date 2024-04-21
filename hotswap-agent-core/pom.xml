@@ -203,6 +203,10 @@
                                     <pattern>jetty-security</pattern>
                                     <shadedPattern>org.hotswap.agent.jetty-security</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>javax.servlet-api</pattern>
+                                    <shadedPattern>org.hotswap.agent.servlet-api</shadedPattern>
+                                </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
@@ -219,6 +223,7 @@
                                     <include>org.eclipse.jetty:jetty-http</include>
                                     <include>org.eclipse.jetty:jetty-io</include>
                                     <include>org.eclipse.jetty:jetty-security</include>
+                                    <include>javax.servlet:javax.servlet-api</include>
                                 </includes>
                             </artifactSet>
                             <shadeSourcesContent>true</shadeSourcesContent>

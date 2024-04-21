@@ -47,23 +47,20 @@ public abstract class AbstractHttpServlet extends HttpServlet {
             return;
         }
         writeJsonResp(resp, BaseResponse.build(result));
-        LOGGER.info("收到HTTP请求 SUCCESS, " +
-                        "uri:{} " +
-                        "body:{} " +
-                        "params:{} " +
-                        "result:{} " +
-                        "cost:{}",
-                req.getRequestURI(),
-                body,
-                JsonUtils.toString(req.getParameterMap()),
-                JsonUtils.toString(result),
-                System.currentTimeMillis() - start);
+
+        if (isPrintLog()) {
+            LOGGER.info("收到HTTP请求 SUCCESS, uri:{} body:{} params:{} result:{} cost:{}", req.getRequestURI(), body, JsonUtils.toString(req.getParameterMap()), JsonUtils.toString(result), System.currentTimeMillis() - start);
+        }
     }
 
     public abstract Object doExecute() throws Exception;
 
     protected boolean isUploadFile() {
         return false;
+    }
+
+    protected boolean isPrintLog() {
+        return true;
     }
 
     private String getRequestBody(HttpServletRequest req) throws IOException {

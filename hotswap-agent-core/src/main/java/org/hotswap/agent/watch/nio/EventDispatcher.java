@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.watch.WatchEventListener;
 import org.hotswap.agent.watch.WatchFileEvent;
 
@@ -134,7 +135,9 @@ public class EventDispatcher implements Runnable {
     private void reset() {
         try {
             // 删除源码文件
-            // FileUtils.cleanDirectory(new File(HotswapConstants.SOURCE_FILE_PATH));
+            FileUtils.cleanDirectory(new File(AllExtensionsManager.getInstance().getSourceDirPath()));
+            // 删除Jar文件
+            FileUtils.cleanDirectory(new File(AllExtensionsManager.getInstance().getJarDirPath()));
         } catch (Exception e) {
             LOGGER.error("reset failure", e);
         }

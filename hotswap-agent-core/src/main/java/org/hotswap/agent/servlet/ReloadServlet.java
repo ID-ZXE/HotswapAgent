@@ -3,14 +3,15 @@ package org.hotswap.agent.servlet;
 import org.hotswap.agent.HotswapApplication;
 import org.hotswap.agent.dto.ReloadResultDTO;
 import org.hotswap.agent.handle.CompileEngine;
-import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AgentLogManager;
 
 public class ReloadServlet extends AbstractHttpServlet {
 
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(ReloadServlet.class);
-
     @Override
     public synchronized Object doExecute() throws Exception {
+        // 清空日志
+        AgentLogManager.getInstance().cleanLog();
+
         ReloadResultDTO reloadResultDTO = new ReloadResultDTO();
         long start = System.currentTimeMillis();
         long compileCostTime = CompileEngine.getInstance().compile();
@@ -20,7 +21,6 @@ public class ReloadServlet extends AbstractHttpServlet {
         reloadResultDTO.setReloadCostTime(reloadCostTime);
         reloadResultDTO.setTotalCostTime(totalCostTime);
         reloadResultDTO.setSuccess(true);
-
         return reloadResultDTO;
     }
 

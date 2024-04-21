@@ -18,13 +18,16 @@
  */
 package org.hotswap.agent.logging;
 
+import org.hotswap.agent.manager.AgentLogManager;
 import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.util.spring.util.StringUtils;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Simple handler to log to output stream (default is system.out).
@@ -49,6 +52,7 @@ public class AgentLoggerHandler {
 
     // print a message to System.out and optionally to custom stream
     protected void printMessage(String message) {
+        AgentLogManager.getInstance().appendLog(message);
         String threadName = Thread.currentThread().getName();
         String log = "YYR AGENT: " + threadName + " " + sdf.format(new Date()) + " " + message;
         // 是否输出到console
@@ -64,6 +68,9 @@ public class AgentLoggerHandler {
         // replace {} in string with actual parameters
         String messageWithArgs = message;
         for (Object arg : args) {
+            if (Objects.equals(arg.toString(), "{}")) {
+                arg = "empty collection";
+            }
             int index = messageWithArgs.indexOf("{}");
             if (index >= 0) {
                 messageWithArgs = messageWithArgs.substring(0, index) + String.valueOf(arg) + messageWithArgs.substring(index + 2);

@@ -8,10 +8,7 @@ import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.manager.ResultManager;
-import org.hotswap.agent.servlet.ReloadClassServlet;
-import org.hotswap.agent.servlet.ReloadJarServlet;
-import org.hotswap.agent.servlet.ReloadServlet;
-import org.hotswap.agent.servlet.UploadReloadFileServlet;
+import org.hotswap.agent.servlet.*;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
 import java.util.concurrent.TimeUnit;
@@ -44,6 +41,7 @@ public class HotswapApplication {
             context.addServlet(new ServletHolder(new ReloadClassServlet()), "/reloadClass");
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
             context.addServlet(new ServletHolder(new ReloadServlet()), "/reload");
+            context.addServlet(new ServletHolder(new LogServlet()), "/log");
 
             server.start();
         } catch (Exception e) {
