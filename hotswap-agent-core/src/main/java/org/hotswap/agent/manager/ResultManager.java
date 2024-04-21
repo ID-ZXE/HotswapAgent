@@ -35,10 +35,10 @@ public class ResultManager {
 
     public static synchronized void addToResulManager(Command command, Thread thread) {
         if (!LOCK.isLocked()) {
-            LOGGER.info("add command:{} thread:{} to THREAD_LIST", command, thread.getName());
+            LOGGER.info("[agent] add command:{} thread:{} to THREAD_LIST", command, thread.getName());
             THREAD_LIST.add(thread);
         } else {
-            LOGGER.info("add command:{} thread:{} to SLOW_THREAD_LIST", command, thread.getName());
+            LOGGER.info("[agent] add command:{} thread:{} to SLOW_THREAD_LIST", command, thread.getName());
             SLOW_THREAD_LIST.add(thread);
         }
     }
@@ -56,7 +56,7 @@ public class ResultManager {
                 for (Thread thread : THREAD_LIST) {
                     // 等待所有线程执行完毕
                     thread.join(60 * 1000);
-                    LOGGER.info("{} finished", thread.getName());
+                    LOGGER.info("[agent] {} finished", thread.getName());
                 }
                 // Thread.sleep(3000);
                 int retry = 0;

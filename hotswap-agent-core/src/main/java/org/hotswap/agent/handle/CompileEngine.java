@@ -20,6 +20,8 @@ public class CompileEngine {
 
     private volatile Map<Class<?>, byte[]> reloadMap = null;
 
+    private volatile boolean isCompiling = false;
+
     private static volatile boolean addedToolsJar = false;
 
     public static CompileEngine getInstance() {
@@ -27,9 +29,14 @@ public class CompileEngine {
     }
 
     public long compile() throws Exception {
+        isCompiling = true;
         long start = System.currentTimeMillis();
-        StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
-        doCompile();
+        try {
+            StaticFieldHandler.generateStaticFieldInitMethod(getJavaFile());
+            doCompile();
+        } finally {
+            isCompiling = false;
+        }
         return System.currentTimeMillis() - start;
     }
 
@@ -127,4 +134,7 @@ public class CompileEngine {
         return new ArrayList<>(fileCollection);
     }
 
+    public boolean isCompiling() {
+        return isCompiling;
+    }
 }

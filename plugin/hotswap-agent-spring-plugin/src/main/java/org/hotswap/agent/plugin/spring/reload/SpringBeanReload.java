@@ -97,9 +97,9 @@ public class SpringBeanReload {
         synchronized (classes) {
             if (classes.add(clazz)) {
                 if (sameClass) {
-                    LOGGER.info("try to add changed class '{}' into {}", clazz.getName(), ObjectUtils.identityToString(beanFactory));
+                    LOGGER.info("[agent] try to add changed class '{}' into {}", clazz.getName(), ObjectUtils.identityToString(beanFactory));
                 } else {
-                    LOGGER.info("try to add changed class '{}({})' into {}", clazz.getName(), userClassSimpleName, ObjectUtils.identityToString(beanFactory));
+                    LOGGER.info("[agent] try to add changed class '{}({})' into {}", clazz.getName(), userClassSimpleName, ObjectUtils.identityToString(beanFactory));
                 }
             } else {
                 if (sameClass) {
@@ -340,10 +340,10 @@ public class SpringBeanReload {
                     String[] names = beanFactory.getBeanNamesForType(clazz);
                     // if the class is not spring bean or Factory Class, remove it
                     if ((names == null || names.length == 0) && !isFactoryMethod(clazz)) {
-                        LOGGER.info("the class '{}' is not spring bean or factory class", clazz.getName());
+                        LOGGER.info("[agent] the class '{}' is not spring bean or factory class", clazz.getName());
                         iterator.remove();
                     } else {
-                        LOGGER.info("the class '{}' is spring bean or factory class", clazz.getName());
+                        LOGGER.info("[agent] the class '{}' is spring bean or factory class", clazz.getName());
                     }
                 }
             }

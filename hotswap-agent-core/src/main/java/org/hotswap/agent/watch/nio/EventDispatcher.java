@@ -29,8 +29,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.constants.HotswapConstants;
-import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.watch.WatchEventListener;
@@ -117,6 +115,10 @@ public class EventDispatcher implements Runnable {
 
     public void closeChannel() {
         CHANNEL.compareAndSet(true, false);
+    }
+
+    public boolean channelIsOpen() {
+        return CHANNEL.get();
     }
 
     public CountDownLatch getCountDownLatch() {

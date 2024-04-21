@@ -99,7 +99,7 @@ public class TreeWatcherNIO extends AbstractNIO2Watcher {
      */
     @Override
     protected void registerAll(Path dir) throws IOException {
-        LOGGER.info("Registering directory {} ", dir);
+        LOGGER.info("[agent] Registering directory {} ", dir);
         register(dir);
     }
 }

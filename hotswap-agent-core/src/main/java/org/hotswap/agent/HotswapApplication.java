@@ -54,6 +54,7 @@ public class HotswapApplication {
         // 启动监控线程
         ResultManager.start();
         dispatcher.openChannel();
+        printBanner();
         // hotswap
         PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
         // 等待执行结束
@@ -71,6 +72,21 @@ public class HotswapApplication {
     public void markHotswapOver() {
         dispatcher.release();
         dispatcher.getCountDownLatch().countDown();
+    }
+
+    public boolean channelIsOpen() {
+        return dispatcher != null && dispatcher.channelIsOpen();
+    }
+
+    private static void printBanner() {
+        LOGGER.info("\n" +
+                "__     ____     _______        _    _  ____ _______ _______          __     _____  \n" +
+                " \\ \\   / /\\ \\   / /  __ \\      | |  | |/ __ \\__   __/ ____\\ \\        / /\\   |  __ \\ \n" +
+                "  \\ \\_/ /  \\ \\_/ /| |__) |_____| |__| | |  | | | | | (___  \\ \\  /\\  / /  \\  | |__) |\n" +
+                "   \\   /    \\   / |  _  /______|  __  | |  | | | |  \\___ \\  \\ \\/  \\/ / /\\ \\ |  ___/ \n" +
+                "    | |      | |  | | \\ \\      | |  | | |__| | | |  ____) |  \\  /\\  / ____ \\| |     \n" +
+                "    |_|      |_|  |_|  \\_\\     |_|  |_|\\____/  |_| |_____/    \\/  \\/_/    \\_\\_|     \n" +
+                "                                                                                    ");
     }
 
 }

@@ -52,9 +52,9 @@ public class AgentLoggerHandler {
 
     // print a message to System.out and optionally to custom stream
     protected void printMessage(String message) {
-        AgentLogManager.getInstance().appendLog(message);
         String threadName = Thread.currentThread().getName();
         String log = "YYR AGENT: " + threadName + " " + sdf.format(new Date()) + " " + message;
+        AgentLogManager.getInstance().appendLog(log);
         // 是否输出到console
         if (AllExtensionsManager.getInstance().getLogToConsole()) {
             System.out.println(log);

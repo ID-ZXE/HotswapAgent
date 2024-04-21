@@ -1,5 +1,8 @@
 package org.hotswap.agent.manager;
 
+import org.hotswap.agent.HotswapApplication;
+import org.hotswap.agent.handle.CompileEngine;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +22,11 @@ public class AgentLogManager {
     }
 
     public void appendLog(String log) {
-        if (log.contains("AbstractHttpServlet")) {
+        boolean isLog = HotswapApplication.getInstance().channelIsOpen() || CompileEngine.getInstance().isCompiling();
+        if (!isLog) {
+            return;
+        }
+        if (log.contains("[agent]")) {
             return;
         }
 
