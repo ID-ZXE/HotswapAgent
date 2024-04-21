@@ -100,6 +100,15 @@ public class AllExtensionsManager {
         return COMMON_PROPERTIES.getProperty(HotswapConstants.BASE_DIR_KEY);
     }
 
+    public String getJarDirPath() {
+        return COMMON_PROPERTIES.getProperty(HotswapConstants.JAR_DIR_KEY);
+    }
+
+    public Integer getEmbedJettyPort() {
+        String port = COMMON_PROPERTIES.getProperty(HotswapConstants.EMBED_JETTY_PORT);
+        return Integer.parseInt(port);
+    }
+
     public Boolean getLogToConsole() {
         try {
             return Boolean.parseBoolean(COMMON_PROPERTIES.getProperty(HotswapConstants.LOG_TO_CONSOLE_KEY));

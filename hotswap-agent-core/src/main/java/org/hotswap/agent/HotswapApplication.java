@@ -1,27 +1,18 @@
 package org.hotswap.agent;
 
-import com.sun.net.httpserver.HttpServer;
-import org.hotswap.agent.config.PluginManager;
-import org.hotswap.agent.dto.BaseResponse;
-import org.hotswap.agent.dto.ReloadResultDTO;
-import org.hotswap.agent.handle.AbstractHttpHandler;
-import org.hotswap.agent.handle.CompileEngine;
-import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.manager.ResultManager;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.servlet.ReloadJarServlet;
+import org.hotswap.agent.servlet.ReloadServlet;
 import org.hotswap.agent.watch.nio.EventDispatcher;
-
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class HotswapApplication {
 
     private EventDispatcher dispatcher;
 
     private static final HotswapApplication INSTANCE = new HotswapApplication();
-
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(HotswapApplication.class);
 
     public static HotswapApplication getInstance() {
         return INSTANCE;
@@ -33,67 +24,19 @@ public class HotswapApplication {
 
     public void start() {
         try {
-            HttpServer httpServer = HttpServer.create(new InetSocketAddress(10888), 0);
+            Server server = new Server(AllExtensionsManager.getInstance().getEmbedJettyPort());
 
-            httpServer.createContext("/hotswap/uploadFilesToClasspath", new AbstractHttpHandler() {
-                @Override
-                public Object execute() {
-                    HashMap<Object, Object> result = new HashMap<>();
-                    result.put("name", "xxx");
-                    return result;
-                }
-            });
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/hotswap");
+            server.setHandler(context);
 
-            httpServer.createContext("/hotswap/reloadJar", new AbstractHttpHandler() {
-                @Override
-                public Object execute() {
-                    HashMap<Object, Object> result = new HashMap<>();
-                    result.put("name", "xxx");
-                    return result;
-                }
-            });
+            context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
+            context.addServlet(new ServletHolder(new ReloadServlet(dispatcher)), "/reload");
 
-            httpServer.createContext("/hotswap/reload", new AbstractHttpHandler() {
-                @Override
-                public Object execute() throws Exception {
-                    ReloadResultDTO reloadResultDTO = new ReloadResultDTO();
-                    long start = System.currentTimeMillis();
-                    long compileCostTime = CompileEngine.getInstance().compile();
-                    long reloadCostTime = openChannel();
-                    long totalCostTime = System.currentTimeMillis() - start;
-                    reloadResultDTO.setCompileCostTime(compileCostTime);
-                    reloadResultDTO.setReloadCostTime(reloadCostTime);
-                    reloadResultDTO.setTotalCostTime(totalCostTime);
-                    reloadResultDTO.setSuccess(true);
-                    return BaseResponse.build(reloadResultDTO);
-                }
-            });
-
-            // 单线程
-            httpServer.setExecutor(Executors.newSingleThreadExecutor());
-            httpServer.start();
+            server.start();
         } catch (Exception e) {
-            LOGGER.error("HotswapApplication start failure!!!", e);
+            throw new RuntimeException("yyr-agent inner jetty server start failure", e);
         }
-    }
-
-    /**
-     * 开始热部署
-     */
-    public long openChannel() throws Exception {
-        long start = System.currentTimeMillis();
-        // 启动监控线程
-        ResultManager.start();
-        dispatcher.openChannel();
-        // hotswap
-        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
-        // 等待执行结束
-        boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
-        if (timeout) {
-            LOGGER.info("hotswap timeout");
-            dispatcher.release();
-        }
-        return System.currentTimeMillis() - start;
     }
 
     /**

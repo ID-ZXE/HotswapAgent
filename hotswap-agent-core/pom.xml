@@ -179,6 +179,30 @@
                                     <pattern>okhttp</pattern>
                                     <shadedPattern>org.hotswap.agent.okhttp</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>jetty-server</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-server</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jetty-servlet</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-servlet</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jetty-util</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-util</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jetty-http</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-http</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jetty-io</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-io</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jetty-security</pattern>
+                                    <shadedPattern>org.hotswap.agent.jetty-security</shadedPattern>
+                                </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
@@ -188,6 +212,13 @@
                                     <include>com.fasterxml.jackson.core:jackson-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-annotations</include>
                                     <include>com.squareup.okhttp3:okhttp</include>
+                                    <!-- jetty -->
+                                    <include>org.eclipse.jetty:jetty-server</include>
+                                    <include>org.eclipse.jetty:jetty-servlet</include>
+                                    <include>org.eclipse.jetty:jetty-util</include>
+                                    <include>org.eclipse.jetty:jetty-http</include>
+                                    <include>org.eclipse.jetty:jetty-io</include>
+                                    <include>org.eclipse.jetty:jetty-security</include>
                                 </includes>
                             </artifactSet>
                             <shadeSourcesContent>true</shadeSourcesContent>
@@ -207,6 +238,17 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.4.54.v20240208</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>9.4.54.v20240208</version>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

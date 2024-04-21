@@ -9,9 +9,12 @@ public final class HotswapConstants {
 
     public static final String BASE_DIR_KEY = "baseDir";
 
+    public static final String JAR_DIR_KEY = "jarDir";
+
     public static final String SOURCE_DIR_KEY = "sourceDir";
 
-    public static final String LOG_TO_CONSOLE_KEY = "ENABLE.LOGGER.Console";
+    public static final String EMBED_JETTY_PORT = "embedJettyPort";
 
+    public static final String LOG_TO_CONSOLE_KEY = "ENABLE.LOGGER.Console";
 
 }

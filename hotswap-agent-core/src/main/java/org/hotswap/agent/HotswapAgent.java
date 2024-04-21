@@ -18,10 +18,9 @@
  */
 package org.hotswap.agent;
 
-import org.hotswap.agent.constants.HotswapConstants;
+import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.config.PluginManager;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.Version;
 import org.hotswap.agent.watch.nio.AbstractNIO2Watcher;
