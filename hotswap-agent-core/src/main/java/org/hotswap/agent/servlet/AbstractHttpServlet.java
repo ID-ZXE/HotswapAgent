@@ -47,7 +47,17 @@ public abstract class AbstractHttpServlet extends HttpServlet {
             return;
         }
         writeJsonResp(resp, BaseResponse.build(result));
-        LOGGER.info("收到HTTP请求 SUCCESS, uri:{} body:{} params:{} result:{} cost:{}", req.getRequestURI(), body, JsonUtils.toString(req.getParameterMap()), JsonUtils.toString(result), System.currentTimeMillis() - start);
+        LOGGER.info("收到HTTP请求 SUCCESS, " +
+                        "uri:{} " +
+                        "body:{} " +
+                        "params:{} " +
+                        "result:{} " +
+                        "cost:{}",
+                req.getRequestURI(),
+                body,
+                JsonUtils.toString(req.getParameterMap()),
+                JsonUtils.toString(result),
+                System.currentTimeMillis() - start);
     }
 
     public abstract Object doExecute() throws Exception;

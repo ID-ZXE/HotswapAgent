@@ -65,7 +65,7 @@ public class SpringBootPlugin {
     @OnClassLoadEvent(classNameRegexp = "org.springframework.boot.SpringApplication")
     public static void register(ClassLoader appClassLoader, CtClass clazz, ClassPool classPool) throws CannotCompileException, NotFoundException {
         StringBuilder src = new StringBuilder("{");
-        // init a spring plugin with every appclassloader
+        // init a spring plugin with every app classloader
         src.append(PluginManagerInvoker.buildInitializePlugin(SpringBootPlugin.class));
         src.append(PluginManagerInvoker.buildCallPluginMethod(SpringBootPlugin.class, "init", "org.springframework.boot.SpringBootVersion.getVersion()", String.class.getName()));
         src.append("}");

@@ -53,7 +53,7 @@ public final class JsonUtils {
 
     public static String toString(Object obj) {
         if (obj == null) {
-            return null;
+            return "";
         }
         try {
             return MAPPER.writeValueAsString(obj);

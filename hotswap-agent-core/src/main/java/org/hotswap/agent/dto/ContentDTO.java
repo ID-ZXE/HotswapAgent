@@ -10,7 +10,9 @@ public class ContentDTO {
 
     private String profile;
 
-    private String classpath;
+    private String lane;
+
+    private Boolean toClasspath;
 
     public Map<String, String> getContent() {
         return content;
@@ -36,11 +38,19 @@ public class ContentDTO {
         this.profile = profile;
     }
 
-    public String getClasspath() {
-        return classpath;
+    public String getLane() {
+        return lane;
     }
 
-    public void setClasspath(String classpath) {
-        this.classpath = classpath;
+    public void setLane(String lane) {
+        this.lane = lane;
+    }
+
+    public Boolean getToClasspath() {
+        return toClasspath;
+    }
+
+    public void setToClasspath(Boolean toClasspath) {
+        this.toClasspath = toClasspath;
     }
 }

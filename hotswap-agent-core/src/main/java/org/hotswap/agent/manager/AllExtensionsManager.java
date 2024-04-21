@@ -1,13 +1,12 @@
 package org.hotswap.agent.manager;
 
+import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-
-import static org.hotswap.agent.config.PluginConfiguration.PLUGIN_CONFIGURATION;
 
 public class AllExtensionsManager {
 
@@ -19,9 +18,20 @@ public class AllExtensionsManager {
 
     private volatile boolean hasPrependClassPath = false;
 
+    /**
+     * 应用名称 取自spring.application.name
+     */
     private volatile String app;
 
+    /**
+     * 环境、Spring Profile
+     */
     private volatile String profile;
+
+    /**
+     * 泳道
+     */
+    private volatile String lane;
 
     private volatile Properties COMMON_PROPERTIES = new Properties();
 
@@ -79,7 +89,7 @@ public class AllExtensionsManager {
 
     public void initProperties() {
         COMMON_PROPERTIES = new Properties();
-        URL configurationURL = ClassLoader.getSystemResource(PLUGIN_CONFIGURATION);
+        URL configurationURL = ClassLoader.getSystemResource(PluginConfiguration.PLUGIN_CONFIGURATION);
         try {
             COMMON_PROPERTIES.load(configurationURL.openStream());
             COMMON_PROPERTIES.putAll(System.getProperties());

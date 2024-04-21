@@ -6,6 +6,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.servlet.ReloadJarServlet;
 import org.hotswap.agent.servlet.ReloadServlet;
+import org.hotswap.agent.servlet.UploadReloadFileServlet;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
 public class HotswapApplication {
@@ -30,6 +31,7 @@ public class HotswapApplication {
             context.setContextPath("/hotswap");
             server.setHandler(context);
 
+            context.addServlet(new ServletHolder(new UploadReloadFileServlet()), "/uploadReloadFile");
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
             context.addServlet(new ServletHolder(new ReloadServlet(dispatcher)), "/reload");
 
