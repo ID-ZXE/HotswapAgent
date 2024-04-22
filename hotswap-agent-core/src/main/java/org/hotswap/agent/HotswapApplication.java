@@ -11,6 +11,7 @@ import org.hotswap.agent.manager.ResultManager;
 import org.hotswap.agent.servlet.*;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class HotswapApplication {

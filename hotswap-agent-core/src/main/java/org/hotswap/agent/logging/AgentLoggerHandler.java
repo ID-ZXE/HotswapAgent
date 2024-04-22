@@ -63,12 +63,14 @@ public class AgentLoggerHandler {
             outputStream.println(log);
     }
 
-    public void print(Class clazz, AgentLogger.Level level, String message, Throwable throwable, Object... args) {
+    public void print(Class<?> clazz, AgentLogger.Level level, String message, Throwable throwable, Object... args) {
 
         // replace {} in string with actual parameters
         String messageWithArgs = message;
         for (Object arg : args) {
-            if (Objects.equals(arg.toString(), "{}")) {
+            if (arg == null) {
+                arg = "null";
+            } else if (Objects.equals(arg.toString(), "{}")) {
                 arg = "empty collection";
             }
             int index = messageWithArgs.indexOf("{}");

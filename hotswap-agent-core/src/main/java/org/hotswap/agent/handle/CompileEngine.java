@@ -96,6 +96,10 @@ public class CompileEngine {
         return this.reloadMap;
     }
 
+    public void setCompileResult(Map<Class<?>, byte[]> reloadMap) {
+        this.reloadMap = reloadMap;
+    }
+
     public void cleanOldClassFile() {
         File basePathDir = new File(AllExtensionsManager.getInstance().getBaseDirPath());
         if (!basePathDir.exists()) {
@@ -137,4 +141,9 @@ public class CompileEngine {
     public boolean isCompiling() {
         return isCompiling;
     }
+
+    public void setIsCompiling(boolean isCompiling) {
+        this.isCompiling = isCompiling;
+    }
+
 }

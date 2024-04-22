@@ -22,7 +22,8 @@ public class AgentLogManager {
     }
 
     public void appendLog(String log) {
-        boolean isLog = HotswapApplication.getInstance().channelIsOpen() || CompileEngine.getInstance().isCompiling();
+        boolean isLog = HotswapApplication.getInstance().channelIsOpen()
+                || CompileEngine.getInstance().isCompiling();
         if (!isLog) {
             return;
         }
