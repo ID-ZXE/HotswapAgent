@@ -69,7 +69,13 @@ public class CompileEngine {
             dynamicCompiler.addSource(name, sourceCode);
         }
 
-        Map<String, byte[]> byteCodes = dynamicCompiler.buildByteCodes();
+        Map<String, byte[]> byteCodes;
+        try {
+            byteCodes = dynamicCompiler.buildByteCodes();
+        } catch (Exception e) {
+            LOGGER.error("编译失败", e);
+            throw e;
+        }
 
         // 全部写入文件系统
         for (Map.Entry<String, byte[]> entry : byteCodes.entrySet()) {

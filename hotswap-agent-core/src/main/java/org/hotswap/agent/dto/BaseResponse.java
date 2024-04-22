@@ -27,11 +27,10 @@ public class BaseResponse<T> {
         return new BaseResponse<>(data);
     }
 
-    public static <T> BaseResponse<T> fail(T data) {
-        BaseResponse<T> res = new BaseResponse<>(data);
+    public static <T> BaseResponse<T> fail(String message) {
+        BaseResponse<T> res = new BaseResponse<>();
         res.code = "-1";
-        res.message = "failure";
-        res.setData(data);
+        res.message = message;
         return res;
     }
 
@@ -39,7 +38,7 @@ public class BaseResponse<T> {
         return code;
     }
 
-    public String getMsg() {
+    public String getMessage() {
         return message;
     }
 

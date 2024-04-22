@@ -36,20 +36,20 @@ public abstract class AbstractHttpServlet extends HttpServlet {
         this.req = req;
         this.resp = resp;
         Object result = null;
+        BaseResponse<Object> response;
         try {
             if (!isUploadFile()) {
                 body = getRequestBody(req);
             }
             result = doExecute();
+            response = BaseResponse.build(result);
         } catch (Exception e) {
-            writeJsonResp(resp, BaseResponse.fail(e.getMessage()));
-            LOGGER.error("[agent]收到HTTP请求 FAILURE, uri:{} body:{} params:{} result:{} cost:{}", e, req.getRequestURI(), body, JsonUtils.toString(req.getParameterMap()), JsonUtils.toString(result), System.currentTimeMillis() - start);
-            return;
+            response = BaseResponse.fail(e.getMessage());
         }
-        writeJsonResp(resp, BaseResponse.build(result));
 
+        writeJsonResp(resp, response);
         if (isPrintLog()) {
-            LOGGER.info("[agent]收到HTTP请求 SUCCESS, uri:{} body:{} params:{} result:{} cost:{}", req.getRequestURI(), body, JsonUtils.toString(req.getParameterMap()), JsonUtils.toString(result), System.currentTimeMillis() - start);
+            LOGGER.info("[agent]收到HTTP请求 uri:{} body:{} params:{} result:{} cost:{}", req.getRequestURI(), body, JsonUtils.toString(req.getParameterMap()), JsonUtils.toString(response), System.currentTimeMillis() - start);
         }
     }
 
