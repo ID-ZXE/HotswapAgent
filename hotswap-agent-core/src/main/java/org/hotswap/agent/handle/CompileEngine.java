@@ -22,7 +22,7 @@ public class CompileEngine {
 
     private volatile boolean isCompiling = false;
 
-    private static volatile boolean addedToolsJar = false;
+    private volatile boolean addedToolsJar = false;
 
     public static CompileEngine getInstance() {
         return INSTANCE;
@@ -54,6 +54,7 @@ public class CompileEngine {
     }
 
     private void doCompile() throws Exception {
+        LOGGER.info("Java远程编译器初始化");
         addToolsJar();
         // 需要每次创建一个新的DynamicCompiler
         DynamicCompiler dynamicCompiler = new DynamicCompiler(AllExtensionsManager.getInstance().getClassLoader());

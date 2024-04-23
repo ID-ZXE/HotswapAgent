@@ -14,7 +14,7 @@ import java.util.jar.JarInputStream;
 
 public class JarUtils {
 
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(AllExtensionsManager.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(JarUtils.class);
 
     public static Map<String, byte[]> loadJarFile(File jarFile) {
         Map<String, byte[]> resultMap = new HashMap<>();

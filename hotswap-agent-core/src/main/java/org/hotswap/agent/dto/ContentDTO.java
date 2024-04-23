@@ -1,10 +1,13 @@
 package org.hotswap.agent.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class ContentDTO {
 
     private Map<String, String> content;
+
+    private List<byte[]> classes;
 
     private String app;
 
@@ -52,5 +55,13 @@ public class ContentDTO {
 
     public void setToClasspath(Boolean toClasspath) {
         this.toClasspath = toClasspath;
+    }
+
+    public List<byte[]> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(List<byte[]> classes) {
+        this.classes = classes;
     }
 }

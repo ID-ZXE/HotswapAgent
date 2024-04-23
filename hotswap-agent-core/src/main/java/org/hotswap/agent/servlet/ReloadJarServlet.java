@@ -58,6 +58,7 @@ public class ReloadJarServlet extends AbstractHttpServlet {
             long reloadCostTime = HotswapApplication.getInstance().openChannel();
             reloadResultDTO.setTotalCostTime(System.currentTimeMillis() - start);
             reloadResultDTO.setReloadCostTime(reloadCostTime);
+            reloadResultDTO.setSuccess(true);
         } finally {
             CompileEngine.getInstance().setIsCompiling(false);
         }
