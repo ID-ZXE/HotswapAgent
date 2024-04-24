@@ -237,8 +237,7 @@ public class SpringBeanReload {
         if (value == null) {
             return false;
         }
-        if (value.startsWith(PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX) &&
-                value.endsWith(PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX)) {
+        if (value.startsWith(PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX) && value.endsWith(PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX)) {
             return true;
         }
         return false;
@@ -265,8 +264,7 @@ public class SpringBeanReload {
             ClassUtils.overrideThreadContextClassLoader(origContextClassLoader);
             beanFactoryAssistant.increaseReloadTimes();
             BeanFactoryProcessor.setAllowBeanDefinitionOverriding(beanFactory, allowBeanDefinitionOverriding);
-            LOGGER.info("##### [{}th] finish reloading '{}', it cost {}ms", beanFactoryAssistant.getReloadTimes(),
-                    ObjectUtils.identityToString(beanFactory), System.currentTimeMillis() - now);
+            LOGGER.info("##### [{}th] finish reloading '{}', it cost {}ms", beanFactoryAssistant.getReloadTimes(), ObjectUtils.identityToString(beanFactory), System.currentTimeMillis() - now);
         }
     }
 
@@ -340,6 +338,13 @@ public class SpringBeanReload {
                     String[] names = beanFactory.getBeanNamesForType(clazz);
                     // if the class is not spring bean or Factory Class, remove it
                     if ((names == null || names.length == 0) && !isFactoryMethod(clazz)) {
+                        try {
+                            if (clazz.getSimpleName().endsWith("Test")) {
+                                Method runRemoteTest = clazz.getMethod("runRemoteTest");
+                                // LOGGER.error("请检查所需要执行的远程单元测试的package是否在springboot工程的base package路径下");
+                            }
+                        } catch (Exception ignore) {
+                        }
                         LOGGER.info("[agent] the class '{}' is not spring bean or factory class", clazz.getName());
                         iterator.remove();
                     } else {
@@ -348,14 +353,16 @@ public class SpringBeanReload {
                 }
             }
         }
-        return checkHasChange();
+        return
+
+                checkHasChange();
+
     }
 
     private boolean isFactoryMethod(Class<?> clazz) {
         for (String beanName : beanFactory.getBeanDefinitionNames()) {
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-            if (beanDefinition.getFactoryMethodName() != null && beanDefinition.getBeanClassName() != null &&
-                    clazz.getName().equals(beanDefinition.getBeanClassName())) {
+            if (beanDefinition.getFactoryMethodName() != null && beanDefinition.getBeanClassName() != null && clazz.getName().equals(beanDefinition.getBeanClassName())) {
                 return true;
             }
         }
@@ -368,8 +375,7 @@ public class SpringBeanReload {
     }
 
     private boolean checkHasChange() {
-        if (properties.isEmpty() && classes.isEmpty() && xmls.isEmpty() && newScanBeanDefinitions.isEmpty()
-                && yamls.isEmpty() && changedBeanNames.isEmpty()) {
+        if (properties.isEmpty() && classes.isEmpty() && xmls.isEmpty() && newScanBeanDefinitions.isEmpty() && yamls.isEmpty() && changedBeanNames.isEmpty()) {
             LOGGER.trace("no change, ignore reloading '{}'", ObjectUtils.identityToString(beanFactory));
             return false;
         }
@@ -404,14 +410,12 @@ public class SpringBeanReload {
     }
 
     private void reloadXmlBeanDefinitions(boolean propertiesChanged) {
-        Set<String> result = XmlBeanDefinitionScannerAgent.reloadXmlsAndGetBean(beanFactory, propertiesChanged,
-                beanFactoryAssistant.placeHolderXmlMapping, beansToProcess, xmls);
+        Set<String> result = XmlBeanDefinitionScannerAgent.reloadXmlsAndGetBean(beanFactory, propertiesChanged, beanFactoryAssistant.placeHolderXmlMapping, beansToProcess, xmls);
         processedBeans.addAll(result);
     }
 
     private void refreshChangedClassesAndBeans() {
-        LOGGER.debug("refresh changed classes and beans of {}, classes:{}, changedBeans:{}",
-                ObjectUtils.identityToString(beanFactory), classes, changedBeanNames);
+        LOGGER.debug("refresh changed classes and beans of {}, classes:{}, changedBeans:{}", ObjectUtils.identityToString(beanFactory), classes, changedBeanNames);
         Set<String> configurationBeansToReload = new HashSet<>();
         // we should refresh changed classes before refresh changed beans.
         // after refresh class, maybe we will add some changed beans into changedBeanNames
@@ -559,8 +563,7 @@ public class SpringBeanReload {
                 beanName = beanName.substring(1);
             }
             BeanDefinition beanDefinition = BeanFactoryProcessor.getBeanDefinition(beanFactory, beanName);
-            if (AnnotationHelper.hasAnnotation(realClass, "org.springframework.context.annotation.Configuration")
-                    && beanDefinition.getAttribute("org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass") != null) {
+            if (AnnotationHelper.hasAnnotation(realClass, "org.springframework.context.annotation.Configuration") && beanDefinition.getAttribute("org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass") != null) {
                 configurationBeansToReload.add(beanName);
                 String generateBeanName = beanNameGenerator.generateBeanName(beanDefinition, beanFactory);
                 // the beanName is not the same as generateBeanName, it should register a new bean definition and remove the old one.
@@ -599,12 +602,10 @@ public class SpringBeanReload {
             return false;
         }
         if (beanDefinition.getBeanClassName() != null && destroyClasses.contains(beanDefinition.getBeanClassName())) {
-            LOGGER.debug("the bean '{}' of factory class '{}' is changed", beanName,
-                    beanDefinition.getBeanClassName());
+            LOGGER.debug("the bean '{}' of factory class '{}' is changed", beanName, beanDefinition.getBeanClassName());
             return true;
         } else if (beanDefinition.getFactoryBeanName() != null && processedBeans.contains(beanDefinition.getFactoryBeanName())) {
-            LOGGER.debug("the bean '{}' of factory bean '{}' is changed", beanName,
-                    beanDefinition.getFactoryBeanName());
+            LOGGER.debug("the bean '{}' of factory bean '{}' is changed", beanName, beanDefinition.getFactoryBeanName());
             return true;
         }
         return false;
@@ -631,8 +632,7 @@ public class SpringBeanReload {
             destroyClasses.add(ClassUtils.getUserClass(singletonObject).getName());
         }
         // dubbo不进行销毁
-        if (singletonObject != null &&
-                Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
+        if (singletonObject != null && Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
             LOGGER.info("Dubbo Service:{} 不执行重建", beanName);
             return;
         }
@@ -676,12 +676,9 @@ public class SpringBeanReload {
         }
     }
 
-    private static void invokePostProcessorRegistrationDelegate(DefaultListableBeanFactory factory) throws NoSuchMethodException,
-            ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-        Class<?> clazz = Class.forName("org.springframework.context.support.PostProcessorRegistrationDelegate",
-                true, factory.getClass().getClassLoader());
-        Method method = clazz.getDeclaredMethod("invokeBeanFactoryPostProcessors",
-                ConfigurableListableBeanFactory.class, List.class);
+    private static void invokePostProcessorRegistrationDelegate(DefaultListableBeanFactory factory) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+        Class<?> clazz = Class.forName("org.springframework.context.support.PostProcessorRegistrationDelegate", true, factory.getClass().getClassLoader());
+        Method method = clazz.getDeclaredMethod("invokeBeanFactoryPostProcessors", ConfigurableListableBeanFactory.class, List.class);
         method.setAccessible(true);
         method.invoke(null, factory, Collections.emptyList());
     }
@@ -693,8 +690,7 @@ public class SpringBeanReload {
             try {
                 pp.postProcessBeanDefinitionRegistry(factory);
             } catch (Exception e) {
-                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}",
-                        pp.getClass().getName(), e.getMessage());
+                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}", pp.getClass().getName(), e.getMessage());
             }
             pp.postProcessBeanDefinitionRegistry(factory);
         }
@@ -704,8 +700,7 @@ public class SpringBeanReload {
             try {
                 pp.postProcessBeanFactory(factory);
             } catch (Exception e) {
-                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}",
-                        pp.getClass().getName(), e.getMessage());
+                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}", pp.getClass().getName(), e.getMessage());
                 LOGGER.trace("Failed to invoke BeanDefinitionRegistryPostProcessor", e);
             }
         }
@@ -719,8 +714,7 @@ public class SpringBeanReload {
             try {
                 pp.postProcessBeanFactory(factory);
             } catch (Exception e) {
-                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}",
-                        pp.getClass().getName(), e.getMessage());
+                LOGGER.debug("Failed to invoke BeanDefinitionRegistryPostProcessor: {}, reason:{}", pp.getClass().getName(), e.getMessage());
                 LOGGER.trace("Failed to invoke BeanDefinitionRegistryPostProcessor", e);
             }
         }

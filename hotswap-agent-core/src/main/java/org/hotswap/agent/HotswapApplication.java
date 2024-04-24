@@ -43,6 +43,7 @@ public class HotswapApplication {
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
             context.addServlet(new ServletHolder(new ReloadServlet()), "/reload");
             context.addServlet(new ServletHolder(new LogServlet()), "/log");
+            context.addServlet(new ServletHolder(new RemoteServlet()), "/remote/test");
 
             server.start();
         } catch (Exception e) {

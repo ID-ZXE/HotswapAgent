@@ -164,6 +164,10 @@
                                     <shadedPattern>org.hotswap.agent.javaparser</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>javaparser-symbol-solver-core</pattern>
+                                    <shadedPattern>org.hotswap.agent.javaparser-symbol-solver-core</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>jackson-databind</pattern>
                                     <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
                                 </relocation>
@@ -212,6 +216,7 @@
                                 <includes>
                                     <include>commons-io:commons-io</include>
                                     <include>com.github.javaparser:javaparser-core</include>
+                                    <include>com.github.javaparser:javaparser-symbol-solver-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-databind</include>
                                     <include>com.fasterxml.jackson.core:jackson-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-annotations</include>
@@ -281,9 +286,15 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core</artifactId>
+            <version>3.25.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-symbol-solver-core</artifactId>
             <version>3.25.8</version>
         </dependency>
 
