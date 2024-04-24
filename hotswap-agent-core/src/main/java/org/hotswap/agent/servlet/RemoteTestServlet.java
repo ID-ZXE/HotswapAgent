@@ -23,7 +23,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class RemoteServlet extends AbstractHttpServlet {
+public class RemoteTestServlet extends AbstractHttpServlet {
 
     @Override
     public Object doExecute() throws Exception {
@@ -96,7 +96,11 @@ public class RemoteServlet extends AbstractHttpServlet {
             indexMethod.setType(StaticJavaParser.parseType("void"));
             StringBuilder body = new StringBuilder("{");
             for (String s : method) {
-                body.append(s).append("()").append(";").append("\n");
+                body.append("try {");
+                body.append(s).append("()").append(";");
+                body.append("} catch(Exception e) {");
+                body.append("e.printStackTrace();");
+                body.append("}");
             }
             body.append("}");
 

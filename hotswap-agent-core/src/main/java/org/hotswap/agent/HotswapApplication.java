@@ -11,7 +11,6 @@ import org.hotswap.agent.manager.ResultManager;
 import org.hotswap.agent.servlet.*;
 import org.hotswap.agent.watch.nio.EventDispatcher;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class HotswapApplication {
@@ -43,7 +42,7 @@ public class HotswapApplication {
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
             context.addServlet(new ServletHolder(new ReloadServlet()), "/reload");
             context.addServlet(new ServletHolder(new LogServlet()), "/log");
-            context.addServlet(new ServletHolder(new RemoteServlet()), "/remote/test");
+            context.addServlet(new ServletHolder(new RemoteTestServlet()), "/remote/test");
 
             server.start();
         } catch (Exception e) {
