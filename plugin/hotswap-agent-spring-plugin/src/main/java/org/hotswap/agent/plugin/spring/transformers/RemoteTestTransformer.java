@@ -23,27 +23,29 @@ public class RemoteTestTransformer {
                         return;
                     }
 
+                    String realName = method.getName().replace(HotswapConstants.REMOTE_TEST_METHOD_PREFIX, "");
+
                     boolean isVoid = method.getReturnType().equals(CtClass.voidType);
                     if (isVoid) {
-                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");");
-                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "执行结束\");");
+                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + realName + "开始执行\");");
+                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + realName + "执行结束\");");
 
                         CtClass ex = ClassPool.getDefault().get("java.lang.Exception");
                         method.addCatch("{ "
-                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + method.getName() + "执行出现异常\", $e);"
+                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + realName + "执行出现异常\", $e);"
                                 + "return;" +
                                 "}", ex);
                     } else {
-                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");");
-                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "执行结束,返回结果:{}\", $_);");
+                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + realName + "开始执行\");");
+                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + realName + "执行结束,返回结果:{}\", $_);");
 
                         CtClass ex = ClassPool.getDefault().get("java.lang.Exception");
                         method.addCatch("{ "
-                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + method.getName() + "执行出现异常\", $e);"
+                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + realName + "执行出现异常\", $e);"
                                 + "return null;" +
                                 "}", ex);
                     }
-                    LOGGER.info("patch remote test method {} success", method.getName());
+                    LOGGER.info("patch remote test method {} success", realName);
                 }
             }
         } catch (Exception e) {
