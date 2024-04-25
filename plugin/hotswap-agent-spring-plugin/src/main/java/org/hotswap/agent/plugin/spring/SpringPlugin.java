@@ -70,7 +70,8 @@ import org.hotswap.agent.watch.Watcher;
                 PostProcessorRegistrationDelegateTransformer.class,
                 BeanFactoryTransformer.class,
                 InitDestroyAnnotationBeanPostProcessorTransformer.class,
-                DubboTransformer.class})
+                DubboTransformer.class,
+                RemoteTestTransformer.class})
 public class SpringPlugin {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringPlugin.class);
 

@@ -14,6 +14,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import org.apache.commons.io.FileUtils;
 import org.hotswap.agent.HotswapApplication;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.dto.ContentDTO;
 import org.hotswap.agent.handle.CompileEngine;
 import org.hotswap.agent.manager.AllExtensionsManager;
@@ -92,7 +93,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
 
         // 新增init方法
         if (!method.isEmpty()) {
-            MethodDeclaration indexMethod = classDeclaration.addMethod("runRemoteTest", Modifier.Keyword.PUBLIC);
+            MethodDeclaration indexMethod = classDeclaration.addMethod(HotswapConstants.RUN_REMOTE_METHOD_NAME, Modifier.Keyword.PUBLIC);
             indexMethod.setType(StaticJavaParser.parseType("void"));
             StringBuilder body = new StringBuilder("{");
             for (String s : method) {
