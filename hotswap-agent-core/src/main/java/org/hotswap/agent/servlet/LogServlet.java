@@ -14,6 +14,11 @@ public class LogServlet extends AbstractHttpServlet {
     }
 
     @Override
+    protected boolean needGlobalLock() {
+        return false;
+    }
+
+    @Override
     protected boolean isPrintLog() {
         return false;
     }

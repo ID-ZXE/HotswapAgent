@@ -36,6 +36,7 @@ public class CompileEngine {
             doCompile();
         } finally {
             isCompiling = false;
+            cleanSourceFile();
         }
         return System.currentTimeMillis() - start;
     }
@@ -49,7 +50,8 @@ public class CompileEngine {
             File toolsJar = new File(AllExtensionsManager.getInstance().getBaseDirPath(), "tools.jar");
             ClassLoader appClassLoader = AllExtensionsManager.getInstance().getClassLoader().getParent();
             URLClassPathHelper.prependClassPath(appClassLoader, new URL[]{toolsJar.toURI().toURL()});
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            throw new RuntimeException("tools.jar初始化失败", e);
         }
     }
 
@@ -134,6 +136,16 @@ public class CompileEngine {
             FileUtils.cleanDirectory(sourceDir);
             FileUtils.cleanDirectory(jarDir);
             LOGGER.info("clean old class file");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void cleanSourceFile() {
+        try {
+            File sourceDir = new File(AllExtensionsManager.getInstance().getSourceDirPath());
+            FileUtils.cleanDirectory(sourceDir);
+            LOGGER.info("clean source file");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

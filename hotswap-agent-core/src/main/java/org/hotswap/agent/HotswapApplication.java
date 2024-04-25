@@ -76,7 +76,7 @@ public class HotswapApplication {
      * 热部署结束
      */
     public void markHotswapOver() {
-        dispatcher.release();
+        // dispatcher.release();
         dispatcher.getCountDownLatch().countDown();
     }
 

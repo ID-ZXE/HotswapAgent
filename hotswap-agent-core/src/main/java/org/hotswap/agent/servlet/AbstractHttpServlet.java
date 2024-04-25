@@ -2,6 +2,7 @@ package org.hotswap.agent.servlet;
 
 import org.hotswap.agent.dto.BaseResponse;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.JsonUtils;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractHttpServlet extends HttpServlet {
 
@@ -37,7 +39,15 @@ public abstract class AbstractHttpServlet extends HttpServlet {
         this.resp = resp;
         Object result = null;
         BaseResponse<Object> response;
+        boolean locked = false;
         try {
+            if (needGlobalLock()) {
+                locked = AllExtensionsManager.getInstance().getReentrantLock().tryLock(100, TimeUnit.MILLISECONDS);
+                if (!locked) {
+                    throw new RuntimeException("当前正在热部署或远程单测执行中，请稍后重试");
+                }
+            }
+
             if (!isUploadFile()) {
                 body = getRequestBody(req);
             }
@@ -45,6 +55,11 @@ public abstract class AbstractHttpServlet extends HttpServlet {
             response = BaseResponse.build(result);
         } catch (Exception | Error e) {
             response = BaseResponse.fail(e.getMessage());
+        } finally {
+            // 如果加锁成功 则释放
+            if (locked) {
+                AllExtensionsManager.getInstance().getReentrantLock().unlock();
+            }
         }
 
         writeJsonResp(resp, response);
@@ -54,6 +69,10 @@ public abstract class AbstractHttpServlet extends HttpServlet {
     }
 
     public abstract Object doExecute() throws Exception;
+
+    protected boolean needGlobalLock() {
+        return true;
+    }
 
     protected boolean isUploadFile() {
         return false;

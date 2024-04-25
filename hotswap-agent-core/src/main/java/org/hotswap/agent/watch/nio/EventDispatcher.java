@@ -18,6 +18,12 @@
  */
 package org.hotswap.agent.watch.nio;
 
+import org.apache.commons.io.FileUtils;
+import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.watch.WatchEventListener;
+import org.hotswap.agent.watch.WatchFileEvent;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
@@ -27,12 +33,6 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.commons.io.FileUtils;
-import org.hotswap.agent.logging.AgentLogger;
-import org.hotswap.agent.manager.AllExtensionsManager;
-import org.hotswap.agent.watch.WatchEventListener;
-import org.hotswap.agent.watch.WatchFileEvent;
 
 /**
  * The EventDispatcher holds a queue of all events collected by the watcher but
@@ -136,8 +136,6 @@ public class EventDispatcher implements Runnable {
 
     private void reset() {
         try {
-            // 删除源码文件
-            FileUtils.cleanDirectory(new File(AllExtensionsManager.getInstance().getSourceDirPath()));
             // 删除Jar文件
             FileUtils.cleanDirectory(new File(AllExtensionsManager.getInstance().getJarDirPath()));
         } catch (Exception e) {

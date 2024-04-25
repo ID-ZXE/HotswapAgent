@@ -42,10 +42,18 @@ public class RemoteTestServlet extends AbstractHttpServlet {
             for (Map.Entry<String, String> entry : contentMap.entrySet()) {
                 byte[] decode = Base64.getDecoder().decode(entry.getValue());
                 File file = new File(AllExtensionsManager.getInstance().getSourceDirPath(), entry.getKey());
-                FileUtils.write(file, transferTest(new String(decode)), StandardCharsets.UTF_8, false);
+                String code = transferTest(new String(decode));
+                LOGGER.info("rebuild remote test java class\n {}", code);
+                FileUtils.write(file, code, StandardCharsets.UTF_8, false);
             }
 
-            CompileEngine.getInstance().compile();
+            try {
+                CompileEngine.getInstance().compile();
+            } catch (Exception e) {
+                LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "编译失败", e);
+                throw e;
+            }
+
             HotswapApplication.getInstance().openChannel();
         } finally {
             AgentLogManager.getInstance().setRemoteTesting(false);
@@ -65,8 +73,13 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         Optional<PackageDeclaration> packageDeclarationOptional = compilationUnit.getPackageDeclaration();
         if (packageDeclarationOptional.isPresent()) {
             PackageDeclaration packageDeclaration = packageDeclarationOptional.get();
-            LOGGER.info(HotswapConstants.REMOTE_TEST_TAG + "当前执行单测的package为:{},请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况", packageDeclaration.getName());
+            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "当前执行单测的package为:{}", packageDeclaration.getName());
+            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
+            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
+            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
         }
+        LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "单测执行时间过长会导致IDEA插件端接口超时，若超时请前往服务器自行查看日志");
+        LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请自行设置TraceID");
 
         // 遍历所有ImportDeclaration节点
         Iterator<ImportDeclaration> importIterator = compilationUnit.getImports().iterator();
@@ -83,14 +96,18 @@ public class RemoteTestServlet extends AbstractHttpServlet {
 
 
         // 创建@Component注解
-        NormalAnnotationExpr annotationExpr = new NormalAnnotationExpr();
-        annotationExpr.setName("org.springframework.stereotype.Component");
+        NormalAnnotationExpr component = new NormalAnnotationExpr();
+        component.setName("org.springframework.stereotype.Component");
+
+        NormalAnnotationExpr slf4j = new NormalAnnotationExpr();
+        slf4j.setName("lombok.extern.slf4j.Slf4j");
 
         // 移除其他注解
         classDeclaration.getAnnotations().clear();
 
         // 添加@Component注解到类上
-        classDeclaration.addAnnotation(annotationExpr);
+        classDeclaration.addAnnotation(component);
+        classDeclaration.addAnnotation(slf4j);
 
         // 检查方法是否有@Test注解
         List<String> method = new ArrayList<>();
@@ -100,7 +117,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
             for (AnnotationExpr expr : declaration.getAnnotations()) {
                 if (expr.getNameAsString().equals("Test")) {
                     if (!declaration.getParameters().isEmpty()) {
-                        LOGGER.info(HotswapConstants.REMOTE_TEST_TAG + "Test方法:{}存在入参, 不执行", methodName);
+                        LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "Test方法:{}存在入参, 不执行", methodName);
                         continue;
                     }
                     method.add(declaration.getName().toString());

@@ -7,12 +7,15 @@ import org.hotswap.agent.logging.AgentLogger;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AllExtensionsManager {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(AllExtensionsManager.class);
 
     private static final AllExtensionsManager INSTANCE = new AllExtensionsManager();
+
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
     private volatile ClassLoader classLoader;
 
@@ -34,6 +37,10 @@ public class AllExtensionsManager {
     private volatile String lane;
 
     private volatile Properties COMMON_PROPERTIES = new Properties();
+
+    public ReentrantLock getReentrantLock() {
+        return reentrantLock;
+    }
 
     public static AllExtensionsManager getInstance() {
         return INSTANCE;
