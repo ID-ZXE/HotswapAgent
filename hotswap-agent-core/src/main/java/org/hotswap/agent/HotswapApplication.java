@@ -42,6 +42,7 @@ public class HotswapApplication {
             context.addServlet(new ServletHolder(new ReloadJarServlet()), "/reloadJar");
             context.addServlet(new ServletHolder(new ReloadServlet()), "/reload");
             context.addServlet(new ServletHolder(new LogServlet()), "/log");
+            context.addServlet(new ServletHolder(new RemoteTestLogServlet()), "/remoteTestLog");
             context.addServlet(new ServletHolder(new RemoteTestServlet()), "/remote/test");
 
             server.start();
@@ -52,16 +53,20 @@ public class HotswapApplication {
 
     public long openChannel() throws Exception {
         long start = System.currentTimeMillis();
-        // 启动监控线程
-        ResultManager.start();
-        dispatcher.openChannel();
-        printBanner();
-        // hotswap
-        PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
-        // 等待执行结束
-        boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
-        if (timeout) {
-            LOGGER.info("hotswap timeout");
+        try {
+            // 启动监控线程
+            ResultManager.start();
+            dispatcher.openChannel();
+            printBanner();
+            // hotswap
+            PluginManager.getInstance().hotswap(CompileEngine.getInstance().getCompileResult());
+            // 等待执行结束
+            boolean timeout = !dispatcher.getCountDownLatch().await(3L, TimeUnit.MINUTES);
+            if (timeout) {
+                LOGGER.info("hotswap timeout");
+                dispatcher.release();
+            }
+        } finally {
             dispatcher.release();
         }
         return System.currentTimeMillis() - start;

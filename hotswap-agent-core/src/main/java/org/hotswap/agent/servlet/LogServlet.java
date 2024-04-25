@@ -9,8 +9,8 @@ public class LogServlet extends AbstractHttpServlet {
 
     @Override
     public Object doExecute() throws Exception {
-        LOGGER.info("[agent] 客户端拉取日志");
-        return AgentLogManager.getInstance().getFirstLog(10);
+        LOGGER.info("[agent] 客户端拉取agent日志");
+        return AgentLogManager.getInstance().getFirstAgentLog(10);
     }
 
     @Override

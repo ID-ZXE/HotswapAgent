@@ -43,7 +43,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
             }
             result = doExecute();
             response = BaseResponse.build(result);
-        } catch (Exception e) {
+        } catch (Exception | Error e) {
             response = BaseResponse.fail(e.getMessage());
         }
 

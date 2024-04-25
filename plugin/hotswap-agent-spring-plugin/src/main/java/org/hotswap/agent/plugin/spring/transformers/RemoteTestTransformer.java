@@ -5,6 +5,7 @@ import org.hotswap.agent.annotation.OnClassLoadEvent;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.javassist.*;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.util.JsonUtils;
 
 public class RemoteTestTransformer {
 
@@ -18,24 +19,31 @@ public class RemoteTestTransformer {
             if (runRemoteTest != null) {
                 CtMethod[] methods = clazz.getDeclaredMethods();
                 for (CtMethod method : methods) {
-                    LOGGER.info("patch remote test method {}", method.getName());
+                    if (!method.getName().startsWith(HotswapConstants.REMOTE_TEST_METHOD_PREFIX)) {
+                        return;
+                    }
 
-                    //method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");");
+                    boolean isVoid = method.getReturnType().equals(CtClass.voidType);
+                    if (isVoid) {
+                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");");
+                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "执行结束\");");
 
-                    CtClass ex = ClassPool.getDefault().get("java.lang.Exception");
-                    method.addCatch("{ System.out.println($e);throw $e;}", ex);
+                        CtClass ex = ClassPool.getDefault().get("java.lang.Exception");
+                        method.addCatch("{ "
+                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + method.getName() + "执行出现异常\", $e);"
+                                + "return;" +
+                                "}", ex);
+                    } else {
+                        method.insertBefore(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");");
+                        method.insertAfter(RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "执行结束,返回结果:{}\", $_);");
 
-                    // 创建新的 try-catch 块
-//                    String tryCatchBody = "try {\n" +
-//                            RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "开始执行\");" +
-//                            "    $_ = $proceed($$);\n" +
-//                            RemoteTestTransformer.class.getName() + ".remoteInfoLog(\"远程单测：" + method.getName() + "执行成功\");" +
-//                            "} catch (Exception e) {\n" +
-//                            RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + method.getName() + "执行出现异常\", e);" +
-//                            "}";
-
-                    // 修改方法体
-//                    method.setBody(tryCatchBody);
+                        CtClass ex = ClassPool.getDefault().get("java.lang.Exception");
+                        method.addCatch("{ "
+                                + RemoteTestTransformer.class.getName() + ".remoteErrorLog(\"远程单测：" + method.getName() + "执行出现异常\", $e);"
+                                + "return null;" +
+                                "}", ex);
+                    }
+                    LOGGER.info("patch remote test method {} success", method.getName());
                 }
             }
         } catch (Exception e) {
@@ -46,6 +54,10 @@ public class RemoteTestTransformer {
 
     public static void remoteInfoLog(String message) {
         LOGGER.info(HotswapConstants.REMOTE_TEST_TAG + message);
+    }
+
+    public static void remoteInfoLog(String message, Object obj) {
+        LOGGER.info(HotswapConstants.REMOTE_TEST_TAG + message, JsonUtils.toString(obj));
     }
 
     public static void remoteErrorLog(String message, Throwable throwable) {

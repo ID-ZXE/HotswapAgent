@@ -19,6 +19,8 @@ public final class HotswapConstants {
 
     public static final String RUN_REMOTE_METHOD_NAME = "runRemoteTest";
 
+    public static final String REMOTE_TEST_METHOD_PREFIX = "remoteTest_";
+
     public static final String REMOTE_TEST_TAG = "[remote-test]\t";
 
 }
