@@ -23,6 +23,8 @@ import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AgentLogManager;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.JsonUtils;
+import org.hotswap.agent.util.spring.util.CollectionUtils;
+import org.hotswap.agent.util.spring.util.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -37,12 +39,23 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         AgentLogManager.getInstance().setRemoteTesting(true);
         try {
             ContentDTO contentDTO = JsonUtils.toObject(body, ContentDTO.class);
-            Map<String, String> contentMap = contentDTO.getContent();
+            Map<String, String> codeMap = contentDTO.getContent();
 
-            for (Map.Entry<String, String> entry : contentMap.entrySet()) {
+            String methodName = "";
+            if (!CollectionUtils.isEmpty(contentDTO.getExtraData())) {
+                methodName = contentDTO.getExtraData().get("remoteTestMethodName");
+            }
+
+            for (Map.Entry<String, String> entry : codeMap.entrySet()) {
                 byte[] decode = Base64.getDecoder().decode(entry.getValue());
                 File file = new File(AllExtensionsManager.getInstance().getSourceDirPath(), entry.getKey());
-                String code = transferTest(new String(decode));
+                String code = transferTest(new String(decode), methodName);
+
+                // 未找到需要执行的测试用例
+                if (StringUtils.isEmpty(code)) {
+                    return null;
+                }
+
                 LOGGER.info("rebuild remote test java class\n {}", code);
                 FileUtils.write(file, code, StandardCharsets.UTF_8, false);
             }
@@ -61,7 +74,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         return null;
     }
 
-    public String transferTest(String testCode) {
+    public String transferTest(String testCode, String needRunMethodName) {
         // 解析Java文件
         JavaParser javaParser = new JavaParser();
         ParseResult<CompilationUnit> result = javaParser.parse(testCode);
@@ -86,14 +99,15 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         while (importIterator.hasNext()) {
             ImportDeclaration importDeclaration = importIterator.next();
             String importName = importDeclaration.getNameAsString();
-            if (importName.startsWith("org.junit") || importName.startsWith("org.springframework.boot.test") || importName.startsWith("org.springframework.test")) {
+            if (importName.startsWith("org.junit")
+                    || importName.startsWith("org.springframework.boot.test")
+                    || importName.startsWith("org.springframework.test")) {
                 importIterator.remove();
             }
         }
 
         // 获取类声明
         ClassOrInterfaceDeclaration classDeclaration = (ClassOrInterfaceDeclaration) compilationUnit.getType(0);
-
 
         // 创建@Component注解
         NormalAnnotationExpr component = new NormalAnnotationExpr();
@@ -120,9 +134,20 @@ public class RemoteTestServlet extends AbstractHttpServlet {
                         LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "Test方法:{}存在入参, 不执行", methodName);
                         continue;
                     }
-                    method.add(declaration.getName().toString());
+
+                    if (!StringUtils.isEmpty(needRunMethodName)
+                            && Objects.equals(needRunMethodName, methodName.asString())) {
+                        method.add(declaration.getName().toString());
+                    } else {
+                        method.add(declaration.getName().toString());
+                    }
                 }
             }
+        }
+
+        if (CollectionUtils.isEmpty(method)) {
+            LOGGER.error("未找到需要执行的远程单元测试！！！");
+            return "";
         }
 
         // 删除Test注解

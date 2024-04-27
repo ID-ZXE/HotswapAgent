@@ -17,6 +17,8 @@ public class ContentDTO {
 
     private Boolean toClasspath;
 
+    private Map<String, String> extraData;
+
     public Map<String, String> getContent() {
         return content;
     }
@@ -63,5 +65,13 @@ public class ContentDTO {
 
     public void setClasses(List<byte[]> classes) {
         this.classes = classes;
+    }
+
+    public Map<String, String> getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(Map<String, String> extraData) {
+        this.extraData = extraData;
     }
 }
