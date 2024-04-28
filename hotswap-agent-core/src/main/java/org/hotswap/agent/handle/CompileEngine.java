@@ -117,18 +117,18 @@ public class CompileEngine {
         }
         File classPathDir = new File(AllExtensionsManager.getInstance().getExtraClassPath());
         if (!classPathDir.exists()) {
-            LOGGER.info("创建extClassPath目录:{}", AllExtensionsManager.getInstance().getExtraClassPath());
             boolean mkdirs = classPathDir.mkdirs();
+            LOGGER.info("创建extClassPath目录:{} result:{}", AllExtensionsManager.getInstance().getExtraClassPath(), mkdirs);
         }
         File sourceDir = new File(AllExtensionsManager.getInstance().getSourceDirPath());
         if (!sourceDir.exists()) {
-            LOGGER.info("创建source目录:{}", AllExtensionsManager.getInstance().getSourceDirPath());
             boolean mkdirs = sourceDir.mkdirs();
+            LOGGER.info("创建source目录:{} result:{}", AllExtensionsManager.getInstance().getSourceDirPath(), mkdirs);
         }
         File jarDir = new File(AllExtensionsManager.getInstance().getJarDirPath());
         if (!jarDir.exists()) {
-            LOGGER.info("创建jar目录:{}", AllExtensionsManager.getInstance().getJarDirPath());
-            boolean mkdirs = sourceDir.mkdirs();
+            boolean mkdirs = jarDir.mkdirs();
+            LOGGER.info("创建jar目录:{} result:{}", AllExtensionsManager.getInstance().getJarDirPath(), mkdirs);
         }
 
         try {

@@ -1,12 +1,19 @@
 package org.hotswap.agent.manager;
 
+import okhttp3.HttpUrl;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.constants.HotswapConstants;
+import org.hotswap.agent.dto.BaseResponse;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.util.HttpUtils;
+import org.hotswap.agent.util.IpUtils;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AllExtensionsManager {
@@ -30,11 +37,6 @@ public class AllExtensionsManager {
      * 环境、Spring Profile
      */
     private volatile String profile;
-
-    /**
-     * 泳道
-     */
-    private volatile String lane;
 
     private volatile Properties COMMON_PROPERTIES = new Properties();
 
@@ -87,11 +89,38 @@ public class AllExtensionsManager {
 
     public void setProfile(String... profiles) {
         if (profiles.length == 0) {
+            this.profile = "default";
             LOGGER.info("profile not exists, set profile is default");
-            return;
+        } else {
+            this.profile = profiles[0];
+            LOGGER.info("profile is {} ", profile);
         }
-        this.profile = profiles[0];
-        LOGGER.info("profile is {} ", profile);
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(() -> {
+            try {
+                registerInfo();
+            } catch (Exception e) {
+                LOGGER.error("register route error", e);
+            }
+        }, 0, 20, TimeUnit.SECONDS);
+    }
+
+    private void registerInfo() {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://localhost:8080/hotswap/register").newBuilder();
+        String lane = System.getProperty("lane", "default");
+
+        urlBuilder.addQueryParameter("app", this.app);
+        urlBuilder.addQueryParameter("profile", this.profile);
+        urlBuilder.addQueryParameter("lane", System.getProperty("lane", "default"));
+        urlBuilder.addQueryParameter("ip", IpUtils.getLocalIp());
+
+        BaseResponse<?> response = HttpUtils.get(urlBuilder.build(), BaseResponse.class);
+        if (response == null || !response.isSuccess()) {
+            LOGGER.error("registerInfo failure app:{}, profile:{}, lane:{}, ip:{}", this.app, this.profile, lane, IpUtils.getLocalIp());
+        } else {
+            LOGGER.info("registerInfo success app:{}, profile:{}, lane:{}, ip:{}", this.app, this.profile, lane, IpUtils.getLocalIp());
+        }
     }
 
     public void initProperties() {

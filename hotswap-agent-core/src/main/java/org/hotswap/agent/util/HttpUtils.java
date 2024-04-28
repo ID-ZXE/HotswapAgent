@@ -1,5 +1,7 @@
 package org.hotswap.agent.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -11,6 +13,62 @@ import java.net.URL;
 import java.nio.file.Files;
 
 public final class HttpUtils {
+
+    private static final OkHttpClient client = new OkHttpClient();
+
+    public static <T> T get(String url, Class<T> clazz) {
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    throw new RuntimeException();
+                }
+                String resultStr = response.body().string();
+                return JsonUtils.toObject(resultStr, clazz);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T get(HttpUrl url, Class<T> clazz) {
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    throw new RuntimeException();
+                }
+                String resultStr = response.body().string();
+                return JsonUtils.toObject(resultStr, clazz);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T get(HttpUrl url, TypeReference<T> typeReference) {
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    throw new RuntimeException();
+                }
+                String resultStr = response.body().string();
+                return JsonUtils.toObject(resultStr, typeReference);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void downloadUrl(String url, String dir) {
         // 创建OkHttpClient实例
