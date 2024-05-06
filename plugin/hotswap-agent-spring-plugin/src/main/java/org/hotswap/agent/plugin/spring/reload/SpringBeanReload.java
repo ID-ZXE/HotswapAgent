@@ -315,7 +315,7 @@ public class SpringBeanReload {
         // 10 reset mvc initialized, it will update the mapping of url and handler
         refreshRequestMapping();
         // 处理dubbo reference
-        DubboReferenceAnnotationProcessor.reset(beanFactory, beansToProcess, newBeanNames);
+        DubboProcessor.reset(beanFactory, beansToProcess, newBeanNames);
         // 11 clear all process cache
         clearLocalCache();
     }

@@ -300,7 +300,7 @@ public class PluginManager {
                 }
                 LOGGER.debug("... reloaded classes {}", Arrays.toString(classNames));
             } catch (Exception e) {
-                LOGGER.debug("... Fail to reload classes {} , msg is {}", Arrays.toString(classNames), e);
+                LOGGER.error("... Fail to reload classes {} , msg is {}", Arrays.toString(classNames), e);
                 throw new IllegalStateException("Unable to redefine classes", e);
             }
 
