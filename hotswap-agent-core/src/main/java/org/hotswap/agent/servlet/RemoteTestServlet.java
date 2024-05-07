@@ -86,12 +86,11 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         Optional<PackageDeclaration> packageDeclarationOptional = compilationUnit.getPackageDeclaration();
         if (packageDeclarationOptional.isPresent()) {
             PackageDeclaration packageDeclaration = packageDeclarationOptional.get();
-            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "当前执行单测的package为:{}", packageDeclaration.getName());
-            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
-            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
-            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请确保与SpringBoot的Application类的basePackage一致,否则可能出现单测不执行的情况");
+            // 改写package
+            packageDeclaration.setName(AllExtensionsManager.getInstance().getSpringbootBasePackage());
         }
         LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "单测执行时间过长会导致IDEA插件端接口超时，若超时请前往服务器自行查看日志");
+        LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "超时时间为2min");
         LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "请自行设置TraceID");
 
         // 遍历所有ImportDeclaration节点
@@ -161,6 +160,9 @@ public class RemoteTestServlet extends AbstractHttpServlet {
             MethodDeclaration indexMethod = classDeclaration.addMethod(HotswapConstants.RUN_REMOTE_METHOD_NAME, Modifier.Keyword.PUBLIC);
             indexMethod.setType(StaticJavaParser.parseType("void"));
             StringBuilder body = new StringBuilder("{");
+            body.append("Thread thread = new Thread(new Runnable() {\n" +
+                    "                @Override\n" +
+                    "                public void run() {");
             for (String s : method) {
                 body.append("try {");
                 body.append(s).append("()").append(";");
@@ -168,6 +170,9 @@ public class RemoteTestServlet extends AbstractHttpServlet {
                 body.append("e.printStackTrace();");
                 body.append("}");
             }
+            body.append("}});\n" +
+                    "            thread.start();" +
+                    "            thread.join(2 * 60 * 1000);");
             body.append("}");
 
             BlockStmt blockStmt = StaticJavaParser.parseBlock(body.toString());

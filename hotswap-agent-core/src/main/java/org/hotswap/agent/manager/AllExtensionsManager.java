@@ -26,6 +26,8 @@ public class AllExtensionsManager {
 
     private volatile ClassLoader classLoader;
 
+    private volatile String springbootBasePackage;
+
     private volatile boolean hasPrependClassPath = false;
 
     /**
@@ -104,6 +106,15 @@ public class AllExtensionsManager {
                 LOGGER.error("register route error", e);
             }
         }, 0, 20, TimeUnit.SECONDS);
+    }
+
+    public void setSpringbootBasePackage(String springbootClass) {
+        this.springbootBasePackage = springbootClass.substring(0, springbootClass.lastIndexOf("."));
+        LOGGER.info("springbootBasePackage is {}", this.springbootBasePackage);
+    }
+
+    public String getSpringbootBasePackage() {
+        return springbootBasePackage;
     }
 
     private void registerInfo() {

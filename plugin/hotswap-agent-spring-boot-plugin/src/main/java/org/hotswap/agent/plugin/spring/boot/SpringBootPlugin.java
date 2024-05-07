@@ -50,6 +50,7 @@ public class SpringBootPlugin {
 
     private final AtomicBoolean isInit = new AtomicBoolean(false);
 
+
     public void init() {
         if (isInit.compareAndSet(false, true)) {
             LOGGER.info("Spring Boot plugin initialized");
@@ -81,6 +82,12 @@ public class SpringBootPlugin {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         LOGGER.info("registrySpringBootClassLoader contextClassLoader:{}", contextClassLoader);
         AllExtensionsManager.getInstance().setClassLoader(contextClassLoader);
+
+        CtMethod runMethod = clazz.getDeclaredMethod("run", new CtClass[]{classPool.get("java.lang.Class"),
+                classPool.get("java.lang.String[]")});
+        runMethod.insertBefore("{" + AllExtensionsManager.class.getName() +
+                ".getInstance().setSpringbootBasePackage($1.getName());" +
+                "}");
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.core.env.AbstractEnvironment")
