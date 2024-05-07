@@ -83,6 +83,19 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         }
         CompilationUnit compilationUnit = result.getResult().get();
 
+        // 获取类声明
+        ClassOrInterfaceDeclaration classDeclaration = (ClassOrInterfaceDeclaration) compilationUnit.getType(0);
+        if (!classDeclaration.getExtendedTypes().isEmpty()) {
+            LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "远程单测无法执行");
+            LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "请删除继承结构");
+            return "";
+        }
+        if (!classDeclaration.getImplementedTypes().isEmpty()) {
+            LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "远程单测无法执行");
+            LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "请删除接口结构");
+            return "";
+        }
+
         Optional<PackageDeclaration> packageDeclarationOptional = compilationUnit.getPackageDeclaration();
         if (packageDeclarationOptional.isPresent()) {
             PackageDeclaration packageDeclaration = packageDeclarationOptional.get();
@@ -104,9 +117,6 @@ public class RemoteTestServlet extends AbstractHttpServlet {
                 importIterator.remove();
             }
         }
-
-        // 获取类声明
-        ClassOrInterfaceDeclaration classDeclaration = (ClassOrInterfaceDeclaration) compilationUnit.getType(0);
 
         // 创建@Component注解
         NormalAnnotationExpr component = new NormalAnnotationExpr();
