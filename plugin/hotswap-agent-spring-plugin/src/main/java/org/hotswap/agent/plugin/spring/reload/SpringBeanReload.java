@@ -19,6 +19,7 @@
 package org.hotswap.agent.plugin.spring.reload;
 
 import org.apache.dubbo.config.annotation.Service;
+import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.spring.core.*;
 import org.hotswap.agent.plugin.spring.files.PropertyReload;
@@ -339,9 +340,9 @@ public class SpringBeanReload {
                     // if the class is not spring bean or Factory Class, remove it
                     if ((names == null || names.length == 0) && !isFactoryMethod(clazz)) {
                         try {
-                            if (clazz.getSimpleName().endsWith("Test")) {
+                            if (clazz.getSimpleName().contains("Test")) {
                                 Method runRemoteTest = clazz.getMethod("runRemoteTest");
-                                // LOGGER.error("请检查所需要执行的远程单元测试的package是否在springboot工程的base package路径下");
+                                LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "请检查所需要执行的远程单元测试的package是否在springboot工程的base package路径下");
                             }
                         } catch (Exception ignore) {
                         }
@@ -631,11 +632,17 @@ public class SpringBeanReload {
         if (singletonObject != null) {
             destroyClasses.add(ClassUtils.getUserClass(singletonObject).getName());
         }
-        // dubbo不进行销毁
-        if (singletonObject != null && Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
-            LOGGER.info("Dubbo Service:{} 不执行重建", beanName);
-            return;
+
+        try {
+            Class.forName("org.apache.dubbo.config.annotation.Service");
+            // dubbo不进行销毁
+            if (singletonObject != null && Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
+                LOGGER.info("Dubbo Service:{} 不执行重建", beanName);
+                return;
+            }
+        } catch (Exception ignore) {
         }
+
         BeanFactoryProcessor.destroySingleton(beanFactory, beanName);
 //        dependentBeanMap.put(beanName, new HashSet<>(Arrays.asList(dependentBeans)));
     }

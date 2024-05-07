@@ -135,9 +135,10 @@ public class RemoteTestServlet extends AbstractHttpServlet {
                         continue;
                     }
 
-                    if (!StringUtils.isEmpty(needRunMethodName)
-                            && Objects.equals(needRunMethodName, methodName.asString())) {
-                        method.add(declaration.getName().toString());
+                    if (!StringUtils.isEmpty(needRunMethodName)) {
+                        if (Objects.equals(needRunMethodName, methodName.asString())) {
+                            method.add(declaration.getName().toString());
+                        }
                     } else {
                         method.add(declaration.getName().toString());
                     }

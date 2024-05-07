@@ -20,6 +20,12 @@ public class DubboProcessor {
     public static DefaultListableBeanFactory beanFactory;
 
     public static void reset(DefaultListableBeanFactory beanFactory, Set<String> beansToProcess, Set<String> newBeanNames) {
+        try {
+            Class.forName("org.apache.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor");
+        } catch (Exception ignore) {
+            return;
+        }
+
         Set<String> allBeans = new HashSet<>();
         allBeans.addAll(beansToProcess);
         allBeans.addAll(newBeanNames);
