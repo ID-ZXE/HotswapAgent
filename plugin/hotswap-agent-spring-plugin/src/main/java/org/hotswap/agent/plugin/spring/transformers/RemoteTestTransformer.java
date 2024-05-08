@@ -11,9 +11,12 @@ public class RemoteTestTransformer {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(RemoteTestTransformer.class);
 
-    @OnClassLoadEvent(classNameRegexp = ".*Test", events = LoadEvent.REDEFINE)
+    @OnClassLoadEvent(classNameRegexp = ".*Test.*", events = LoadEvent.REDEFINE)
     public static void addRemoteExecuteLog(ClassLoader appClassLoader, CtClass clazz,
                                            ClassPool classPool) throws NotFoundException, CannotCompileException {
+        if (clazz.getName().contains("$")) {
+            return;
+        }
         try {
             CtMethod runRemoteTest = clazz.getDeclaredMethod(HotswapConstants.RUN_REMOTE_METHOD_NAME);
             if (runRemoteTest != null) {

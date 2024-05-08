@@ -169,6 +169,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         if (!method.isEmpty()) {
             MethodDeclaration indexMethod = classDeclaration.addMethod(HotswapConstants.RUN_REMOTE_METHOD_NAME, Modifier.Keyword.PUBLIC);
             indexMethod.setType(StaticJavaParser.parseType("void"));
+            indexMethod.addThrownException(StaticJavaParser.parseClassOrInterfaceType("java.lang.Exception"));
             StringBuilder body = new StringBuilder("{");
             body.append("Thread thread = new Thread(new Runnable() {\n" +
                     "                @Override\n" +
