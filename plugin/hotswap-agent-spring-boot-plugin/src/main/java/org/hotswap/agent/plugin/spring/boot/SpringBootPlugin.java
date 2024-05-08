@@ -88,6 +88,10 @@ public class SpringBootPlugin {
         runMethod.insertBefore("{" + AllExtensionsManager.class.getName() +
                 ".getInstance().setSpringbootBasePackage($1.getName());" +
                 "}");
+
+        runMethod.insertAfter("{" +
+                AllExtensionsManager.class.getName() + ".getInstance().setServerIsRunning(true);" +
+                "}");
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.springframework.core.env.AbstractEnvironment")
@@ -96,6 +100,33 @@ public class SpringBootPlugin {
         method.insertBefore("{" + AllExtensionsManager.class.getName() + ".getInstance().setProfile($1);}");
 
         LOGGER.debug("patch org.springframework.core.env.AbstractEnvironment");
+    }
+
+//    @OnClassLoadEvent(classNameRegexp = "org.springframework.web.servlet.view.ResourceBundleViewResolver")
+//    public static void patchDisposableBean(CtClass ctClass) throws NotFoundException, CannotCompileException {
+//        CtMethod destroy = ctClass.getDeclaredMethod("destroy");
+//        destroy.insertBefore("{" +
+//                AllExtensionsManager.class.getName() + ".getInstance().setServerIsRunning(false);" +
+//                "}");
+//        LOGGER.debug("patch org.springframework.web.servlet.view.ResourceBundleViewResolver");
+//    }
+//
+//    @OnClassLoadEvent(classNameRegexp = "org.apache.dubbo.spring.boot.context.event.AwaitingNonWebApplicationListener")
+//    public static void patchAwaitingNonWebApplicationListener(CtClass ctClass) throws NotFoundException, CannotCompileException {
+//        CtMethod release = ctClass.getDeclaredMethod("release");
+//        release.insertBefore("{" +
+//                AllExtensionsManager.class.getName() + ".getInstance().setServerIsRunning(false);" +
+//                "}");
+//        LOGGER.debug("patch org.apache.dubbo.spring.boot.context.event.AwaitingNonWebApplicationListener");
+//    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.springframework.boot.SpringApplicationShutdownHook")
+    public static void patchSpringApplicationShutdownHook(CtClass ctClass) throws NotFoundException, CannotCompileException {
+        CtMethod run = ctClass.getDeclaredMethod("run");
+        run.insertBefore("{" +
+                AllExtensionsManager.class.getName() + ".getInstance().setServerIsRunning(false);" +
+                "}");
+        LOGGER.debug("patch org.apache.dubbo.spring.boot.context.event.AwaitingNonWebApplicationListener");
     }
 
 }

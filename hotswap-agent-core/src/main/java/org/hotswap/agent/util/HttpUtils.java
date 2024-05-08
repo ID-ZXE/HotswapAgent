@@ -1,102 +1,34 @@
 package org.hotswap.agent.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import cn.hutool.http.HttpUtil;
+import org.hotswap.agent.dto.BaseResponse;
+import org.hotswap.agent.logging.AgentLogger;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
+import java.util.Map;
 
 public final class HttpUtils {
 
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(HttpUtils.class);
 
-    public static <T> T get(String url, Class<T> clazz) {
+    public static BaseResponse<?> get(String url, Map<String, Object> params) {
         try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .build();
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    throw new RuntimeException();
-                }
-                String resultStr = response.body().string();
-                return JsonUtils.toObject(resultStr, clazz);
-            }
+            String result = HttpUtil.get(url, params);
+            return JsonUtils.toObject(result, BaseResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("request " + url + " error", e);
         }
     }
 
-    public static <T> T get(HttpUrl url, Class<T> clazz) {
+    public static void downloadFile(String url, String dir) {
         try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .build();
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    throw new RuntimeException();
-                }
-                String resultStr = response.body().string();
-                return JsonUtils.toObject(resultStr, clazz);
-            }
+            String fileName = new URL(url).getFile().substring(new URL(url).getFile().lastIndexOf('/') + 1);
+            File file = new File(dir, fileName);
+            HttpUtil.downloadFile(url, file);
+            LOGGER.info("文件下载成功，保存在:{}", file.getAbsolutePath());
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T get(HttpUrl url, TypeReference<T> typeReference) {
-        try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .build();
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    throw new RuntimeException();
-                }
-                String resultStr = response.body().string();
-                return JsonUtils.toObject(resultStr, typeReference);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void downloadUrl(String url, String dir) {
-        // 创建OkHttpClient实例
-        OkHttpClient client = new OkHttpClient();
-        // 构建Request对象
-        Request request = new Request.Builder().url(url).build();
-        try {
-            String fileName = new URL(url).getFile().substring(url.lastIndexOf('/') + 1);
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                InputStream inputStream = response.body().byteStream();
-                OutputStream outputStream = Files.newOutputStream(new File(dir, fileName).toPath());
-
-                // 缓冲区
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-
-                // 读取输入流并写入文件，直到所有数据都被写入
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-                // 完成写入并关闭流
-                outputStream.flush();
-                outputStream.close();
-                inputStream.close();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("文件下载失败:" + url, e);
+            throw new RuntimeException("文件下载失败", e);
         }
     }
 

@@ -180,8 +180,12 @@
                                     <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>okhttp</pattern>
-                                    <shadedPattern>org.hotswap.agent.okhttp</shadedPattern>
+                                    <pattern>hutool-http</pattern>
+                                    <shadedPattern>org.hotswap.agent.hutool-http</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>hutool-core</pattern>
+                                    <shadedPattern>org.hotswap.agent.hutool-core</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>jetty-server</pattern>
@@ -214,13 +218,14 @@
                             </relocations>
                             <artifactSet>
                                 <includes>
+                                    <include>cn.hutool:hutool-http</include>
+                                    <include>cn.hutool:hutool-core</include>
                                     <include>commons-io:commons-io</include>
                                     <include>com.github.javaparser:javaparser-core</include>
                                     <include>com.github.javaparser:javaparser-symbol-solver-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-databind</include>
                                     <include>com.fasterxml.jackson.core:jackson-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-annotations</include>
-                                    <include>com.squareup.okhttp3:okhttp</include>
                                     <!-- jetty -->
                                     <include>org.eclipse.jetty:jetty-server</include>
                                     <include>org.eclipse.jetty:jetty-servlet</include>
@@ -276,9 +281,14 @@
         </dependency>
 
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+            <version>5.8.25</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.8.25</version>
         </dependency>
 
         <dependency>

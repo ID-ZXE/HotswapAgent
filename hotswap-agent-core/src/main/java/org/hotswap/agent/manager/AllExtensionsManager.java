@@ -1,6 +1,5 @@
 package org.hotswap.agent.manager;
 
-import okhttp3.HttpUrl;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.dto.BaseResponse;
@@ -10,6 +9,8 @@ import org.hotswap.agent.util.IpUtils;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,6 +28,8 @@ public class AllExtensionsManager {
     private volatile ClassLoader classLoader;
 
     private volatile String springbootBasePackage;
+
+    private volatile boolean serverIsRunning = false;
 
     private volatile boolean hasPrependClassPath = false;
 
@@ -117,16 +120,28 @@ public class AllExtensionsManager {
         return springbootBasePackage;
     }
 
+    public void setServerIsRunning(boolean serverIsRunning) {
+        LOGGER.info("Server启动状态变更为:{}", serverIsRunning);
+        this.serverIsRunning = serverIsRunning;
+    }
+
+    public boolean getServerIsRunning() {
+        return serverIsRunning;
+    }
+
     private void registerInfo() {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://localhost:8080/hotswap/register").newBuilder();
+        if (!serverIsRunning) {
+            return;
+        }
+
         String lane = System.getProperty("lane", "default");
+        Map<String, Object> params = new HashMap<>();
+        params.put("app", this.app);
+        params.put("profile", this.profile);
+        params.put("lane", System.getProperty("lane", "default"));
+        params.put("ip", IpUtils.getLocalIp());
 
-        urlBuilder.addQueryParameter("app", this.app);
-        urlBuilder.addQueryParameter("profile", this.profile);
-        urlBuilder.addQueryParameter("lane", System.getProperty("lane", "default"));
-        urlBuilder.addQueryParameter("ip", IpUtils.getLocalIp());
-
-        BaseResponse<?> response = HttpUtils.get(urlBuilder.build(), BaseResponse.class);
+        BaseResponse<?> response = HttpUtils.get("http://localhost:8080/hotswap/register", params);
         if (response == null || !response.isSuccess()) {
             LOGGER.error("registerInfo failure app:{}, profile:{}, lane:{}, ip:{}", this.app, this.profile, lane, IpUtils.getLocalIp());
         } else {
