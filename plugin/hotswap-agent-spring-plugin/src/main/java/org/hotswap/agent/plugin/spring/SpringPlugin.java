@@ -20,10 +20,7 @@ package org.hotswap.agent.plugin.spring;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import org.hotswap.agent.annotation.FileEvent;
 import org.hotswap.agent.annotation.Init;
@@ -298,6 +295,17 @@ public class SpringPlugin {
                 "}";
         CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
         method.insertBefore(src);
+    }
+
+    /**
+     * 清除dubbo缓存
+     */
+    @OnClassLoadEvent(classNameRegexp = "org.apahce.dubbo.common.bytecode.Wrapper")
+    public static void patchDubboWrapper(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        CtMethod method = ctClass.getDeclaredMethod("getWrapper");
+        method.insertBefore("{" +
+                "WRAPPER_MAP.clear();" +
+                "}");
     }
 
     @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")

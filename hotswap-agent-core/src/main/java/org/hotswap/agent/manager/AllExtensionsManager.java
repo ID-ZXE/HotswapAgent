@@ -106,7 +106,7 @@ public class AllExtensionsManager {
             try {
                 registerInfo();
             } catch (Exception e) {
-                LOGGER.error("register route error", e);
+                LOGGER.error("[agent] register route error", e);
             }
         }, 0, 20, TimeUnit.SECONDS);
     }

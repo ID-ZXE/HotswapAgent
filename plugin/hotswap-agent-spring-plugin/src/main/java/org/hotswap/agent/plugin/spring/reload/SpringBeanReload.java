@@ -633,16 +633,6 @@ public class SpringBeanReload {
             destroyClasses.add(ClassUtils.getUserClass(singletonObject).getName());
         }
 
-        try {
-            Class.forName("org.apache.dubbo.config.annotation.Service");
-            // dubbo不进行销毁
-            if (singletonObject != null && Objects.nonNull(singletonObject.getClass().getAnnotation(Service.class))) {
-                LOGGER.info("Dubbo Service:{} 不执行重建", beanName);
-                return;
-            }
-        } catch (Exception ignore) {
-        }
-
         BeanFactoryProcessor.destroySingleton(beanFactory, beanName);
 //        dependentBeanMap.put(beanName, new HashSet<>(Arrays.asList(dependentBeans)));
     }

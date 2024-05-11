@@ -31,7 +31,7 @@ public class DubboSupport {
 
     public static void doInvokeApacheDubbo(ServiceBean serviceBean, Object bean) throws Exception {
         ReflectionHelper.invoke(serviceBean, serviceBean.getClass(), "setRef", new Class[]{Object.class}, bean);
-        ReflectionHelper.invoke(serviceBean, "unexport");
+        // ReflectionHelper.invoke(serviceBean, "unexport");
         ReflectionHelper.set(serviceBean, AllExtensionsManager.getInstance().
                 getClassLoader().loadClass("org.apache.dubbo.config.ServiceConfig"), "unexported", false);
         ReflectionHelper.set(serviceBean, AllExtensionsManager.getInstance().
