@@ -42,7 +42,6 @@ import org.hotswap.agent.plugin.spring.reload.*;
 import org.hotswap.agent.plugin.spring.scanner.SpringBeanWatchEventListener;
 import org.hotswap.agent.plugin.spring.transformers.*;
 import org.hotswap.agent.plugin.spring.transformers.support.DubboSupport;
-import org.hotswap.agent.plugin.spring.transformers.support.MyBatisSpringBeanDefinition;
 import org.hotswap.agent.plugin.spring.transformers.support.MybatisSupport;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.IOUtils;
@@ -342,7 +341,7 @@ public class SpringPlugin {
                     classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")
             });
             method.insertAfter("{" +
-                    MyBatisSpringBeanDefinition.class.getName() + ".loadBasePackages($1);" +
+                    MybatisSupport.class.getName() + ".loadBasePackages($1);" +
                     "} ");
         } catch (Exception e) {
             LOGGER.error("patchMapperScannerRegistrar err", e);

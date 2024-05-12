@@ -1,37 +1,13 @@
-/*
- * Copyright 2013-2024 the HotswapAgent authors.
- *
- * This file is part of HotswapAgent.
- *
- * HotswapAgent is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 2 of the License, or (at your
- * option) any later version.
- *
- * HotswapAgent is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with HotswapAgent. If not, see http://www.gnu.org/licenses/.
- */
 package org.hotswap.agent.plugin.mybatis.transformers;
 
 import org.hotswap.agent.annotation.OnClassLoadEvent;
 import org.hotswap.agent.javassist.*;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.plugin.mybatis.MyBatisPlugin;
-import org.hotswap.agent.plugin.mybatis.MyBatisPlusRefresh;
 import org.hotswap.agent.util.PluginManagerInvoker;
 
 import java.util.Objects;
 
-/**
- * Static transformers for MyBatis plugin.
- *
- * @author Vladimir Dvorak
- */
 public class MyBatisPlusTransformers {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisPlusTransformers.class);
@@ -59,10 +35,10 @@ public class MyBatisPlusTransformers {
             return;
         }
 
-        StringBuilder src = new StringBuilder("{");
-        src.append(PluginManagerInvoker.buildInitializePlugin(MyBatisPlugin.class));
-        src.append("}");
-        noArgsConstructor.insertAfter(src.toString());
+        String src = "{" +
+                PluginManagerInvoker.buildInitializePlugin(MyBatisPlugin.class) +
+                "}";
+        noArgsConstructor.insertAfter(src);
         LOGGER.info("patch MybatisPlus Configuration success");
     }
 
