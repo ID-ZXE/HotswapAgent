@@ -42,6 +42,7 @@ import org.hotswap.agent.plugin.spring.reload.*;
 import org.hotswap.agent.plugin.spring.scanner.SpringBeanWatchEventListener;
 import org.hotswap.agent.plugin.spring.transformers.*;
 import org.hotswap.agent.plugin.spring.transformers.support.DubboSupport;
+import org.hotswap.agent.plugin.spring.transformers.support.MyBatisSpringBeanDefinition;
 import org.hotswap.agent.plugin.spring.transformers.support.MybatisSupport;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.IOUtils;
@@ -317,6 +318,7 @@ public class SpringPlugin {
         method.insertBefore(src);
     }
 
+
     // todo 验证有效性
     @OnClassLoadEvent(classNameRegexp = "org.springframework.beans.factory.support.AbstractBeanFactory")
     public static void patchPredictBeanType(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
@@ -332,4 +334,18 @@ public class SpringPlugin {
                 + "}", true);
     }
 
+    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.annotation.MapperScannerRegistrar")
+    public static void patchMapperScannerRegistrar(CtClass ctClass, ClassPool classPool) {
+        try {
+            CtMethod method = ctClass.getDeclaredMethod("registerBeanDefinitions", new CtClass[]{
+                    classPool.get("org.springframework.core.type.AnnotationMetadata"),
+                    classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")
+            });
+            method.insertAfter("{" +
+                    MyBatisSpringBeanDefinition.class.getName() + ".loadBasePackages($1);" +
+                    "} ");
+        } catch (Exception e) {
+            LOGGER.error("patchMapperScannerRegistrar err", e);
+        }
+    }
 }

@@ -281,7 +281,7 @@ public class ClassPathBeanDefinitionScannerAgent {
      * @return the definition or null if not a spring bean
      * @throws IOException
      */
-    private BeanDefinition resolveBeanDefinition(ClassLoader appClassLoader, byte[] bytes) throws IOException {
+    public BeanDefinition resolveBeanDefinition(ClassLoader appClassLoader, byte[] bytes) throws IOException {
         Resource resource = new ByteArrayResource(bytes);
         resetCachingMetadataReaderFactoryCache();
         MetadataReader metadataReader = getMetadataReader(appClassLoader, resource);

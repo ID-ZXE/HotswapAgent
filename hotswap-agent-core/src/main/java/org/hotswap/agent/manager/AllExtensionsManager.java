@@ -29,6 +29,8 @@ public class AllExtensionsManager {
 
     private volatile String springbootBasePackage;
 
+    private volatile String mybatisBasePackage;
+
     private volatile boolean serverIsRunning = false;
 
     private volatile boolean hasPrependClassPath = false;
@@ -104,7 +106,7 @@ public class AllExtensionsManager {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(() -> {
             try {
-                registerInfo();
+                // registerInfo();
             } catch (Exception e) {
                 LOGGER.error("[agent] register route error", e);
             }
@@ -118,6 +120,15 @@ public class AllExtensionsManager {
 
     public String getSpringbootBasePackage() {
         return springbootBasePackage;
+    }
+
+    public String getMybatisBasePackage() {
+        return mybatisBasePackage;
+    }
+
+    public void setMybatisBasePackage(String mybatisBasePackage) {
+        this.mybatisBasePackage = mybatisBasePackage;
+        LOGGER.info("mybatisBasePackage is {}", this.mybatisBasePackage);
     }
 
     public void setServerIsRunning(boolean serverIsRunning) {

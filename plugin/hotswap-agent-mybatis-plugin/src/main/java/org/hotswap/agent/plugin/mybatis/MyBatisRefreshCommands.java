@@ -30,6 +30,7 @@ import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
 import org.hotswap.agent.util.ReflectionHelper;
 import org.hotswap.agent.util.spring.util.CollectionUtils;
@@ -51,6 +52,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 
 /**
@@ -70,14 +72,6 @@ public class MyBatisRefreshCommands {
      */
     public static boolean reloadFlag = false;
 
-//    public static void reloadConfiguration() {
-//        LOGGER.debug("Refreshing MyBatis configuration.");
-//        ConfigurationProxy.refreshProxiedConfigurations();
-//        SpringMybatisConfigurationProxy.refreshProxiedConfigurations();
-//        LOGGER.reload("MyBatis configuration refreshed.");
-//        reloadFlag = false;
-//    }
-
     private static ClassPathMapperScanner mapperScanner;
 
     public static void loadScanner(ClassPathMapperScanner scanner) {
@@ -88,23 +82,45 @@ public class MyBatisRefreshCommands {
     }
 
     public static void refreshModelField(Class<?> clazz) {
-        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
-        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
-            LOGGER.info("没有发现Configuration 停止更新Model Field缓存");
-            return;
-        }
-        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
-            try {
-                //移除实体类对应的映射器缓存
-                DefaultReflectorFactory reflectorFactory = (DefaultReflectorFactory) configurationProxy.getConfiguration().getReflectorFactory();
-                Field reflectorMapField = DefaultReflectorFactory.class.getDeclaredField("reflectorMap");
-                reflectorMapField.setAccessible(true);
-                @SuppressWarnings("unchecked") ConcurrentMap<Class<?>, Reflector> reflectorMap = (ConcurrentMap<Class<?>, Reflector>) reflectorMapField.get(reflectorFactory);
-                reflectorMap.remove(clazz);
-            } catch (Exception e) {
-                LOGGER.error("移除MyBatis Model Field 缓存失败", e);
+        try {
+            Class<?> sqlSessionFactoryClz = Class.forName("org.apache.ibatis.session.defaults.DefaultSqlSessionFactory", true, AllExtensionsManager.getInstance().getClassLoader());
+            Field staticConfiguration = sqlSessionFactoryClz.getDeclaredField("_staticConfiguration");
+            ArrayList<Configuration> configurations = (ArrayList<Configuration>) staticConfiguration.get(null);
+            if (configurations.isEmpty()) {
+                LOGGER.info("configuration不存在 跳过MyBatis Model Field缓存清理");
+                return;
             }
+
+            for (Configuration configuration : configurations) {
+                try {
+                    try {
+                        Class.forName("com.baomidou.mybatisplus.extension.activerecord.Model");
+                        if (MyBatisPlusRefresh.isEntity(clazz)) {
+                            MyBatisPlusRefresh.refreshModel(clazz);
+                        } else {
+                            cleanModelCache(configuration, clazz);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        LOGGER.error("ClassNotFound", e);
+                        cleanModelCache(configuration, clazz);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("移除MyBatis Model Field 缓存失败:{}", e, clazz.getName());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("refreshModelField failure", e);
         }
+    }
+
+    private static void cleanModelCache(Configuration configuration, Class<?> clazz) throws NoSuchFieldException, IllegalAccessException {
+        //移除实体类对应的映射器缓存
+        DefaultReflectorFactory reflectorFactory = (DefaultReflectorFactory) configuration.getReflectorFactory();
+        Field reflectorMapField = DefaultReflectorFactory.class.getDeclaredField("reflectorMap");
+        reflectorMapField.setAccessible(true);
+        @SuppressWarnings("unchecked") ConcurrentMap<Class<?>, Reflector> reflectorMap = (ConcurrentMap<Class<?>, Reflector>) reflectorMapField.get(reflectorFactory);
+        reflectorMap.remove(clazz);
+        LOGGER.info("移除MyBatis Model 缓存:{}", clazz.getName());
     }
 
     public static void refreshNewMapperClass(Class<?> clazz) {
@@ -151,26 +167,26 @@ public class MyBatisRefreshCommands {
     }
 
     public static void refreshXMLMapper(String xmlPath) {
-        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
-        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
+        List<Configuration> configurations = getAllConfiguration();
+        if (CollectionUtils.isEmpty(configurations)) {
             LOGGER.info("没有发现Configuration 停止更新MyBatis XML Mapper");
             return;
         }
 
-        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
-            reloadXMLMapper(xmlPath, configurationProxy.getConfiguration());
+        for (Configuration configuration : configurations) {
+            reloadXMLMapper(xmlPath, configuration);
         }
     }
 
     public static void refreshAnnotationMapper(Class<?> mapper) {
-        Collection<ConfigurationProxy> allConfigurationProxy = ConfigurationProxy.getAllConfigurationProxy();
-        if (CollectionUtils.isEmpty(allConfigurationProxy)) {
+        List<Configuration> configurations = getAllConfiguration();
+        if (CollectionUtils.isEmpty(configurations)) {
             LOGGER.info("没有发现Configuration 停止更新MyBatis XML Mapper");
             return;
         }
 
-        for (ConfigurationProxy configurationProxy : allConfigurationProxy) {
-            reloadAnnotationMapper(mapper, configurationProxy.getConfiguration());
+        for (Configuration configuration : configurations) {
+            reloadAnnotationMapper(mapper, configuration);
         }
     }
 
@@ -239,6 +255,12 @@ public class MyBatisRefreshCommands {
                 LOGGER.info("not cur sql session factory:{}", reloadMapper.getName());
                 return;
             }
+
+            if (configuration.getClass().getName()
+                    .equals("com.baomidou.mybatisplus.core.MybatisConfiguration")) {
+                MyBatisPlusRefresh.refreshMapper(configuration, reloadMapper);
+            }
+
             loadedResources.remove(generateInterfaceNamespace(reloadMapper.getName()));
 
             // 重新加载按注解方式实现的 mybatis
@@ -255,6 +277,16 @@ public class MyBatisRefreshCommands {
 
     private static String generateInterfaceNamespace(String interfaceName) {
         return "interface " + interfaceName;
+    }
+
+    private static List<Configuration> getAllConfiguration() {
+        try {
+            Class<?> sqlSessionFactoryClz = Class.forName("org.apache.ibatis.session.defaults.DefaultSqlSessionFactory", true, AllExtensionsManager.getInstance().getClassLoader());
+            Field staticConfiguration = sqlSessionFactoryClz.getDeclaredField("_staticConfiguration");
+            return (ArrayList<Configuration>) staticConfiguration.get(null);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
 }

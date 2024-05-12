@@ -18,32 +18,32 @@
  */
 package org.hotswap.agent.plugin.mybatis;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.ibatis.annotations.*;
 import org.hotswap.agent.annotation.*;
 import org.hotswap.agent.command.Command;
 import org.hotswap.agent.command.ReflectionCommand;
 import org.hotswap.agent.command.Scheduler;
 import org.hotswap.agent.config.PluginConfiguration;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
+import org.hotswap.agent.plugin.mybatis.transformers.MyBatisPlusTransformers;
 import org.hotswap.agent.plugin.mybatis.transformers.MyBatisTransformers;
 import org.hotswap.agent.util.XmlUtils;
-import org.springframework.stereotype.Repository;
+import org.hotswap.agent.util.spring.util.StringUtils;
+
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Reload MyBatis configuration after entity create/change.
  *
  * @author Vladimir Dvorak
  */
-@Plugin(name = "MyBatis", description = "Reload MyBatis configuration after configuration create/change.", testedVersions = {"All between 3.5.9"}, expectedVersions = {"3.5.9"}, supportClass = {MyBatisTransformers.class})
+@Plugin(name = "MyBatis", description = "Reload MyBatis configuration after configuration create/change.",
+        testedVersions = {"All between 3.5.9"}, expectedVersions = {"3.5.9"},
+        supportClass = {MyBatisTransformers.class, MyBatisPlusTransformers.class})
 public class MyBatisPlugin {
     private static final AgentLogger LOGGER = AgentLogger.getLogger(MyBatisPlugin.class);
 
@@ -62,7 +62,7 @@ public class MyBatisPlugin {
 
     public void registerConfigurationFile(String configFile, Object configObject) {
         if (configFile != null && !configurationMap.containsKey(configFile)) {
-            LOGGER.debug("MyBatisPlugin - configuration file registered : {}", configFile);
+            LOGGER.info("MyBatisPlugin - configuration file registered : {}", configFile);
             configurationMap.put(configFile, configObject);
         }
     }
@@ -79,7 +79,7 @@ public class MyBatisPlugin {
 
     @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.REDEFINE})
     public void registerClassListeners(ClassLoader classLoader, Class<?> clazz) {
-        if (isMybatisAnnotationMapper(classLoader, clazz)) {
+        if (isMybatisMapper(clazz)) {
             LOGGER.info("发现MyBatis Annotation Mapper变更 开始RELOAD:{}", clazz.getName());
             Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshAnnotationMapper", appClassLoader, clazz);
             scheduler.scheduleCommand(command, 500);
@@ -90,51 +90,18 @@ public class MyBatisPlugin {
         }
     }
 
-    @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.DEFINE})
-    public void registerNewClassListeners(Class<?> clazz) {
-        if (isMapper(clazz)) {
-            LOGGER.info("发现新增MyBatis Mapper 开始LOAD:{}", clazz.getName());
-            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshNewMapperClass", appClassLoader, clazz);
-            scheduler.scheduleCommand(command, 500);
-        }
-    }
-
-    private static boolean isMybatisAnnotationMapper(ClassLoader classLoader, Class<?> clazz) {
-        try {
-            if (clazz.isInterface()) {
-                for (Method method : clazz.getMethods()) {
-                    Annotation[] annotations = method.getAnnotations();
-                    for (Annotation annotation : annotations) {
-                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Select"))) {
-                            return true;
-                        }
-                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Update"))) {
-                            return true;
-                        }
-                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Delete"))) {
-                            return true;
-                        }
-                        if (annotation.annotationType().equals(classLoader.loadClass("org.apache.ibatis.annotations.Insert"))) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
+    private static boolean isMybatisMapper(Class<?> clazz) {
+        String mybatisBasePackage = AllExtensionsManager.getInstance().getMybatisBasePackage();
+        if (StringUtils.isEmpty(mybatisBasePackage)) {
             return false;
+        }
+        String[] basePackages = mybatisBasePackage.split(",");
+        for (String basePackage : basePackages) {
+            if (clazz.getName().startsWith(basePackage)) {
+                return true;
+            }
         }
         return false;
     }
-
-    private static boolean isMapper(Class<?> clazz) {
-        if (clazz == null || !clazz.isInterface()) {
-            return false;
-        }
-        if (Objects.isNull(clazz.getAnnotation(Mapper.class)) && Objects.isNull(clazz.getAnnotation(Repository.class))) {
-            return false;
-        }
-        return true;
-    }
-
 
 }
