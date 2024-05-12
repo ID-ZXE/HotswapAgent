@@ -118,7 +118,7 @@ public class ResetRequestMappingCaches {
         }
 
         for (Entry<String, ?> e : mappings.entrySet()) {
-            processMappings(c, e.getValue());
+            processMappings(c, e.getValue(), true);
         }
     }
 
@@ -128,12 +128,12 @@ public class ResetRequestMappingCaches {
         }
         for (HandlerMapping handlerMapping : handlerMappings) {
             if (handlerMapping instanceof RequestMappingHandlerMapping) {
-                processMappings(abstractHandlerMethodMapping, handlerMapping);
+                processMappings(abstractHandlerMethodMapping, handlerMapping, false);
             }
         }
     }
 
-    private static void processMappings(Class<?> abstractHandlerMethodMapping, Object handlerMapping) throws Exception {
+    private static void processMappings(Class<?> abstractHandlerMethodMapping, Object handlerMapping, boolean needProcessNewController) throws Exception {
         LOGGER.info("clearing HandlerMapping for {}", handlerMapping.getClass());
         try {
             Field f = abstractHandlerMethodMapping.getDeclaredField("handlerMethods");
@@ -174,7 +174,9 @@ public class ResetRequestMappingCaches {
             }
             // Register mapping manually
             registerHandlerBeans(ResetRequestMappingCaches.beansToProcess, abstractHandlerMethodMapping, handlerMapping);
-            registerHandlerBeans(ResetRequestMappingCaches.newBeanNames, abstractHandlerMethodMapping, handlerMapping);
+            if (needProcessNewController) {
+                registerHandlerBeans(ResetRequestMappingCaches.newBeanNames, abstractHandlerMethodMapping, handlerMapping);
+            }
         }
     }
 

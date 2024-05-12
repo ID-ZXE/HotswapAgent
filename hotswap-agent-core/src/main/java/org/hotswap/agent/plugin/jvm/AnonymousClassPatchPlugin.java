@@ -35,6 +35,7 @@ import org.hotswap.agent.javassist.ClassPool;
 import org.hotswap.agent.javassist.CtClass;
 import org.hotswap.agent.javassist.NotFoundException;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.util.HotswapTransformer;
 import org.hotswap.agent.util.HaClassFileTransformer;
 import org.hotswap.agent.util.classloader.ClassLoaderHelper;
@@ -101,6 +102,10 @@ public class AnonymousClassPatchPlugin {
         if (classPool.find(className) == null)
             return null;
 
+        // 远程热部署时，匿名类如果新增引用字段，classPool取到的类信息还是老的class，会导致NoSuchMethodError问题（匿名构造函数还是老的）
+        // 这里在队首插入热更新的类，时刻保证获取到的类的信息是最新的
+        classPool.insertClassPath(AllExtensionsManager.getInstance().getExtraClassPath());
+
         AnonymousClassInfos info = getStateInfo(classLoader, classPool, mainClass);
 
         String compatibleName = info.getCompatibleTransition(javaClass);
@@ -158,6 +163,7 @@ public class AnonymousClassPatchPlugin {
                     return null;
                 }
             }
+
             @Override
             public boolean isForRedefinitionOnly() {
                 return false;

@@ -83,9 +83,7 @@ public class MyBatisRefreshCommands {
 
     public static void refreshModelField(Class<?> clazz) {
         try {
-            Class<?> sqlSessionFactoryClz = Class.forName("org.apache.ibatis.session.defaults.DefaultSqlSessionFactory", true, AllExtensionsManager.getInstance().getClassLoader());
-            Field staticConfiguration = sqlSessionFactoryClz.getDeclaredField("_staticConfiguration");
-            ArrayList<Configuration> configurations = (ArrayList<Configuration>) staticConfiguration.get(null);
+            List<Configuration> configurations = getAllConfiguration();
             if (configurations.isEmpty()) {
                 LOGGER.info("configuration不存在 跳过MyBatis Model Field缓存清理");
                 return;
@@ -101,7 +99,6 @@ public class MyBatisRefreshCommands {
                             cleanModelCache(configuration, clazz);
                         }
                     } catch (ClassNotFoundException e) {
-                        LOGGER.error("ClassNotFound", e);
                         cleanModelCache(configuration, clazz);
                     }
                 } catch (Exception e) {
