@@ -148,6 +148,8 @@ public class SpringBeanReload {
                 synchronized (newScanBeanDefinitions) {
                     newScanBeanDefinitions.add(beanDefinitionHolder);
                     LOGGER.info("add new spring bean '{}' into {}", beanDefinitionHolder.getBeanName(), ObjectUtils.identityToString(beanFactory));
+                    // todo 补丁 后续有更好的方式再修改
+                    SpringChangedAgent.reload(System.currentTimeMillis());
                     return;
                 }
             }
