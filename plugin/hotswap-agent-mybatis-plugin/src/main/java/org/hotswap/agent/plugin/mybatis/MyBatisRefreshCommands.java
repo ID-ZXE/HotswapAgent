@@ -117,7 +117,7 @@ public class MyBatisRefreshCommands {
         reflectorMapField.setAccessible(true);
         @SuppressWarnings("unchecked") ConcurrentMap<Class<?>, Reflector> reflectorMap = (ConcurrentMap<Class<?>, Reflector>) reflectorMapField.get(reflectorFactory);
         reflectorMap.remove(clazz);
-        LOGGER.info("移除MyBatis Model 缓存:{}", clazz.getName());
+        LOGGER.info("[agent] 移除MyBatis Model 缓存:{}", clazz.getName());
     }
 
     public static void refreshNewMapperClass(Class<?> clazz) {

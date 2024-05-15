@@ -42,11 +42,11 @@ public class SpringBeanClassFileTransformer implements HaClassFileTransformer {
                             ProtectionDomain protectionDomain,
                             byte[] classfileBuffer) {
         if (classBeingRedefined != null) {
-            // SpringChangesAnalyzer analyzer = new SpringChangesAnalyzer(appClassLoader);
-            // if (analyzer.isReloadNeeded(classBeingRedefined, classfileBuffer)) {
+             SpringChangesAnalyzer analyzer = new SpringChangesAnalyzer(appClassLoader);
+             if (analyzer.isReloadNeeded(classBeingRedefined, classfileBuffer)) {
                 scheduler.scheduleCommand(new ClassPathBeanRefreshCommand(classBeingRedefined.getClassLoader(),
                         basePackage, className, classfileBuffer, scheduler));
-            // }
+             }
         }
         return classfileBuffer;
     }

@@ -50,7 +50,8 @@ public class SpringChangesAnalyzer {
     public boolean isReloadNeeded(Class<?> classBeingRedefined, byte[] classfileBuffer) {
         if (classBeingRedefined.isSynthetic() || isSyntheticClass(classBeingRedefined))
             return false;
-        return classChangeNeedsReload(classBeingRedefined, classfileBuffer);
+        return true;
+        // return classChangeNeedsReload(classBeingRedefined, classfileBuffer);
     }
 
     private boolean classChangeNeedsReload(Class<?> classBeingRedefined, byte[] classfileBuffer) {
