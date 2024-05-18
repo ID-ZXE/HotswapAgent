@@ -156,64 +156,36 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>commons-io</pattern>
-                                    <shadedPattern>org.hotswap.agent.commons.io</shadedPattern>
+                                    <pattern>org.apache.commons.io</pattern>
+                                    <shadedPattern>org.hotswap.agent.org.apache.commons.io</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>javaparser-core</pattern>
-                                    <shadedPattern>org.hotswap.agent.javaparser</shadedPattern>
+                                    <pattern>com.github.javaparser</pattern>
+                                    <shadedPattern>org.hotswap.agent.com.github.javaparser</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>javaparser-symbol-solver-core</pattern>
-                                    <shadedPattern>org.hotswap.agent.javaparser-symbol-solver-core</shadedPattern>
+                                    <pattern>com.github.javaparser.symbolsolver</pattern>
+                                    <shadedPattern>org.hotswap.agent.com.github.javaparser.symbolsolver</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>jackson-databind</pattern>
-                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>org.hotswap.agent.com.fasterxml.jackson</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>jackson-core</pattern>
-                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>jackson-annotations</pattern>
-                                    <shadedPattern>org.hotswap.agent.jackson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>hutool-http</pattern>
-                                    <shadedPattern>org.hotswap.agent.hutool-http</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>hutool-core</pattern>
-                                    <shadedPattern>org.hotswap.agent.hutool-core</shadedPattern>
+                                    <pattern>cn.hutool</pattern>
+                                    <shadedPattern>org.hotswap.agent.cn.hutool</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>jetty-server</pattern>
                                     <shadedPattern>org.hotswap.agent.jetty-server</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>jetty-servlet</pattern>
-                                    <shadedPattern>org.hotswap.agent.jetty-servlet</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>jetty-util</pattern>
-                                    <shadedPattern>org.hotswap.agent.jetty-util</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>jetty-http</pattern>
-                                    <shadedPattern>org.hotswap.agent.jetty-http</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>jetty-io</pattern>
-                                    <shadedPattern>org.hotswap.agent.jetty-io</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>jetty-security</pattern>
-                                    <shadedPattern>org.hotswap.agent.jetty-security</shadedPattern>
+                                    <pattern>org.eclipse.jetty</pattern>
+                                    <shadedPattern>org.hotswap.agent.org.eclipse.jetty</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>javax.servlet-api</pattern>
-                                    <shadedPattern>org.hotswap.agent.servlet-api</shadedPattern>
+                                    <shadedPattern>org.hotswap.agent.javax.servlet-api</shadedPattern>
                                 </relocation>
                             </relocations>
                             <artifactSet>

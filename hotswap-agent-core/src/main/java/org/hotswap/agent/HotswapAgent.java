@@ -66,8 +66,10 @@ public class HotswapAgent {
         premain(args, inst);
     }
 
+    private static final String name = "io.netty.util.internal.ObjectUtil";
+
     public static void premain(String args, Instrumentation inst) {
-        LOGGER.info("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
+        LOGGER.debug("Loading Hotswap agent {{}} - unlimited runtime class redefinition.", Version.version());
         // 清空class文件夹
         AllExtensionsManager.getInstance().initProperties();
         CompileEngine.getInstance().cleanOldClassFile();
