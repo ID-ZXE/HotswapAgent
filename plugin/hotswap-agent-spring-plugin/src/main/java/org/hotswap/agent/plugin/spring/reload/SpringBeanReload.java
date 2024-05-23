@@ -338,16 +338,22 @@ public class SpringBeanReload {
                 Iterator<Class<?>> iterator = classes.iterator();
                 while (iterator.hasNext()) {
                     Class<?> clazz = iterator.next();
-                    String[] names = beanFactory.getBeanNamesForType(clazz);
-                    // if the class is not spring bean or Factory Class, remove it
-                    if ((names == null || names.length == 0) && !isFactoryMethod(clazz)) {
-                        try {
-                            if (clazz.getSimpleName().contains("Test")) {
-                                Method runRemoteTest = clazz.getMethod("runRemoteTest");
-                                LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + "请检查所需要执行的远程单元测试的package是否在springboot工程的base package路径下");
-                            }
-                        } catch (Exception ignore) {
+
+                    Set<String> nameSet = new HashSet<>();
+                    String[] names1 = beanFactory.getBeanNamesForType(clazz);
+                    if (names1.length != 0) {
+                        nameSet.addAll(Arrays.asList(names1));
+                    }
+
+                    for (Class<?> anInterface : clazz.getInterfaces()) {
+                        String[] names2 = beanFactory.getBeanNamesForType(anInterface);
+                        if (names2.length != 0) {
+                            Collections.addAll(nameSet, names2);
                         }
+                    }
+
+                    // if the class is not spring bean or Factory Class, remove it
+                    if (!nameSet.isEmpty() && !isFactoryMethod(clazz)) {
                         LOGGER.info("[agent] the class '{}' is not spring bean or factory class", clazz.getName());
                         iterator.remove();
                     } else {
@@ -439,12 +445,25 @@ public class SpringBeanReload {
         }
         for (Class clazz : classToProcess) {
             destroyClasses.add(ClassUtils.getUserClass(clazz).getName());
-            String[] names = beanFactory.getBeanNamesForType(clazz);
-            if (names != null && names.length > 0) {
-                LOGGER.info("the bean of class {} has the bean names {}", clazz.getName(), Arrays.asList(names));
-                beansToProcess.addAll(Arrays.asList(names));
+
+            Set<String> nameSet = new HashSet<>();
+            String[] names1 = beanFactory.getBeanNamesForType(clazz);
+            if (names1.length != 0) {
+                nameSet.addAll(Arrays.asList(names1));
+            }
+
+            for (Class<?> anInterface : clazz.getInterfaces()) {
+                String[] names2 = beanFactory.getBeanNamesForType(anInterface);
+                if (names2.length != 0) {
+                    Collections.addAll(nameSet, names2);
+                }
+            }
+
+            if (!nameSet.isEmpty()) {
+                LOGGER.info("the bean of class {} has the bean names {}", clazz.getName(), Arrays.asList(nameSet));
+                beansToProcess.addAll(nameSet);
                 // 3.1 when the bean is @Configuration, it should be recreated.
-                reloadBeans.accept(reloadAnnotatedBeanDefinitions(clazz, names));
+                reloadBeans.accept(reloadAnnotatedBeanDefinitions(clazz, nameSet.toArray(new String[0])));
                 // notify the class is changed
                 SpringEventSource.INSTANCE.fireEvent(new ClassChangeEvent(clazz, beanFactory));
             } else {
