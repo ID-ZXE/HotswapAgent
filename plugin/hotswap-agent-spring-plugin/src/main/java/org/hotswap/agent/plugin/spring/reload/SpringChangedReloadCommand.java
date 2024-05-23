@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * The type Spring changed reload command.
  */
 public class SpringChangedReloadCommand extends MergeableCommand {
-    private static final AgentLogger LOGGER = AgentLogger.getLogger(XmlsChangedCommand.class);
+    private static final AgentLogger LOGGER = AgentLogger.getLogger(SpringChangedReloadCommand.class);
 
     // unit test only
     private static AtomicLong waitingTaskCount = new AtomicLong(0);

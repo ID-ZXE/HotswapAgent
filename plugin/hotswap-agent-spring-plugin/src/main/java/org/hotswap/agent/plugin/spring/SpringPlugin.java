@@ -333,18 +333,4 @@ public class SpringPlugin {
                 + "}", true);
     }
 
-    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.annotation.MapperScannerRegistrar")
-    public static void patchMapperScannerRegistrar(CtClass ctClass, ClassPool classPool) {
-        try {
-            CtMethod method = ctClass.getDeclaredMethod("registerBeanDefinitions", new CtClass[]{
-                    classPool.get("org.springframework.core.type.AnnotationMetadata"),
-                    classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")
-            });
-            method.insertAfter("{" +
-                    MybatisSupport.class.getName() + ".loadBasePackages($1);" +
-                    "} ");
-        } catch (Exception e) {
-            LOGGER.error("patchMapperScannerRegistrar err", e);
-        }
-    }
 }

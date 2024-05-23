@@ -353,7 +353,7 @@ public class SpringBeanReload {
                     }
 
                     // if the class is not spring bean or Factory Class, remove it
-                    if (!nameSet.isEmpty() && !isFactoryMethod(clazz)) {
+                    if (nameSet.isEmpty() && !isFactoryMethod(clazz)) {
                         LOGGER.info("[agent] the class '{}' is not spring bean or factory class", clazz.getName());
                         iterator.remove();
                     } else {
