@@ -278,6 +278,12 @@ public class MyBatisRefreshCommands {
     }
 
     private static List<Configuration> getAllConfiguration() {
+        List<Configuration> collect = ConfigurationProxy.getAllConfigurationProxy().stream().map(ConfigurationProxy::getConfiguration)
+                .collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(collect)) {
+            return collect;
+        }
+
         Set<Object> beanFactorySet = AllExtensionsManager.getInstance().getBeanFactorySet();
         if (CollectionUtils.isEmpty(beanFactorySet)) {
             try {

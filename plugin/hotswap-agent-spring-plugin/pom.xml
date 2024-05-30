@@ -128,15 +128,11 @@
             <artifactId>mybatis</artifactId>
             <version>${org.mybatis.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
             <version>${org.mybatis-spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.1</version>
         </dependency>
 
         <dependency>
