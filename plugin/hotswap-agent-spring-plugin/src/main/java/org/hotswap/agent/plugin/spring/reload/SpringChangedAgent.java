@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.plugin.spring.listener.SpringEvent;
 import org.hotswap.agent.plugin.spring.listener.SpringEventSource;
 import org.hotswap.agent.plugin.spring.listener.SpringListener;
@@ -66,6 +67,7 @@ public class SpringChangedAgent implements SpringListener<SpringEvent<?>>, Compa
             synchronized (SpringChangedAgent.class) {
                 if (springChangeAgents.get(beanFactory) == null) {
                     SpringChangedAgent springChangedAgent = new SpringChangedAgent(beanFactory);
+                    AllExtensionsManager.getInstance().addBeanFactory(beanFactory);
                     springChangeAgents.put(beanFactory, springChangedAgent);
                 }
             }

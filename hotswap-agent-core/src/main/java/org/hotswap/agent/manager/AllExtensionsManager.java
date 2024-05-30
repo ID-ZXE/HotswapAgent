@@ -9,9 +9,7 @@ import org.hotswap.agent.util.IpUtils;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +32,8 @@ public class AllExtensionsManager {
     private volatile boolean serverIsRunning = false;
 
     private volatile boolean hasPrependClassPath = false;
+
+    private volatile Set<Object> beanFactorySets = new HashSet<>();
 
     /**
      * 应用名称 取自spring.application.name
@@ -120,6 +120,14 @@ public class AllExtensionsManager {
 
     public String getSpringbootBasePackage() {
         return springbootBasePackage;
+    }
+
+    public void addBeanFactory(Object beanFactory) {
+        this.beanFactorySets.add(beanFactory);
+    }
+
+    public Set<Object> getBeanFactorySet() {
+        return this.beanFactorySets;
     }
 
     public String getMybatisBasePackage() {

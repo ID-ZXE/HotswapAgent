@@ -29,6 +29,7 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
 import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
@@ -277,13 +278,25 @@ public class MyBatisRefreshCommands {
     }
 
     private static List<Configuration> getAllConfiguration() {
-        try {
-            Class<?> sqlSessionFactoryClz = Class.forName("org.apache.ibatis.session.defaults.DefaultSqlSessionFactory", true, AllExtensionsManager.getInstance().getClassLoader());
-            Field staticConfiguration = sqlSessionFactoryClz.getDeclaredField("_staticConfiguration");
-            return (ArrayList<Configuration>) staticConfiguration.get(null);
-        } catch (Exception e) {
-            return new ArrayList<>();
+        Set<Object> beanFactorySet = AllExtensionsManager.getInstance().getBeanFactorySet();
+        if (CollectionUtils.isEmpty(beanFactorySet)) {
+            try {
+                Class<?> sqlSessionFactoryClz = Class.forName("org.apache.ibatis.session.defaults.DefaultSqlSessionFactory", true, AllExtensionsManager.getInstance().getClassLoader());
+                Field staticConfiguration = sqlSessionFactoryClz.getDeclaredField("_staticConfiguration");
+                return (ArrayList<Configuration>) staticConfiguration.get(null);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
         }
+
+        List<Configuration> result = new ArrayList<>();
+        beanFactorySet.forEach(beanFactory -> {
+            Map<String, SqlSessionFactory> sqlSessionFactoryMap = (Map<String, SqlSessionFactory>) ReflectionHelper.invoke(beanFactory, beanFactory.getClass(), "getBeansOfType", new Class[]{Class.class}, SqlSessionFactory.class);
+            sqlSessionFactoryMap.values().stream().forEach(sqlSessionFactory -> {
+                result.add(sqlSessionFactory.getConfiguration());
+            });
+        });
+        return result;
     }
 
 }
