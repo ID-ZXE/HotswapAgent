@@ -90,6 +90,15 @@ public class MyBatisPlugin {
         }
     }
 
+    @OnClassLoadEvent(classNameRegexp = ".*", events = {LoadEvent.REDEFINE})
+    public void registerNewClassListeners(Class<?> clazz) {
+        if (isMybatisMapper(clazz)) {
+            LOGGER.info("发现新增MyBatis Mapper 开始LOAD:{}", clazz.getName());
+            Command command = new ReflectionCommand(this, MyBatisRefreshCommands.class.getName(), "refreshNewMapperClass", appClassLoader, clazz);
+            scheduler.scheduleCommand(command, 500);
+        }
+    }
+
     private static boolean isMybatisMapper(Class<?> clazz) {
         String mybatisBasePackage = AllExtensionsManager.getInstance().getMybatisBasePackage();
         if (StringUtils.isEmpty(mybatisBasePackage)) {

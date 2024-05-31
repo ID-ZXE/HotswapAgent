@@ -6,6 +6,7 @@ import org.hotswap.agent.javassist.util.proxy.ProxyFactory;
 import org.hotswap.agent.util.ReflectionHelper;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,10 @@ public class SpringMybatisConfigurationProxy {
 
     public SpringMybatisConfigurationProxy(Object sqlSessionFactoryBean) {
         this.sqlSessionFactoryBean = sqlSessionFactoryBean;
+    }
+
+    public static Collection<SpringMybatisConfigurationProxy> getAllConfigurationProxy() {
+        return proxiedConfigurations.values();
     }
 
     public static SpringMybatisConfigurationProxy getWrapper(Object sqlSessionFactoryBean) {
@@ -65,6 +70,7 @@ public class SpringMybatisConfigurationProxy {
         return proxyInstance;
     }
 
-
-
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 }

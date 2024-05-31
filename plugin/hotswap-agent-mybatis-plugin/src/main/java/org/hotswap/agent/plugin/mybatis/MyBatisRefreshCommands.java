@@ -19,7 +19,6 @@
 package org.hotswap.agent.plugin.mybatis;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.binding.MapperProxyFactory;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -32,7 +31,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.hotswap.agent.logging.AgentLogger;
 import org.hotswap.agent.manager.AllExtensionsManager;
-import org.hotswap.agent.plugin.mybatis.proxy.ConfigurationProxy;
+import org.hotswap.agent.plugin.mybatis.proxy.SpringMybatisConfigurationProxy;
 import org.hotswap.agent.util.ReflectionHelper;
 import org.hotswap.agent.util.spring.util.CollectionUtils;
 import org.hotswap.agent.util.spring.util.ReflectionUtils;
@@ -42,7 +41,6 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -125,9 +123,6 @@ public class MyBatisRefreshCommands {
         if (clazz == null || !clazz.isInterface()) {
             return;
         }
-        if (Objects.isNull(clazz.getAnnotation(Mapper.class)) && Objects.isNull(clazz.getAnnotation(Repository.class))) {
-            return;
-        }
         if (null == mapperScanner) {
             return;
         }
@@ -148,9 +143,6 @@ public class MyBatisRefreshCommands {
     }
 
     private static void registerBeanDefinition(BeanDefinitionHolder holder) {
-        if (null == mapperScanner) {
-            return;
-        }
         try {
             Set<BeanDefinitionHolder> holders = new HashSet<>();
             holders.add(holder);
@@ -278,7 +270,7 @@ public class MyBatisRefreshCommands {
     }
 
     private static List<Configuration> getAllConfiguration() {
-        List<Configuration> collect = ConfigurationProxy.getAllConfigurationProxy().stream().map(ConfigurationProxy::getConfiguration)
+        List<Configuration> collect = SpringMybatisConfigurationProxy.getAllConfigurationProxy().stream().map(SpringMybatisConfigurationProxy::getConfiguration)
                 .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(collect)) {
             return collect;
