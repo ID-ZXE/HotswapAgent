@@ -100,7 +100,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         if (packageDeclarationOptional.isPresent()) {
             PackageDeclaration packageDeclaration = packageDeclarationOptional.get();
             // 改写package
-            packageDeclaration.setName(AllExtensionsManager.getInstance().getSpringbootBasePackage());
+            packageDeclaration.setName(AllExtensionsManager.getInstance().getSpringbootBasePackage() + ".test");
         }
         LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "单测执行时间过长会导致IDEA插件端接口超时，若超时请前往服务器自行查看日志");
         LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + "超时时间为2min");
@@ -111,9 +111,7 @@ public class RemoteTestServlet extends AbstractHttpServlet {
         while (importIterator.hasNext()) {
             ImportDeclaration importDeclaration = importIterator.next();
             String importName = importDeclaration.getNameAsString();
-            if (importName.startsWith("org.junit")
-                    || importName.startsWith("org.springframework.boot.test")
-                    || importName.startsWith("org.springframework.test")) {
+            if (importName.startsWith("org.junit") || importName.startsWith("org.springframework.boot.test") || importName.startsWith("org.springframework.test")) {
                 importIterator.remove();
             }
         }
@@ -171,9 +169,9 @@ public class RemoteTestServlet extends AbstractHttpServlet {
             indexMethod.setType(StaticJavaParser.parseType("void"));
             indexMethod.addThrownException(StaticJavaParser.parseClassOrInterfaceType("java.lang.Exception"));
             StringBuilder body = new StringBuilder("{");
-            body.append("Thread thread = new Thread(new Runnable() {\n" +
-                    "                @Override\n" +
-                    "                public void run() {");
+            body.append("if(!org.hotswap.agent.manager.AgentLogManager.getInstance().isRemoteTesting()){return;}");
+            body.append("Thread thread = new Thread(new Runnable() {\n" + "                @Override\n" + "                public void run() {");
+            body.append("org.hotswap.agent.watch.nio.EventDispatcher.openRemoteTestLog();");
             for (String s : method) {
                 body.append("try {");
                 body.append(s).append("()").append(";");
@@ -181,9 +179,8 @@ public class RemoteTestServlet extends AbstractHttpServlet {
                 body.append("e.printStackTrace();");
                 body.append("}");
             }
-            body.append("}});\n" +
-                    "            thread.start();" +
-                    "            thread.join(2 * 60 * 1000);");
+            body.append("org.hotswap.agent.watch.nio.EventDispatcher.closeRemoteTestChannel();");
+            body.append("}});\n" + "            thread.start();" + "            thread.join(2 * 60 * 1000);");
             body.append("}");
 
             BlockStmt blockStmt = StaticJavaParser.parseBlock(body.toString());

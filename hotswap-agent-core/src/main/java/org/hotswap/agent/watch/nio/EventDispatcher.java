@@ -52,6 +52,8 @@ public class EventDispatcher implements Runnable {
 
     private final AtomicBoolean CHANNEL = new AtomicBoolean(false);
 
+    private static final ThreadLocal<Boolean> REMOTE_TEST_LOG_ENABLE = new ThreadLocal<>();
+
     private CountDownLatch countDownLatch;
 
     /**
@@ -105,6 +107,18 @@ public class EventDispatcher implements Runnable {
     public EventDispatcher(Map<Path, List<WatchEventListener>> listeners) {
         super();
         this.listeners = listeners;
+    }
+
+    public static boolean remoteTestLogIsOpen() {
+        return Boolean.TRUE.equals(REMOTE_TEST_LOG_ENABLE.get());
+    }
+
+    public static void openRemoteTestLog() {
+        REMOTE_TEST_LOG_ENABLE.set(true);
+    }
+
+    public static void closeRemoteTestChannel() {
+        REMOTE_TEST_LOG_ENABLE.set(false);
     }
 
     public void openChannel() {

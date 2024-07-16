@@ -21,6 +21,7 @@ package org.hotswap.agent.plugin.spring.reload;
 import org.apache.dubbo.config.annotation.Service;
 import org.hotswap.agent.constants.HotswapConstants;
 import org.hotswap.agent.logging.AgentLogger;
+import org.hotswap.agent.plugin.spring.SpringConstants;
 import org.hotswap.agent.plugin.spring.core.*;
 import org.hotswap.agent.plugin.spring.files.PropertyReload;
 import org.hotswap.agent.plugin.spring.files.XmlBeanDefinitionScannerAgent;
@@ -32,6 +33,7 @@ import org.hotswap.agent.plugin.spring.transformers.support.MybatisSupport;
 import org.hotswap.agent.plugin.spring.utils.ResourceUtils;
 import org.hotswap.agent.util.AnnotationHelper;
 import org.hotswap.agent.util.spring.util.ClassUtils;
+import org.hotswap.agent.util.spring.util.CollectionUtils;
 import org.hotswap.agent.util.spring.util.ObjectUtils;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -345,10 +347,16 @@ public class SpringBeanReload {
                         nameSet.addAll(Arrays.asList(names1));
                     }
 
-                    for (Class<?> anInterface : clazz.getInterfaces()) {
-                        String[] names2 = beanFactory.getBeanNamesForType(anInterface);
-                        if (names2.length != 0) {
-                            Collections.addAll(nameSet, names2);
+                    if (CollectionUtils.isEmpty(nameSet)) {
+                        for (Class<?> anInterface : clazz.getInterfaces()) {
+                            if (SpringConstants.ignore(anInterface.getName())) {
+                                continue;
+                            }
+                            String[] names2 = beanFactory.getBeanNamesForType(anInterface);
+                            if (names2.length != 0) {
+                                LOGGER.info("发现interface:{}存在Bean", anInterface.getName());
+                                Collections.addAll(nameSet, names2);
+                            }
                         }
                     }
 
@@ -452,10 +460,16 @@ public class SpringBeanReload {
                 nameSet.addAll(Arrays.asList(names1));
             }
 
-            for (Class<?> anInterface : clazz.getInterfaces()) {
-                String[] names2 = beanFactory.getBeanNamesForType(anInterface);
-                if (names2.length != 0) {
-                    Collections.addAll(nameSet, names2);
+            if (CollectionUtils.isEmpty(nameSet)) {
+                for (Class<?> anInterface : clazz.getInterfaces()) {
+                    if (SpringConstants.ignore(anInterface.getName())) {
+                        continue;
+                    }
+                    String[] names2 = beanFactory.getBeanNamesForType(anInterface);
+                    if (names2.length != 0) {
+                        LOGGER.info("发现interface:{}存在Bean", anInterface.getName());
+                        Collections.addAll(nameSet, names2);
+                    }
                 }
             }
 

@@ -308,16 +308,6 @@ public class SpringPlugin {
                 "}");
     }
 
-    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
-    public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
-        String src = "{" + "{if(" + MybatisSupport.class.getName() + ".CONFLICT_MAPPER_BEANS.contains($1))" +
-                "{System.out.println($1 + \"MyBatis $1 checkCandidate return true\");return true;}}" +
-                "}";
-        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
-        method.insertBefore(src);
-    }
-
-
     // todo 验证有效性
     @OnClassLoadEvent(classNameRegexp = "org.springframework.beans.factory.support.AbstractBeanFactory")
     public static void patchPredictBeanType(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
@@ -346,6 +336,18 @@ public class SpringPlugin {
         } catch (Exception e) {
             LOGGER.error("patchMapperScannerRegistrar err", e);
         }
+    }
+
+    @OnClassLoadEvent(classNameRegexp = "org.mybatis.spring.mapper.ClassPathMapperScanner")
+    public static void patchMyBatisClassPathMapperScanner(CtClass ctClass, ClassPool classPool) throws NotFoundException, CannotCompileException {
+        String src = "{" + "{if(" + MybatisSupport.class.getName() + ".CONFLICT_MAPPER_BEANS.contains($1))" +
+                "{System.out.println($1 + \"MyBatis $1 checkCandidate return true\");return true;}}" +
+                "}";
+        CtMethod method = ctClass.getDeclaredMethod("checkCandidate");
+        method.insertBefore(src);
+
+        CtConstructor constructor = ctClass.getDeclaredConstructor(new CtClass[]{classPool.get("org.springframework.beans.factory.support.BeanDefinitionRegistry")});
+        constructor.insertAfter("{org.hotswap.agent.plugin.mybatis.MyBatisRefreshCommands.loadScanner(this);}");
     }
 
 }

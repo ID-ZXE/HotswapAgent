@@ -146,7 +146,8 @@ public class MyBatisRefreshCommands {
         try {
             Set<BeanDefinitionHolder> holders = new HashSet<>();
             holders.add(holder);
-            Method method = Class.forName("org.mybatis.spring.mapper.ClassPathMapperScanner").getDeclaredMethod("processBeanDefinitions", Set.class);
+            Method method = Class.forName("org.mybatis.spring.mapper.ClassPathMapperScanner")
+                    .getDeclaredMethod("processBeanDefinitions", Set.class);
             boolean isAccess = method.isAccessible();
             method.setAccessible(true);
             method.invoke(mapperScanner, holders);

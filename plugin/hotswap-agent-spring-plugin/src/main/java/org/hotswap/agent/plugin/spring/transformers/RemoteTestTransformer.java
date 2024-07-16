@@ -1,5 +1,7 @@
 package org.hotswap.agent.plugin.spring.transformers;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.hotswap.agent.annotation.LoadEvent;
 import org.hotswap.agent.annotation.OnClassLoadEvent;
 import org.hotswap.agent.constants.HotswapConstants;
@@ -10,6 +12,17 @@ import org.hotswap.agent.util.JsonUtils;
 public class RemoteTestTransformer {
 
     private static final AgentLogger LOGGER = AgentLogger.getLogger(RemoteTestTransformer.class);
+
+    @OnClassLoadEvent(classNameRegexp = "ch.qos.logback.classic.Logger", events = LoadEvent.DEFINE)
+    public static void patchLogger(ClassLoader appClassLoader, CtClass clazz, ClassPool classPool) {
+        try {
+            CtMethod callAppenders = clazz.getDeclaredMethod("callAppenders");
+            callAppenders.insertBefore("if(org.hotswap.agent.watch.nio.EventDispatcher.remoteTestLogIsOpen()) " +
+                    "{" + RemoteTestTransformer.class.getName() + ".remoteInfoLog($1);}");
+        } catch (Exception e) {
+            LOGGER.error("远程单元测试增加日志切面失败");
+        }
+    }
 
     @OnClassLoadEvent(classNameRegexp = ".*Test.*", events = LoadEvent.REDEFINE)
     public static void addRemoteExecuteLog(ClassLoader appClassLoader, CtClass clazz,
@@ -55,6 +68,20 @@ public class RemoteTestTransformer {
             LOGGER.error("patch remote test error", e);
         }
         // LOGGER.info("patch remote test success {}", clazz.getName());
+    }
+
+    public static void remoteInfoLog(ILoggingEvent event) {
+        if (event.getLevel().equals(Level.INFO)) {
+            LOGGER.info(HotswapConstants.REMOTE_TEST_TAG + event.getFormattedMessage());
+        } else if (event.getLevel().equals(Level.ERROR)) {
+            LOGGER.error(HotswapConstants.REMOTE_TEST_TAG + event.getFormattedMessage());
+        } else if (event.getLevel().equals(Level.WARN)) {
+            LOGGER.warning(HotswapConstants.REMOTE_TEST_TAG + event.getFormattedMessage());
+        } else if (event.getLevel().equals(Level.DEBUG)) {
+            LOGGER.debug(HotswapConstants.REMOTE_TEST_TAG + event.getFormattedMessage());
+        } else if (event.getLevel().equals(Level.TRACE)) {
+            LOGGER.trace(HotswapConstants.REMOTE_TEST_TAG + event.getFormattedMessage());
+        }
     }
 
     public static void remoteInfoLog(String message) {
